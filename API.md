@@ -4,7 +4,7 @@
 
 Ce document est le contrat des routes que Sésame expose et des routes que le client doit exposer à Sésame (la passerelle). L'OpenAPI, les vecteurs de test et le double local `sesame-fake` (étape 2 du plan de construction) en dérivent ; en cas d'écart, ce document se corrige d'abord.
 
-Les valeurs marquées **proposition** ne sont pas fixées par la spécification de référence : elles sont proposées ici pour que le contrat soit complet, et seront confirmées ou corrigées avec l'OpenAPI.
+Les limites de débit du §6 sont des valeurs initiales, à ajuster avec les mesures de l'étape 2 ; tout le reste est fixé par la spécification de référence.
 
 ## 1. Conventions
 
@@ -92,7 +92,7 @@ Preuve de vie. Appelée par l'app à chaque déverrouillage, au plus une fois pa
  "transmis": false}
 ```
 
-`transmis` (**proposition**) vaut `true` quand au moins une ouverture a eu lieu après `transmissibleLe` : l'app affiche alors le cas « téléphone retrouvé », traité par le support.
+`transmis` vaut `true` quand au moins une ouverture a eu lieu après `transmissibleLe` : l'app affiche alors le cas « téléphone retrouvé », traité par le support.
 
 **Erreurs** : `404 titulaire_inconnu`, `400 message_refuse` (tag GCM invalide : mauvaise KTS ou mauvais uid), `400 horodatage_invalide`, `409 nonce_rejoue`.
 
@@ -146,7 +146,7 @@ Le proche saisit le dernier code reçu par SMS ou email.
 {"jeton": "<JWT ES256>", "scope": "destine" | "elargi", "role": "proche" | "gardien", "expireLe": "<ISO>", "prenom": "<prénom de la charte>", "titulaireAffiche": "<nom du titulaire>"}
 ```
 
-`prenom` et `titulaireAffiche` (**proposition**) servent à l'affichage du portail (« Bonjour Léa ») ; ils viennent de la charte, pas du client.
+`prenom` et `titulaireAffiche` servent à l'affichage du portail (« Bonjour Léa ») ; ils viennent de la charte, pas du client.
 
 **Erreurs** : `404 session_inconnue`, `401 session_expiree`, `401 otp_refuse` (`details.essaisRestants`), `429 trop_d_essais` (`details.reessayerLe`), `409 parcours_invalide` (session en parcours « courrier »), `502 fournisseur_indisponible`.
 
@@ -171,7 +171,7 @@ Ouvre les enveloppes du proche authentifié. Les enveloppes viennent du client (
  "enveloppes": [{"type": "fichier" | "motdepasse", "id": "<contentId>", "contactId": "<id>", "enveloppe": "<base64, 48 octets>", "iv": "<base64, 12 octets>"}]}
 ```
 
-**Traitement** : session valide ; descelle KTS ; pour chaque enveloppe, reconstruit `aad_env` avec `uid`, `type`, `id`, `contactId`, `ktsGeneration` du registre et exige `contactId == session.contactId` (scope `destine`) ou `contactId` quelconque (scope `elargi`) ; ouvre sous `KTS_env` ; efface KTS après la réponse. Au plus **500 enveloppes par appel** (**proposition**, comme la borne du client pour destiner).
+**Traitement** : session valide ; descelle KTS ; pour chaque enveloppe, reconstruit `aad_env` avec `uid`, `type`, `id`, `contactId`, `ktsGeneration` du registre et exige `contactId == session.contactId` (scope `destine`) ou `contactId` quelconque (scope `elargi`) ; ouvre sous `KTS_env` ; efface KTS après la réponse. Au plus **500 enveloppes par appel**, comme la borne du client pour destiner.
 
 **Réponse `200`** (sous le canal : les clés ne sont lisibles que par le navigateur) :
 
@@ -181,7 +181,7 @@ Ouvre les enveloppes du proche authentifié. Les enveloppes viennent du client (
  "jeton": "<JWT ES256 renouvelé>", "expireLe": "<ISO>"}
 ```
 
-Une enveloppe refusée (AAD étranger, tag invalide) n'empêche pas les autres (**proposition**). Le jeton renouvelé (**proposition**) matérialise « 1 h d'inactivité » : chaque appel réussi prolonge la session ; sans appel pendant 1 h, elle expire.
+Une enveloppe refusée (AAD étranger, tag invalide) n'empêche pas les autres. Le jeton renouvelé matérialise « 1 h d'inactivité » : chaque appel réussi prolonge la session ; sans appel pendant 1 h, elle expire.
 
 **Erreurs** : `404 session_inconnue`, `401 session_expiree`, `400 requete_invalide` (plus de 500 enveloppes, forme), `429 trop_d_appels`.
 
@@ -193,7 +193,7 @@ Une enveloppe refusée (AAD étranger, tag invalide) n'empêche pas les autres (
 
 Réservé au contact de confiance authentifié (`role == gardien`).
 
-**Corps** : `{"sessionId": "<id>"}`. **Traitement** : crée `signalements/{id}` (`source: gardien`, `signaleLe = now`, `transmissibleLe = now + 7 j`) ; s'il existe déjà un signalement non annulé, le renvoie sans en créer un second (**proposition**) ; notifie `deathSignaled` au client (§3.3).
+**Corps** : `{"sessionId": "<id>"}`. **Traitement** : crée `signalements/{id}` (`source: gardien`, `signaleLe = now`, `transmissibleLe = now + 7 j`) ; s'il existe déjà un signalement non annulé, le renvoie sans en créer un second ; notifie `deathSignaled` au client (§3.3).
 
 **Réponse `200`** : `{"signalementId": "<id>", "signaleLe": "<ISO>", "transmissibleLe": "<ISO>", "recu": "<JWS, §4.2>"}`.
 
@@ -211,7 +211,7 @@ Réservé au contact de confiance authentifié. **Corps** : `{"sessionId": "<id>
 {"jeton": "<OIDC du compte de service du client>", "uid": "<uid>", "source": "insee" | "admin", "preuve": "<référence opaque conservée au registre, ≤ 1 Kio>"}
 ```
 
-**Traitement** : vérifie le jeton OIDC (signature Google, `aud`, `exp`, `email` = compte de service configuré) ; crée le signalement avec **la date de Sésame** ; s'il existe déjà un signalement non annulé, le renvoie (**proposition**).
+**Traitement** : vérifie le jeton OIDC (signature Google, `aud`, `exp`, `email` = compte de service configuré) ; crée le signalement avec **la date de Sésame** ; s'il existe déjà un signalement non annulé, le renvoie sans en créer un second.
 
 **Réponse `200`** : `{"signalementId": "<id>", "signaleLe": "<ISO>", "transmissibleLe": "<ISO>", "recu": "<JWS, §4.2>"}`.
 
@@ -225,7 +225,7 @@ Réservé au contact de confiance authentifié. **Corps** : `{"sessionId": "<id>
 
 Le client expose une passerelle HTTPS que seule une enclave attestée peut appeler. Son adresse est une variable attestée de Sésame. Fatoom l'implémente par une Cloud Function ; les noms de routes ci-dessous sont ceux de son contrat.
 
-### 3.1 Authentification des appels de Sésame (**proposition**)
+### 3.1 Authentification des appels de Sésame
 
 Chaque appel porte quatre en-têtes :
 
@@ -278,7 +278,7 @@ Toute notification est idempotente côté client sur `X-Sesame-Request-Id` ; Sé
 
 ## 4. Jetons signés par Sésame
 
-Les deux jetons sont signés par la clé KMS `session-sign` (ECDSA P-256, SHA-256) ; la clé publique est épinglée par le client. Claims **proposition**.
+Les deux jetons sont signés par la clé KMS `session-sign` (ECDSA P-256, SHA-256) ; la clé publique est épinglée par le client.
 
 ### 4.1 Jeton de session (JWT, `alg: ES256`)
 
@@ -333,7 +333,7 @@ Le client le conserve pour prévenir le titulaire ; il ne lui donne aucun droit 
 
 Spécifiées : **5 essais puis blocage 15 min** pour le code d'accès et le dernier code ; **3 échecs puis blocage 24 h** pour l'identité ; preuve de vie refusée hors `± 10 min` et nonce rejoué dans la journée ; session de portail expirée après **1 h** d'inactivité.
 
-**Proposition** pour le reste, à confirmer avec l'OpenAPI :
+Valeurs initiales pour le reste, à ajuster avec les mesures de l'étape 2 :
 
 | Route | Limite | Clé |
 |---|---|---|
