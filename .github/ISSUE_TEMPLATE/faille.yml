@@ -1,0 +1,81 @@
+name: Faille (déjà signalée ou publiée)
+description: Pour une faille DÉJÀ signalée par le canal privé de SECURITY.md et dont nous avons convenu ensemble du traitement public. Jamais pour un premier signalement.
+title: "Faille : <résumé neutre, sans détail exploitable>"
+labels: ["sécurité"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Arrêtez-vous ici si c'est un premier signalement.** Une faille se signale d'abord en privé : adresse et délais dans `SECURITY.md`. Une issue publique ne protège personne et expose les titulaires le temps du correctif.
+
+        Ce gabarit sert après coup : la faille est corrigée et en service, ou nous avons convenu ensemble qu'elle pouvait être traitée en public (par exemple un écart entre un document et le code, sans exploitation possible).
+  - type: checkboxes
+    id: prealable
+    attributes:
+      label: Préalable
+      options:
+        - label: J'ai signalé cette faille à support@fatoom.fr et nous avons convenu de son traitement public.
+          required: true
+        - label: Cette issue ne contient aucun détail qui permettrait d'exploiter la faille avant son correctif.
+          required: true
+  - type: input
+    id: reference
+    attributes:
+      label: Référence du signalement privé
+      description: La date de votre email, ou la référence que nous vous avons donnée.
+      placeholder: "2026-11-03, [Sésame] …"
+    validations:
+      required: true
+  - type: dropdown
+    id: zone
+    attributes:
+      label: Zone concernée
+      options:
+        - Attestation et vérification des claims
+        - Canal chiffré (clé de session, compteur, AAD)
+        - Libération des clés (KMS, condition IAM)
+        - Registre (générations, signalements, preuves de vie)
+        - Protocoles du portail (code, dernier code, identité, enveloppes)
+        - Lettre et code d'invitation
+        - Manifeste et build reproductible
+        - Journalisation
+        - Passerelle (appels de Sésame vers le client)
+        - Écart entre un document et le code
+        - Autre
+    validations:
+      required: true
+  - type: dropdown
+    id: contredit
+    attributes:
+      label: Ce que la faille contredit
+      description: La ligne de THREAT_MODEL.md qui n'est plus vraie.
+      options:
+        - Une clé s'ouvre pour quelqu'un qui n'y a pas droit
+        - Une transmission avant 7 jours, ou malgré une preuve de vie
+        - Un code révoqué ouvre encore
+        - Une attestation acceptée à tort
+        - Une image non publiée obtient une clé
+        - Une fuite dans les journaux
+        - Un build non reproductible
+        - Autre
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description publique
+      description: Ce qui était vulnérable, dans quelles conditions, et ce que la version corrective change. Sans pas-à-pas d'exploitation.
+    validations:
+      required: true
+  - type: input
+    id: version-corrigee
+    attributes:
+      label: Version corrective
+      description: Le tag du manifeste qui corrige, s'il existe.
+      placeholder: v1.0.1
+  - type: checkboxes
+    id: credit
+    attributes:
+      label: Crédit
+      options:
+        - label: Je souhaite être nommé dans la publication (indiquez le nom dans la description).

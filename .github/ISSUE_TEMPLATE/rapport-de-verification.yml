@@ -1,0 +1,105 @@
+name: Rapport de vérification
+description: Vous avez reconstruit une version de Sésame et comparé son empreinte à celle publiée.
+title: "Vérification v<version> : <identique | différente>"
+labels: ["vérification"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci d'avoir vérifié Sésame. Un rapport **identique** compte autant qu'un rapport **différent** : il dit à tous qu'une personne de plus a reconstruit la version.
+        Les quatre étapes sont dans `README.md` ; le détail du build dans `RELEASE.md` §1.
+  - type: input
+    id: version
+    attributes:
+      label: Version vérifiée
+      description: Le tag Git, tel qu'il apparaît dans le manifeste.
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit
+      description: Sortie de `git rev-parse HEAD` après `git checkout v<version>`.
+      placeholder: "0123456789abcdef…"
+    validations:
+      required: true
+  - type: dropdown
+    id: tag
+    attributes:
+      label: Signature du tag
+      description: Résultat de `git tag -v v<version>`.
+      options:
+        - Valide (bonne signature de la clé de release publiée)
+        - Invalide ou clé inconnue
+        - Non vérifiée
+    validations:
+      required: true
+  - type: input
+    id: empreinte-obtenue
+    attributes:
+      label: Empreinte obtenue
+      description: Sortie de `./build/reproduire.sh v<version>`.
+      placeholder: "sha256:…"
+    validations:
+      required: true
+  - type: input
+    id: empreinte-publiee
+    attributes:
+      label: Empreinte publiée
+      description: La valeur `imageDigest` de cette version dans `manifeste.json`.
+      placeholder: "sha256:…"
+    validations:
+      required: true
+  - type: dropdown
+    id: resultat
+    attributes:
+      label: Résultat
+      options:
+        - Identique
+        - Différente
+        - La construction a échoué
+    validations:
+      required: true
+  - type: dropdown
+    id: manifeste
+    attributes:
+      label: Vérification du manifeste
+      description: Résultat de `./build/verifier-manifeste.sh`.
+      options:
+        - Signatures valides et ligne conforme
+        - Signatures valides, ligne non conforme
+        - Signatures invalides ou en nombre insuffisant
+        - Non exécutée
+    validations:
+      required: true
+  - type: textarea
+    id: environnement
+    attributes:
+      label: Environnement de construction
+      description: Système, architecture, version de `docker` ou `podman`, version de `git`. Indiquez si vous avez construit hors ligne ou derrière un proxy.
+      placeholder: |
+        Debian 12, x86_64
+        docker 26.1
+        git 2.43
+    validations:
+      required: true
+  - type: textarea
+    id: journal
+    attributes:
+      label: Journal de construction
+      description: Collez le contenu de `build/sortie/v<version>.log`, ou les dernières lignes si la construction a échoué. Comparez-le au journal officiel `manifeste/journaux/v<version>.log`.
+      render: text
+  - type: textarea
+    id: attestation
+    attributes:
+      label: Attestation (facultatif)
+      description: Si vous avez exécuté `./build/verifier-attestation.sh`, collez sa sortie (elle ne contient aucune donnée personnelle).
+      render: text
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: Ce rapport ne contient aucune faille non publiée (sinon, voir SECURITY.md).
+          required: true

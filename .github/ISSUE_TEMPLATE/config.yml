@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Signaler une faille (canal privé)
+    url: https://github.com/Fatoom-Heritage-Numerique/sesame/blob/main/SECURITY.md
+    about: Une faille ne se signale pas dans une issue publique. SECURITY.md donne l'adresse et les délais de réponse.
+  - name: Comprendre Sésame
+    url: https://github.com/Fatoom-Heritage-Numerique/sesame/blob/main/README.md
+    about: Ce que Sésame fait, ne fait pas, et comment le vérifier en 4 étapes.

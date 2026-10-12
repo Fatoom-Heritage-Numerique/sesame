@@ -1,0 +1,16 @@
+# Les propriétaires revoient et approuvent toute PR. Les fichiers listés
+# ci-dessous sont des zones critiques : aucune fusion sans leur accord explicite
+# (CONTRIBUTING.md, « Ce qu'une PR contient »).
+
+*                       @Fatoom-Heritage-Numerique/equipe-securite
+
+ARCHITECTURE.md         @Fatoom-Heritage-Numerique/equipe-securite
+API.md                  @Fatoom-Heritage-Numerique/equipe-securite
+THREAT_MODEL.md         @Fatoom-Heritage-Numerique/equipe-securite
+RELEASE.md              @Fatoom-Heritage-Numerique/equipe-securite
+SECURITY.md             @Fatoom-Heritage-Numerique/equipe-securite
+CODEOWNERS              @Fatoom-Heritage-Numerique/equipe-securite
+manifeste.json          @Fatoom-Heritage-Numerique/equipe-securite
+manifeste/              @Fatoom-Heritage-Numerique/equipe-securite
+docs/decisions/         @Fatoom-Heritage-Numerique/equipe-securite
+.github/                @Fatoom-Heritage-Numerique/equipe-securite
