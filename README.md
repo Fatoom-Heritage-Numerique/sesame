@@ -8,6 +8,22 @@ Fatoom est un coffre-fort numérique : fichiers et mots de passe chiffrés sur l
 
 Sésame est conçu comme un service générique de garde de clés de transmission. Fatoom en est le premier client ; `ARCHITECTURE.md` et `API.md` décrivent le service indépendamment de lui.
 
+## Où lire quoi
+
+Ce dépôt ne contient pas de cahier des charges ni de document technique uniques : la spécification de référence est tenue par l'opérateur, et chaque document ici en reprend une partie, pour un lecteur précis. En langage courant :
+
+| Vous voulez savoir… | Lisez |
+|---|---|
+| ce que Sésame fait, ne fait pas, et comment le vérifier | cette page |
+| contre qui il protège, et ce qu'il ne protège pas (sans détour) | `THREAT_MODEL.md` |
+| pourquoi il est fait comme ça, et ce qu'on a écarté | `docs/decisions/` (un fichier par décision) |
+| comment il fonctionne, étape par étape | `ARCHITECTURE.md` |
+| ce que Sésame et le client s'envoient exactement | `API.md` |
+| comment une version est construite, signée et publiée | `RELEASE.md` |
+| comment contribuer, comment signaler une faille | `CONTRIBUTING.md`, `SECURITY.md` |
+
+Les trois premiers disent le **quoi** et le **pourquoi** ; les trois suivants disent le **comment**. Chaque fichier commence par un commentaire qui indique la section de la spécification dont il dérive, pour que les deux restent alignés.
+
 ## Pour qui
 
 - **Les utilisateurs de Fatoom**, qui veulent comprendre à quoi sert Sésame et ce qu'il ne fera jamais : cette page, puis `THREAT_MODEL.md`.
