@@ -2,7 +2,7 @@
 
 # 0008 · Lettre au proche sans téléphone ni email et vérification d'identité menées par Sésame
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur : « tout sur Sésame, en réduisant au maximum la taille du code ») · Résout la question Q-30 du client
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur : « tout sur Sésame, en réduisant au maximum la taille du code ») · Résout la question Q-30 du client · **revue depuis** : compte Pingen distinct, identité sur trois champs obligatoires comparés avec tolérance, bascule vers l'identité quand les coordonnées ne fonctionnent plus, lettre de secours ; l'état actuel est dans `ARCHITECTURE.md`
 
 ## Contexte et menace
 

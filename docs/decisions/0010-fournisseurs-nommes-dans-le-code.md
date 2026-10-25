@@ -2,7 +2,7 @@
 
 # 0010 · Fournisseurs nommés dans le code, réglages du client en variables attestées, clés d'API dans Secret Manager
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur)
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** : réglages du client en `env_override` dont tout le dictionnaire est exigé par la condition KMS, textes longs dans des fichiers de l'image ; plus de délai de 7 jours ([0014](0014-liste-des-versions-compilee.md))
 
 ## Contexte et menace
 

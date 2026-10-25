@@ -1,20 +1,18 @@
-<!-- Source : fatoom-app docs/TRD.md §16.3.2, §16.5.5, §16.8.4, §16.10 (« Clé de release », « Publier une version ») -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/TRD.md §16.3.1, §16.3.2, §16.3.4, §16.3.8, §16.5.5, §16.8.4, §16.10 (état du 2026-10-26) -->
 
 # Publier une version de Sésame
 
-> **État du document (2026-10-26) : en retard sur la spécification.** Ce texte décrit la conception du 2026-10-12. La spécification qui fait foi est `docs/TRD.md` §16 du dépôt `Fatoom-Heritage-Numerique/Fatoom` ; ce document est à réécrire avant toute publication du dépôt (TRD §16.10). Ont changé depuis, entre autres : plus de manifeste signé, de clé de release ni de délai de 7 jours avant une mise en service (liste `versions.json` compilée dans les clients, mise à jour forcée, TRD §16.5.5) ; matériel AMD SEV, pas SEV-SNP (Intel TDX en option, §16.3.1) ; un seul administrateur (§16.9 #2) ; canaux d'envoi croisés (§16.9 #13) ; plus d'accès élargi ; annulation explicite d'un signalement et transmission sur décès définitive après l'échéance (§16.5.3) ; signe de vie, transmission par inactivité (§16.5.10) ; protocole de PIN sur une grappe de trois VM à majorité (§16.3.9) ; canal hybride X25519 + ML-KEM-768 (§16.3.5) ; registre en ajout seul signé par `registre-sign`, borne publique (§16.3.6, §16.3.8) ; alertes envoyées par Sésame (§16.5.11) ; index du code d'accès étiré par Argon2id et calculé par le client (§16.4.4).
-
-Une version de Sésame n'existe que si elle figure dans le manifeste, signé sur une clé matérielle et publié **7 jours avant** sa mise en service. Tant qu'une empreinte n'est pas `en_service` dans le manifeste, aucun client ne lui parle et KMS ne lui libère aucune clé. Il n'y a pas de voie rapide : un correctif attend 7 jours, les transmissions patientent. Une version se retire, elle, immédiatement.
+Une version de Sésame n'est acceptée que si elle figure dans `versions.json`, à la racine de ce dépôt, avec le statut `en_service`, **et** dans une version du client qui l'a compilée. Les clients ne téléchargent aucune liste et ne vérifient aucune signature : la liste fait partie de leur propre code. Il n'y a pas de délai d'annonce. La revue des boutiques et l'historique public de ce dépôt en tiennent lieu (`THREAT_MODEL.md` §2, limite 12). Une version se retire immédiatement.
 
 ## 1. Build reproductible
 
 Le but : quiconque reconstruit la version `vX.Y.Z` obtient **la même empreinte d'image**, caractère pour caractère, que celle publiée. Ce qui le garantit :
 
-- un binaire Go statique, construit avec `-trimpath`, sans CGO, horodatages figés par `SOURCE_DATE_EPOCH` (la date du commit du tag) ;
-- des dépendances verrouillées par somme de contrôle (`go.sum`, `GOFLAGS=-mod=readonly`) ;
+- un binaire Go statique, construit avec `-trimpath`, horodatages figés par `SOURCE_DATE_EPOCH` ;
+- des dépendances verrouillées par somme de contrôle (`go.sum`) ;
 - une image de base `gcr.io/distroless/static-debian12` épinglée **par digest**, jamais par tag ;
-- un conteneur de build lui-même épinglé par digest (image Go officielle), de sorte que la version de Go et de la chaîne de compilation ne dépendent pas de la machine ;
-- un `Dockerfile` multi-étapes sans étape réseau autre que le téléchargement des modules vérifiés par `go.sum`.
+- un conteneur de build lui-même épinglé par digest, de sorte que la version de Go et de la chaîne de compilation ne dépendent pas de la machine ;
+- un `Dockerfile` multi-étapes.
 
 ### 1.1 Reconstruire
 
@@ -22,27 +20,27 @@ Le but : quiconque reconstruit la version `vX.Y.Z` obtient **la même empreinte 
 git clone https://github.com/Fatoom-Heritage-Numerique/sesame
 cd sesame
 git checkout vX.Y.Z
-git tag -v vX.Y.Z                      # tag signé par la clé de release (§3)
+git tag -v vX.Y.Z                      # tag signé par une clé SSH (§3)
 ./build/reproduire.sh vX.Y.Z           # construit, puis affiche sha256:<empreinte>
 ```
 
-Le script n'a besoin que de `docker` (ou `podman`) et de `git`. Il refuse de construire une arborescence modifiée ou un tag non signé. Son journal complet est écrit dans `build/sortie/vX.Y.Z.log` ; le dépôt publie, pour chaque version mise en service, le journal de la construction officielle dans `manifeste/journaux/vX.Y.Z.log`, à comparer au vôtre.
+Le script n'a besoin que de `docker` (ou `podman`) et de `git`. Le dépôt publie, pour chaque version, le journal de la construction reproductible officielle, à comparer au vôtre ; son emplacement est fixé avec le script de build.
 
 ### 1.2 Double construction en CI
 
-La CI construit chaque tag **deux fois, sur deux exécuteurs distincts**, et échoue si les deux digests diffèrent. Une version dont la construction n'est pas reproductible n'entre pas au manifeste.
+La CI construit chaque tag **deux fois, sur deux exécuteurs distincts**, et échoue si les deux digests diffèrent. Une version dont la construction n'est pas reproductible n'entre pas dans `versions.json`.
 
 ### 1.3 Comparer
 
 ```bash
-./build/verifier-manifeste.sh manifeste.json vX.Y.Z sha256:<empreinte obtenue>
+jq -r '.versions[] | select(.tag == "vX.Y.Z") | .imageDigest' versions.json
 ```
 
-Vérifie les signatures du manifeste (§3) avec les clés publiques du dépôt, puis que la ligne `vX.Y.Z` porte exactement cette empreinte. Un écart se signale avec le gabarit d'issue « Rapport de vérification ».
+L'empreinte affichée doit être celle que vous avez obtenue. Un écart se signale avec le gabarit d'issue « Rapport de vérification ».
 
-## 2. Le manifeste : `manifeste.json`
+## 2. La liste des versions : `versions.json`
 
-Format exact, à la racine du dépôt et publié par le client sur sa page de transparence (pour Fatoom : `https://fatoom.fr/sesame/manifeste.json`) :
+Format exact, à la racine du dépôt, sur la branche `main` protégée :
 
 ```json
 {
@@ -51,20 +49,16 @@ Format exact, à la racine du dépôt et publié par le client sur sa page de tr
     {
       "version": "1.2.0",
       "imageDigest": "sha256:…",
-      "imageReference": "<region>-docker.pkg.dev/<projet>/sesame/sesame@sha256:…",
+      "imageReference": "<dépôt d'images de l'opérateur>/sesame@sha256:…",
       "envDigest": "sha256:…",
+      "hwmodels": ["GCP_AMD_SEV", "GCP_INTEL_TDX"],
       "tag": "v1.2.0",
       "commit": "<sha git>",
       "publishedAt": "<ISO 8601 UTC>",
-      "activeFrom": "<ISO 8601 UTC, ≥ publishedAt + 7 jours>",
-      "status": "annoncee" | "en_service" | "retiree",
+      "status": "en_service" | "retiree",
       "retiredAt": "<ISO 8601 UTC>" | null,
       "notes": "<français, une phrase>"
     }
-  ],
-  "requiredSignatures": 1,
-  "signatures": [
-    {"keyId": "release-1", "sig": "<base64, Ed25519 sur UTF-8(JSON canonique sans « signatures »)>"}
   ]
 }
 ```
@@ -72,54 +66,84 @@ Format exact, à la racine du dépôt et publié par le client sur sa page de tr
 | Champ | Règle |
 |---|---|
 | `imageDigest` | l'empreinte attestée (`submods.container.image_digest`) et autorisée dans KMS |
-| `imageReference` | la référence complète de l'image dans le dépôt d'images de l'opérateur ; les clients exigent qu'elle commence par le préfixe gravé chez eux |
-| `envDigest` | `SHA-256` de l'ensemble des variables d'environnement non secrètes de la version (`ARCHITECTURE.md` §2.2), que les clients comparent à `submods.container.env` |
-| `publishedAt`, `activeFrom` | `activeFrom ≥ publishedAt + 7 jours`, sans exception |
-| `status` | `annoncee` à la publication ; `en_service` à `activeFrom`, une fois la liaison IAM posée ; `retiree` avec `retiredAt` |
-| `requiredSignatures` | informatif : le nombre exigé est **gravé dans les clients**, pas lu dans le fichier ; `1` au départ, `2` dès qu'une seconde clé existe |
-| `signatures` | une par clé de release ; `sig` est calculée sur le JSON canonique (clés triées, sans espace, UTF-8) de l'objet **sans** le champ `signatures` |
+| `imageReference` | la référence complète de l'image ; les clients exigent qu'elle commence par le préfixe du dépôt d'images de l'opérateur (pour Fatoom : `europe-west9-docker.pkg.dev/fatoom-sesame-prod/sesame/`) |
+| `envDigest` | `SHA-256` du JSON canonique de `submods.container.env_override`, c'est-à-dire des variables non secrètes propres au client (`ARCHITECTURE.md`, « Fournisseurs et réglages ») ; les clients le comparent au jeton |
+| `hwmodels` | les valeurs de `hwmodel` acceptées pour cette version, par les clients comme par la condition KMS (§6) |
+| `status` | `en_service` à l'ajout ; `retiree` avec `retiredAt` au retrait |
 
-Le fichier est en ajout seul : une version ne disparaît jamais, elle passe `retiree`. L'historique complet reste lisible.
+`versions.json` ne change que par un commit sur `main` : son historique est public. Le client le recopie à la construction de chacune de ses versions (pour Fatoom : l'app, le portail et la passerelle). Une empreinte absente de la liste compilée ou `retiree`, ou un `hwmodel` hors de `hwmodels`, fait refuser l'attestation. La passerelle applique la même règle aux appels de Sésame.
 
-## 3. Signature sur clé matérielle
+Le client affiche aussi la liste et son historique sur sa page de transparence (pour Fatoom : <https://fatoom.fr/sesame>).
 
-- La clé de release est une clé **Ed25519** générée sur une clé matérielle (YubiKey ou équivalent), détenue par le porteur du produit, hors de tout serveur : le secret ne quitte jamais la clé, signer exige sa présence physique.
-- Elle signe deux choses : le **tag Git** de chaque version et le **manifeste**.
-- **Une** signature est exigée au départ. Dès qu'une seconde personne de confiance existe, une seconde clé est ajoutée et le nombre de signatures exigées passe à 2 par une version des clients (le nombre est gravé chez eux). Rotation ou ajout : une version des clients (clé ajoutée, puis ancienne retirée une version plus tard).
-- Les clés publiques sont publiées dans `manifeste/cles/<keyId>.pub` et sur la page de transparence du client, et embarquées dans l'app, le portail et la passerelle.
-- **Jamais** de clé de release dans un fichier, un dépôt, une CI ou un service en ligne. La CI vérifie des signatures ; elle n'en produit aucune.
+## 3. Tag signé et comptes de publication
 
-Procédure (sur le poste du signataire, clé matérielle branchée) :
+- Chaque version porte un tag Git `vX.Y.Z`, signé par la clé SSH du compte GitHub de l'administrateur de l'opérateur. C'est la seule signature d'une version.
+- L'ancre de confiance est l'ensemble des comptes qui publient : ce dépôt (GitHub) et, chez le client, ceux qui publient l'app (Apple, Google), le site et les fonctions. Tous se connectent par **passkey**, jamais avec un second facteur par SMS ; leurs codes de récupération sont rangés hors ligne.
+- Un vol des seuls accès Google Cloud de Sésame ne change aucune liste : une image autorisée en douce dans KMS reste refusée par les clients et laisse sa trace dans les journaux d'administration publics (§7). Qui tient **à la fois** Google Cloud et l'un de ces comptes peut faire accepter une image malveillante par les clients de cette publication (`THREAT_MODEL.md` §2, limite 12).
 
-```bash
-./build/canoniser-manifeste.sh manifeste.json > manifeste.canonique.json   # JSON canonique sans « signatures »
-./build/signer-manifeste.sh release-1 manifeste.canonique.json             # Ed25519 sur la clé matérielle → sig base64
-# coller la signature dans manifeste.json, puis :
-./build/verifier-manifeste.sh manifeste.json                              # toutes les signatures exigées valides
-```
+## 4. Mettre en service une version : mise à jour forcée
 
-L'interface entre `signer-manifeste.sh` et la clé matérielle (OpenPGP card ou FIDO2) est fixée à l'étape 2 du plan de construction, avec les vecteurs à une et deux signatures.
+1. **Figer** : tag `vX.Y.Z` signé ; CI verte (§8) ; ligne `en_service` ajoutée à `versions.json`.
+2. **Publier les clients d'abord** : les versions de l'app, du site et des fonctions qui contiennent la nouvelle ligne sont publiées, et l'app est **disponible dans les deux boutiques**, avant toute mise en service. Jamais l'inverse.
+3. **Autoriser** : l'empreinte est ajoutée à la condition du fournisseur du pool d'identités (`ARCHITECTURE.md`, « Libération des clés »). La liste d'abord, l'IAM ensuite. La nouvelle version démarre.
+4. **Forcer la mise à jour** : la version minimale de l'app est relevée à la première version qui contient la ligne. Une app plus ancienne demande sa mise à jour à sa prochaine ouverture. Aucune période de recouvrement n'est prévue pour les apps non mises à jour : la boutique propose toujours la mise à jour.
+5. **Arrêter l'ancienne version** aussitôt la nouvelle en service : sa grappe du protocole de PIN est effacée, et chaque titulaire redépose dans la nouvelle (`ARCHITECTURE.md`, « Protocole de PIN »).
 
-## 4. Publier une version
+Règles :
 
-1. **Figer** : tag `vX.Y.Z` signé sur le commit ; CI verte (double construction, vecteurs identiques à ceux du client, dépendances dans la liste, image sans shell).
-2. **Annoncer** : ligne au manifeste en `annoncee` avec `imageDigest`, `imageReference`, `envDigest`, `publishedAt = now`, `activeFrom ≥ now + 7 j` ; signature sur clé matérielle ; publication dans le dépôt et sur la page de transparence du client, avec le journal de construction. À partir de là, la version est visible de tous ; aucun client ne lui parle encore, KMS ne la connaît pas.
-3. **Attendre 7 jours.** Un problème découvert pendant ce délai : la version passe `retiree` sans avoir jamais servi ; une nouvelle version repart à l'étape 1 avec ses 7 jours.
-4. **Mettre en service** (à `activeFrom`) : ajouter l'empreinte à la condition IAM de KMS et de Secret Manager (scripts `gcloud` du dépôt), passer la ligne `en_service`, signer, publier ; basculer le groupe d'instances sur la nouvelle image. Les anciennes versions encore `en_service` le restent jusqu'à leur retrait.
-5. **Retirer** (à tout moment, immédiat) : ligne `retiree` avec `retiredAt`, signer, publier ; retirer l'empreinte de la condition IAM ; remplacer les instances. Un retrait n'attend rien : il ferme.
+- **Jamais deux versions de Sésame à moins de 30 jours d'écart**, sauf retrait d'urgence : un titulaire entré dans une grappe depuis moins de 30 jours ne peut pas en changer (`THREAT_MODEL.md` §2, limite 19).
+- **Téléphone trop ancien** : sur un appareil sous la version minimale du système exigée par la dernière app, l'app laisse ouvrir et consulter le coffre localement, sans aucun appel à Sésame, et le signe de vie y est suspendu. Les fonctions de Sésame se font depuis un appareil à jour.
+- Le client publie sa version minimale de l'app dans un fichier statique versionné (pour Fatoom : `fatoom.fr/.well-known/fatoom-version-minimale.json`), que `build/verifier-journaux.sh` lit avec son historique (§7).
 
-## 5. Cohérence KMS ⇔ manifeste
+## 5. Retrait d'urgence
 
-L'ensemble des empreintes autorisées dans la condition IAM de `kts-seal`, `session-sign`, `registre-mac` et des secrets doit être **identique** à l'ensemble des lignes `en_service` du manifeste (plus les lignes `annoncee` dont `activeFrom` est passé et dont la mise en service est en cours). Un contrôle CI du dépôt, exécuté à chaque publication et chaque jour, lit la condition avec `gcloud` et échoue si les deux ensembles diffèrent. Une empreinte autorisée dans KMS mais absente du manifeste est l'alerte la plus grave que ce dépôt peut lever : elle signifie qu'une image non publiée pourrait desceller des clés (`THREAT_MODEL.md` §2, limite 2).
+À tout moment, sans délai :
 
-## 6. Contrôles CI du dépôt
+1. ligne passée `retiree`, avec `retiredAt` ;
+2. empreinte retirée de la condition KMS **immédiatement** : la version ne descelle plus rien ;
+3. version minimale de l'app relevée ;
+4. VM de la version retirée arrêtées dès que la nouvelle est en service (effacement de sa grappe, redépôt).
+
+Google ne garantit aucun délai de propagation : une révocation n'est tenue pour effective qu'après au moins 7 minutes et une vérification.
+
+## 6. Matériel admis : `hwmodels`
+
+`hwmodels` liste, pour chaque version, les valeurs de `hwmodel` acceptées par les clients, la passerelle et la condition KMS. `GCP_AMD_SEV` (en service) et `GCP_INTEL_TDX` (option de montée en gamme, qui protège aussi l'intégrité de la mémoire) sont admis **dès la première version**. Le passage d'AMD SEV à Intel TDX se fait sans nouvelle version : les VM sont remplacées une à la fois. `GCP_AMD_SEV` est retiré ensuite par une version suivante.
+
+## 7. Cohérence KMS ⇔ `versions.json`
+
+La condition du fournisseur du pool d'identités est le seul point d'autorisation de toutes les clés de Sésame. Elle doit correspondre exactement à `versions.json` :
+
+- l'ensemble des empreintes autorisées est **identique** à l'ensemble des lignes `en_service` ;
+- la clause `dbgstat` est présente ;
+- le dictionnaire `env_override` de la condition correspond à l'`envDigest` publié ;
+- les valeurs de `hwmodel` correspondent à `hwmodels`.
+
+Un contrôle CI lit la condition avec `gcloud` et échoue au moindre écart. Une empreinte autorisée dans KMS mais absente de `versions.json` signifie qu'une image non publiée pourrait desceller des clés (`THREAT_MODEL.md` §2, limite 2).
+
+Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit le bucket d'audit public (journaux d'administration de Google exportés et bornes du registre) et signale : tout appel aux clés qui ne vient pas d'une empreinte `en_service` dans l'historique de `versions.json` à cette date ; toute modification d'IAM, de pool, de fournisseur, de journalisation ou de verrou sans commit de `versions.json` correspondant ; tout import de matériel de clé ; tout trou de plus de 3 heures dans les bornes. La CI l'exécute chaque jour et publie son résultat ; n'importe qui peut l'exécuter.
+
+## 8. Contrôles CI du dépôt
 
 | Contrôle | Échoue si |
 |---|---|
 | Double construction | les deux digests diffèrent |
-| Vecteurs | les vecteurs de test diffèrent de ceux du client |
-| Manifeste | signatures invalides ou en nombre insuffisant ; `activeFrom < publishedAt + 7 j` ; version `en_service` sans journal de construction |
-| KMS ⇔ manifeste | les ensembles d'empreintes diffèrent |
-| Dépendances | une dépendance réseau hors liste (`ARCHITECTURE.md` §2.1) |
-| Image | un shell, un port de débogage, une variable de lanceur factice lue hors du paquet de test |
 | Budget | plus de 6 000 lignes de Go hors tests |
+| Vecteurs | les vecteurs de test diffèrent de ceux du client de référence |
+| `versions.json` | le fichier n'est pas conforme à son schéma |
+| KMS ⇔ `versions.json` | les empreintes, la clause `dbgstat` ou le dictionnaire `env_override` de la condition ne correspondent pas (§7) |
+| Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` |
+| Image | un shell ; une variable de lanceur factice lue hors du paquet de test |
+| Borne du registre | borne non signée ou non déposée toutes les 10 minutes en création seule ; pas d'échec fermé sans borne ; une version activée de la clé de signature refusée |
+| Journaux (chaque jour) | `build/verifier-journaux.sh` signale un appel d'une identité inconnue, un surplus, une modification inattendue ou un trou ; le résultat est publié |
+
+## 9. Actions manuelles de l'opérateur
+
+| Action | Quand |
+|---|---|
+| Comptes de publication (Apple Developer, Google Play Console, GitHub : organisation et dépôt `sesame`, branche `main` protégée ; Google Cloud) sous passkey, sans SMS, codes de récupération hors ligne | avant la première version |
+| Publier une version (§4) ou en retirer une (§5) | chaque version |
+| Lire le résultat de `build/verifier-journaux.sh` ; chaque écart déclenche une alerte par email et est expliqué publiquement dans ce dépôt ; aucun écart ne s'efface | chaque jour |
+| Recréer les VM sur l'image Confidential Space courante (l'attribut `STABLE` dure environ 6 mois) | au moins tous les 6 mois |
+| Faire entrer la racine Confidential Space suivante dans les clients, par une version | avant l'échéance de la racine, renouvelée tous les 10 ans par Google |
+| Restaurer le registre : toujours par une reprise publiée dans une nouvelle version de Sésame (`ARCHITECTURE.md`, « Registre ») | sur perte du registre |

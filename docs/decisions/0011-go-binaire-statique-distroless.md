@@ -2,7 +2,7 @@
 
 # 0011 · Go, binaire statique, image distroless, scripts gcloud ; ordre de construction
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · Résout la question Q-29 du client
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · Résout la question Q-29 du client · **revue depuis** : budget porté à 6 000 lignes de Go hors tests (grappe Raft du protocole de PIN), `github.com/cloudflare/circl` admise pour l'OPRF
 
 ## Contexte et menace
 

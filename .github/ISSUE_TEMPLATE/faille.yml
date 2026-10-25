@@ -34,11 +34,13 @@ body:
         - Attestation et vérification des claims
         - Canal chiffré (clé de session, compteur, AAD)
         - Libération des clés (KMS, condition IAM)
-        - Registre (générations, signalements, preuves de vie)
+        - Registre (générations, signalements, annulations, preuves de vie)
+        - Protocole de PIN et grappe
         - Protocoles du portail (code, dernier code, identité, enveloppes)
         - Lettre et code d'invitation
-        - Manifeste et build reproductible
+        - versions.json et build reproductible
         - Journalisation
+        - Borne du registre, journaux publics
         - Passerelle (appels de Sésame vers le client)
         - Écart entre un document et le code
         - Autre
@@ -51,7 +53,8 @@ body:
       description: La ligne de THREAT_MODEL.md qui n'est plus vraie.
       options:
         - Une clé s'ouvre pour quelqu'un qui n'y a pas droit
-        - Une transmission avant 7 jours, ou malgré une preuve de vie
+        - Une transmission avant 7 jours, ou malgré une annulation
+        - Plus de 10 essais contre un même PIN
         - Un code révoqué ouvre encore
         - Une attestation acceptée à tort
         - Une image non publiée obtient une clé
@@ -71,7 +74,7 @@ body:
     id: version-corrigee
     attributes:
       label: Version corrective
-      description: Le tag du manifeste qui corrige, s'il existe.
+      description: Le tag de la version qui corrige (ligne de versions.json), s'il existe.
       placeholder: v1.0.1
   - type: checkboxes
     id: credit
