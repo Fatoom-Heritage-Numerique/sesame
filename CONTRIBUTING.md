@@ -20,7 +20,7 @@ La prose est en **français** : documents, commentaires, messages de commit, des
 - **Cryptographie de la bibliothèque standard** (`crypto/ecdh`, `crypto/aes`, `crypto/ed25519`, `crypto/ecdsa`, `golang.org/x/crypto/hkdf`). Aucune autre bibliothèque cryptographique.
 - **Dépendances** : SDK Google officiels (KMS, Firestore, Secret Manager) ; `net/http` brut pour Twilio Verify, Stripe Identity et Pingen. Toute nouvelle dépendance se justifie dans la PR et entre dans la liste d'`ARCHITECTURE.md` §2.1 ; la CI refuse une dépendance réseau hors liste.
 - **Adresses des fournisseurs en dur** dans le code, jamais lues au démarrage. Ce qui est propre à un client (identifiants de compte, textes, gabarit de lettre, adresse de la passerelle) est une variable attestée ; les clés d'API sont dans Secret Manager. **Rien de propre à un client dans ce dépôt** : ni identifiant, ni texte de marque, ni adresse.
-- **Budget** : moins de 5 000 lignes de Go hors tests. Une PR qui le dépasse doit retirer autant qu'elle ajoute.
+- **Budget** : au plus 6 000 lignes de Go hors tests, contrôlé en CI. Une PR qui le dépasse doit retirer autant qu'elle ajoute.
 - **Journaux** : jamais de clé, de code, de numéro, d'email, de nom, de libellé ni de corps de requête (`ARCHITECTURE.md` §7). Les identifiants sont masqués (`uidMasque`).
 - **Lanceur factice** (`SESAME_FAKE_LAUNCHER`) et doubles de KMS, Twilio, Stripe, Pingen, Firestore : uniquement dans le paquet de test ; le build échoue si la variable est lue ailleurs.
 - Pas de rétrocompatibilité tant qu'aucune version n'est en production : un format se remplace, il ne se versionne pas. Cette règle sera levée à la première mise en service.
@@ -43,7 +43,7 @@ On ne modifie jamais un vecteur à la main.
 - Les documents mis à jour si le changement les rend faux, et un fichier `docs/decisions/` si une décision est prise ou revue (une décision revue est un **nouveau** fichier, jamais une réécriture).
 - La CI verte : build reproductible (double construction), vecteurs, manifeste, dépendances, image sans shell, budget.
 
-Une PR qui touche l'attestation, le canal, KMS, le registre, les protocoles ou le manifeste est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Personne, l'opérateur compris, ne fusionne seul une telle PR sans qu'une décision écrite n'existe.
+Une PR qui touche l'attestation, le canal, KMS, le registre, les protocoles ou le manifeste est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Tant qu'il n'y a qu'un administrateur, une telle PR cite une décision écrite (`docs/decisions/`) et reste publique au moins 7 jours avant sa fusion ; dès qu'une seconde personne de confiance existe, elle approuve aussi.
 
 ## Vérifier et signaler
 

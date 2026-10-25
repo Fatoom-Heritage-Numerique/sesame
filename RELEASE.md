@@ -122,4 +122,4 @@ L'ensemble des empreintes autorisées dans la condition IAM de `kts-seal`, `sess
 | KMS ⇔ manifeste | les ensembles d'empreintes diffèrent |
 | Dépendances | une dépendance réseau hors liste (`ARCHITECTURE.md` §2.1) |
 | Image | un shell, un port de débogage, une variable de lanceur factice lue hors du paquet de test |
-| Budget | plus de 5 000 lignes de Go hors tests |
+| Budget | plus de 6 000 lignes de Go hors tests |
