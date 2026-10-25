@@ -10,7 +10,7 @@ THREAT_MODEL.md         @Fatoom-Heritage-Numerique/equipe-securite
 RELEASE.md              @Fatoom-Heritage-Numerique/equipe-securite
 SECURITY.md             @Fatoom-Heritage-Numerique/equipe-securite
 CODEOWNERS              @Fatoom-Heritage-Numerique/equipe-securite
-manifeste.json          @Fatoom-Heritage-Numerique/equipe-securite
-manifeste/              @Fatoom-Heritage-Numerique/equipe-securite
+versions.json           @Fatoom-Heritage-Numerique/equipe-securite
+build/                  @Fatoom-Heritage-Numerique/equipe-securite
 docs/decisions/         @Fatoom-Heritage-Numerique/equipe-securite
 .github/                @Fatoom-Heritage-Numerique/equipe-securite

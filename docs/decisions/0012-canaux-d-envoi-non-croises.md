@@ -2,7 +2,7 @@
 
 # 0012 · Canaux d'envoi non croisés : un fournisseur piraté peut ouvrir après un décès vérifié
 
-**Date** : 2026-10-12 · **Statut** : actée comme limite assumée (décision de l'opérateur : « garder tel quel ») · **à reconsidérer avant la production** (question Q-31 du client, ouverte)
+**Date** : 2026-10-12 · **Statut** : actée comme limite assumée (décision de l'opérateur : « garder tel quel ») · **remplacée le 2026-10-22 par [0013](0013-canaux-d-envoi-croises.md)** (Q-31 tranchée)
 
 ## Contexte et menace
 

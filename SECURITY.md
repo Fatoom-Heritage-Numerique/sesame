@@ -17,20 +17,20 @@ Vous avez trouvé une faille ? Écrivez-nous avant de la rendre publique, nous v
 | Accusé de réception | sous **72 h** |
 | Premier diagnostic : reproduit, non reproduit, hors périmètre | sous **7 jours** |
 | Point d'avancement | toutes les 2 semaines tant que le sujet est ouvert |
-| Correctif | selon `RELEASE.md` : une version corrective attend **7 jours** entre son annonce et sa mise en service ; une version vulnérable peut être **retirée immédiatement**, les transmissions patientent |
+| Correctif | selon `RELEASE.md` : une version corrective est mise en service dès que les versions des clients qui la contiennent sont disponibles (mise à jour forcée) ; une version vulnérable peut être **retirée immédiatement**, les transmissions patientent |
 | Publication | une fois le correctif en service, nous publions la faille, sa portée et votre nom si vous le souhaitez, dans `docs/decisions/` ou dans les notes de la version |
 
 ## Périmètre
 
-Nous intéresse tout ce qui contredit `THREAT_MODEL.md` : une clé ouverte pour quelqu'un qui n'y a pas droit, une transmission avant 7 jours ou malgré une preuve de vie, un code révoqué qui ouvre encore, une attestation acceptée à tort par un client, une image non publiée qui obtient une clé de KMS, une fuite dans les journaux, un écart entre le code et les documents de ce dépôt, un build non reproductible.
+Nous intéresse tout ce qui contredit `THREAT_MODEL.md` : une clé ouverte pour quelqu'un qui n'y a pas droit, une transmission avant 7 jours ou malgré une annulation, une transmission par inactivité malgré une preuve de vie, plus de 10 essais d'un même PIN, un code révoqué qui ouvre encore, une attestation acceptée à tort par un client, une image non publiée qui obtient une clé de KMS, une fuite dans les journaux, un écart entre le code et les documents de ce dépôt, un build non reproductible.
 
-Ne nous intéresse pas, parce que c'est assumé et écrit : les limites de `THREAT_MODEL.md` §2 (matériel et Google, IAM administrée par l'opérateur, codes d'accès reçus par le client, lettre vue par l'imprimeur, métadonnées en clair, disponibilité, collusion, horloge, perte du registre, clé de release unique, fournisseurs d'envoi). Si vous pensez qu'une de ces limites est plus grave que ce que nous écrivons, dites-le quand même : c'est une discussion, pas une faille.
+Ne nous intéresse pas, parce que c'est assumé et écrit : les limites de `THREAT_MODEL.md` §2 (matériel et Google, IAM administrée par l'opérateur, codes d'accès reçus par le client, lettre vue par l'imprimeur, métadonnées en clair, disponibilité, collusion, horloge, perte du registre, versions acceptées par les comptes de publication, fournisseurs d'envoi). Si vous pensez qu'une de ces limites est plus grave que ce que nous écrivons, dites-le quand même : c'est une discussion, pas une faille.
 
 ## Ce que nous demandons
 
 - Ne pas accéder à des données qui ne sont pas les vôtres ; pour tester, utilisez un coffre et des proches que vous avez créés.
 - Ne pas déclencher d'envoi réel (SMS, email, lettre, vérification d'identité) vers des personnes qui n'ont pas accepté de participer.
-- Nous laisser le temps du correctif avant toute publication ; nous ne demanderons jamais plus que les délais ci-dessus plus les 7 jours du manifeste.
+- Nous laisser le temps du correctif avant toute publication ; nous ne demanderons jamais plus que les délais ci-dessus.
 
 ## Bug bounty
 

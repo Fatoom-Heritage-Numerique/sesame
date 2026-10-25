@@ -2,6 +2,8 @@
 
 # Publier une version de Sésame
 
+> **État du document (2026-10-26) : en retard sur la spécification.** Ce texte décrit la conception du 2026-10-12. La spécification qui fait foi est `docs/TRD.md` §16 du dépôt `Fatoom-Heritage-Numerique/Fatoom` ; ce document est à réécrire avant toute publication du dépôt (TRD §16.10). Ont changé depuis, entre autres : plus de manifeste signé, de clé de release ni de délai de 7 jours avant une mise en service (liste `versions.json` compilée dans les clients, mise à jour forcée, TRD §16.5.5) ; matériel AMD SEV, pas SEV-SNP (Intel TDX en option, §16.3.1) ; un seul administrateur (§16.9 #2) ; canaux d'envoi croisés (§16.9 #13) ; plus d'accès élargi ; annulation explicite d'un signalement et transmission sur décès définitive après l'échéance (§16.5.3) ; signe de vie, transmission par inactivité (§16.5.10) ; protocole de PIN sur une grappe de trois VM à majorité (§16.3.9) ; canal hybride X25519 + ML-KEM-768 (§16.3.5) ; registre en ajout seul signé par `registre-sign`, borne publique (§16.3.6, §16.3.8) ; alertes envoyées par Sésame (§16.5.11) ; index du code d'accès étiré par Argon2id et calculé par le client (§16.4.4).
+
 Une version de Sésame n'existe que si elle figure dans le manifeste, signé sur une clé matérielle et publié **7 jours avant** sa mise en service. Tant qu'une empreinte n'est pas `en_service` dans le manifeste, aucun client ne lui parle et KMS ne lui libère aucune clé. Il n'y a pas de voie rapide : un correctif attend 7 jours, les transmissions patientent. Une version se retire, elle, immédiatement.
 
 ## 1. Build reproductible
