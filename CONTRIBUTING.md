@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/TRD.md §16.3.1, §16.3.2, §16.3.9, §16.5.5, §16.8.1, §16.8.4, §13.1 (état du 2026-10-26) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) -->
 
 # Contribuer à Sésame
 

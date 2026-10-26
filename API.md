@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/TRD.md §16.3.3, §16.3.5, §16.3.9, §16.4.5, §16.5, §16.7.1 (état du 2026-10-26) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) -->
 
 # API de Sésame
 

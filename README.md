@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/TRD.md §16.1, §16.3.1, §16.3.2, §16.3.3, §16.3.8, §16.5.5, §16.9 (état du 2026-10-26) ; planche SiteSesameV2 -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) ; planche SiteSesameV2 -->
 
 # Sésame
 

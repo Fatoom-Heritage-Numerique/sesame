@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/TRD.md §16.2, §16.9 (état du 2026-10-26) ; maquette « Fatoom · Maquette du site », planche SiteSesameV2 (« Vous avez trouvé une faille ? ») -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) ; maquette « Fatoom · Maquette du site », planche SiteSesameV2 (« Vous avez trouvé une faille ? ») -->
 
 # Signaler une faille
 

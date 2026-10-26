@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/TRD.md §16.1, §16.3, §16.4, §16.5 (état du 2026-10-26) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) -->
 
 # Architecture de Sésame
 
