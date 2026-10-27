@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Fournisseurs d'envoi piratés »), §16.9 #13 ; docs/PRD.md §9 (« Fournisseurs d'envoi »), §10 (Q-31, ouverte) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0012 · Canaux d'envoi non croisés : un fournisseur piraté peut ouvrir après un décès vérifié
 

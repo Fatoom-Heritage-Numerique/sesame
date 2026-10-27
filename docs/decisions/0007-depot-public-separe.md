@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Spécification de Sésame », décision 7 ; « Stack de Sésame »), §16.3.2 -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0007 · Un dépôt public séparé du client
 

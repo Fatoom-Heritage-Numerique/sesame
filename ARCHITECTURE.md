@@ -17,7 +17,7 @@ Conventions : « app » = le téléphone du titulaire, coffre déverrouillé ; �
 
 | Terme | Définition |
 |---|---|
-| **Sésame** | Le programme (ce dépôt) et son enclave. Projet cloud distinct de celui du client (pour Fatoom : `fatoom-sesame-prod`), joignable directement par l'app et le portail (pour Fatoom : `sesame.fatoom.fr`). |
+| **Sésame** | Le programme (ce dépôt) et son enclave. Projet cloud distinct de celui du client (pour Fatoom : un projet dédié, dont le nom n'est pas publié ; `<projet-sesame>` dans ce dépôt), joignable directement par l'app et le portail (pour Fatoom : `sesame.fatoom.fr`). |
 | **Empreinte** | `sha256` de l'image de conteneur de Sésame (`image_digest`). C'est elle qui est publiée, attestée et autorisée dans KMS. |
 | **Attestation** | Jeton signé par Google pour une enclave Confidential Space, portant l'empreinte de l'image en cours d'exécution et les nonces choisis par Sésame (§3). |
 | **Liste des versions** | `versions.json` de ce dépôt (empreintes, matériel admis, dates, statut), compilée dans l'app, le portail et la passerelle (§11.6, `RELEASE.md`). |
@@ -107,7 +107,7 @@ Un client (app, portail, passerelle) **n'accepte** le jeton que si toutes les co
 | `dbgstat` | `disabled-since-boot` |
 | `secboot` | `true` |
 | `submods.container.image_digest` | figure dans la liste des versions compilée, statut `en_service` (§11.6) |
-| `submods.container.image_reference` | commence par le préfixe du dépôt d'images de l'exploitant, gravé dans les clients (pour Fatoom : `europe-west9-docker.pkg.dev/fatoom-sesame-prod/sesame/`) |
+| `submods.container.image_reference` | commence par le préfixe du dépôt d'images de l'exploitant, gravé dans les clients (pour Fatoom : `europe-west9-docker.pkg.dev/<projet-sesame>/sesame/`) |
 | `submods.container.env_override` | `SHA-256` du JSON canonique de `env_override` égal à l'`envDigest` de la version (§2.3) |
 
 Toute condition fausse ⇒ aucune donnée n'est envoyée ; le client affiche un échec d'attestation (§11.7). Les clients ne vérifient rien d'autre que l'attestation : aucune politique publiée par Sésame n'entre dans la décision.
@@ -188,7 +188,7 @@ calculée par KMS à l'écriture (un appel par écriture, écritures rares) et v
 
 | Collection | Document | Champs |
 |---|---|---|
-| `titulaires/{uid}` | un par titulaire enrôlé | `etat` ∈ `actif` \| `supprime` ; `ktsGeneration` (int) ; `enroledAt` ; `vivantLe` (dernière preuve de vie, horloge Sésame ; **initialisé à `enroledAt`**) ; `chartes.{contactId}` = génération courante (int ; `-1` = proche supprimé) ; `cleViePub` (reçue de l'app à l'enrôlement) ; `grappePin` = `{grappeId, depuisLe}` (grappe du dernier dépôt du PIN, §9) ; `ficheGeneration`, `ficheScellee` (fiche d'alerte sous `alerte-seal`, §11.10) ; `ecritLe` ; `sig` |
+| `titulaires/{uid}` | un par titulaire enrôlé | `etat` ∈ `actif` \| `supprime` ; `ktsGeneration` (int) ; `enroledAt` ; `vivantLe` (dernière preuve de vie, horloge Sésame ; **initialisé à `enroledAt`**) ; `chartes.{contactId}` = génération courante (int ; `-1` = proche supprimé ou rôle refusé) ; `chartesDerniere.{contactId}` = dernière génération positive, écrite au passage à `-1` ; `cleViePub` (reçue de l'app à l'enrôlement) ; `grappePin` = `{grappeId, depuisLe}` (grappe du dernier dépôt du PIN, §9) ; `ficheGeneration`, `ficheScellee` (fiche d'alerte sous `alerte-seal`, §11.10) ; `ecritLe` ; `sig` |
 | `titulaires/{uid}/signalements/{id}` | un par signalement (décès ou inactivité) | `signaleLe` (horloge Sésame) ; `source` ∈ `insee` \| `acte` \| `inactivite` ; `deces` (vrai sauf pour `inactivite`) ; `dateDeces` (fournie par le client, absente pour `inactivite`) ; `empreinteActe` (`SHA-256` du fichier de l'acte, source `acte` seulement) ; `transmissibleLe` ; `annuleLe?` ; `annulePar` ∈ `annulation` (décès) \| `preuve_de_vie` (inactivité seulement) ; `lettresEnvoyeesLe?` ; `alertesEnvoyeesLe[]` (J0, J3, J6) ; `ecritLe` ; `sig` |
 | `titulaires/{uid}/ouvertures/{id}` | une par session de proche réussie | `contactId`, `role`, `ouvertLe`, `nbCles`, `contenus[]` (identifiants des contenus dont la clé a été ouverte), `ecritLe`, `sig` |
 | `titulaires/{uid}/lettres/{contactId}` | une par proche prévenu par lettre (§11.9) | `invitationLookup`, `pingenDocumentId`, `statut` ∈ `commandee` \| `imprimee` \| `en_distribution` \| `distribuee` \| `erreur`, `envoyeeLe`, `renvoyeeLe[]`, `ouverteLe?`, `identiteVerifieeLe?`, `essaisIdentite`, `ecritLe`, `sig` |
@@ -207,7 +207,7 @@ Taille : quelques Ko par titulaire. Aucune coordonnée en clair, aucun nom, aucu
 La `sig` empêche de modifier une ligne ; elle n'empêche ni de restaurer une sauvegarde ancienne, ni d'effacer un titulaire, ni de recopier une ligne ancienne. Les règles suivantes ferment ces cas.
 
 - **Pierres tombales** : aucune ligne n'est jamais retirée. Supprimer un titulaire (§11.3) passe sa ligne à `supprime` : plus d'enrôlement, d'ouverture ni de PIN pour cet `uid`, définitivement ; un proche supprimé garde sa génération `-1`. Un `uid` sans ligne n'est jamais « ouvert » : toute ouverture est refusée (échec fermé), seul un premier enrôlement est possible.
-- **Marqueur d'inscription** : au premier enrôlement, Sésame crée `inscrits/<hex(SHA-256(uid))>` dans un bucket privé (pour Fatoom : `gs://fatoom-sesame-inscrits`, `europe-west9`, rétention verrouillée de 10 ans, création seule avec `ifGenerationMatch=0`, aucun écrasement ni suppression) **avant** d'écrire la ligne. Avant tout premier enrôlement, et à toute lecture qui trouve une ligne absente, Sésame lit ce marqueur : marqueur présent et ligne absente ⇒ échec fermé pour cet `uid`, comme une ligne rejetée (ci-dessous), et événement `ligne_absente` dans la borne du registre (§8) ; bucket illisible ⇒ aucun premier enrôlement. Une ligne effacée ne fait donc pas passer le titulaire pour jamais enrôlé. Le bucket est privé : il ne publie pas le nombre de titulaires.
+- **Marqueur d'inscription** : au premier enrôlement, Sésame crée `inscrits/<hex(SHA-256(uid))>` dans un bucket privé (pour Fatoom : `gs://<bucket-inscrits>`, `europe-west9`, rétention verrouillée de 10 ans, création seule avec `ifGenerationMatch=0`, aucun écrasement ni suppression) **avant** d'écrire la ligne. Avant tout premier enrôlement, et à toute lecture qui trouve une ligne absente, Sésame lit ce marqueur : marqueur présent et ligne absente ⇒ échec fermé pour cet `uid`, comme une ligne rejetée (ci-dessous), et événement `ligne_absente` dans la borne du registre (§8) ; bucket illisible ⇒ aucun premier enrôlement. Une ligne effacée ne fait donc pas passer le titulaire pour jamais enrôlé. Le bucket est privé : il ne publie pas le nombre de titulaires.
 - **Époque et chaîne** : chaque écriture fait avancer `epoque` et la chaîne `empreinte = SHA-256(empreinte précédente ‖ JSON canonique de l'écriture)`. Chaque borne du registre porte `registre: {epoque, empreinte}` (§8).
 
 ### 6.3 Contrôles anti-retour
@@ -234,7 +234,7 @@ Il n'y a pas de tiers séquestre : l'IAM des clés KMS est administrée par l'ex
 
 ### 8.1 La borne du registre
 
-Toutes les **10 minutes**, chaque instance dépose au bucket d'audit (pour Fatoom : `gs://fatoom-sesame-audit`) un fichier `bornes/AAAA/MM/JJ/HH-mm-<instanceId>.json`, en création seule (`ifGenerationMatch=0`) :
+Toutes les **10 minutes**, chaque instance dépose au bucket d'audit (pour Fatoom : `gs://<bucket-audit>`) un fichier `bornes/AAAA/MM/JJ/HH-mm-<instanceId>.json`, en création seule (`ifGenerationMatch=0`) :
 
 ```
 borne = {"v":1, "instanceId", "imageDigest",
@@ -265,9 +265,9 @@ Le préfixe de domaine empêche de confondre une borne avec un jeton de session,
 
 ### 8.3 Chaque descellement journalisé et vérifié par un script public
 
-Les journaux « Data Access » sont activés dans la politique IAM de l'**organisation** : `cloudkms.googleapis.com` (`DATA_READ` pour chiffrer, déchiffrer et signer ; `ADMIN_READ`), `secretmanager.googleapis.com` (`DATA_READ`, `ADMIN_READ`), `iam.googleapis.com` et `sts.googleapis.com` (`ADMIN_READ`, qui couvre l'échange et la création des jetons fédérés). La contrainte `iam.disableAuditLoggingExemption` est posée avant toute autre configuration ; toute exemption ou désactivation est une opération d'administration journalisée et exportée.
+Les journaux « Data Access » sont activés dans la politique IAM de l'**organisation** : `cloudkms.googleapis.com` (`DATA_READ` pour chiffrer, déchiffrer et signer ; `ADMIN_READ`), `secretmanager.googleapis.com` (`DATA_READ`, `ADMIN_READ`), `datastore.googleapis.com` (`DATA_WRITE`), `iam.googleapis.com` et `sts.googleapis.com` (`ADMIN_READ`, qui couvre l'échange et la création des jetons fédérés). La contrainte `iam.disableAuditLoggingExemption` est posée avant toute autre configuration ; toute exemption ou désactivation est une opération d'administration journalisée et exportée.
 
-Les **écritures du registre** (`datastore.googleapis.com` en `DATA_WRITE`) sont exportées par un récepteur limité au projet de Sésame vers un second bucket (pour Fatoom : `gs://fatoom-sesame-ecritures`, `europe-west9`), à rétention de 10 ans verrouillée mais **non public** : ces entrées portent le chemin des documents, donc l'`uid`. Elles servent de preuve en cas de contestation (une écriture qui ne vient pas de `sesame-workload` signale une manœuvre) ; la garantie elle-même vient du contrôle de fraîcheur (§6.3).
+Les **écritures du registre** (`datastore.googleapis.com` en `DATA_WRITE`) sont exportées par un récepteur limité au projet de Sésame vers un second bucket (pour Fatoom : `gs://<bucket-ecritures>`, `europe-west9`), à rétention de 10 ans verrouillée mais **non public** : ces entrées portent le chemin des documents, donc l'`uid`. Elles servent de preuve en cas de contestation (une écriture qui ne vient pas de `sesame-workload` signale une manœuvre) ; la garantie elle-même vient du contrôle de fraîcheur (§6.3).
 
 Le script public `build/verifier-journaux.sh` de ce dépôt lit le bucket d'audit (journaux exportés et bornes) et vérifie :
 
@@ -292,7 +292,7 @@ Un propriétaire unique de l'organisation peut toujours tout défaire dans Googl
 
 **Par titulaire** (environ 80 octets, en mémoire seulement) : `cleOprf` (clé OPRF de 32 octets tirée par Sésame, RFC 9497 ; suite exacte fixée à l'étude du lot 1 du client, candidates `ristretto255` avec `cloudflare/circl/oprf` côté Go), `essaisRestants` (10 au dépôt), `prochainEssaiLe` (délai croissant), `creeLe`. Rien sur disque, dans KMS, au registre, dans les journaux ni chez le client.
 
-**Côté app** : l'app « aveugle » le PIN, Sésame évalue l'OPRF sans voir ni le PIN ni une empreinte du PIN, l'app retire l'aveuglement et obtient `y`. La clé de la copie serveur de la KMU est `Argon2id(y, sel)` et la copie est `AES-256-GCM(clé, KMU, aad "fatoom-kmu-pin|" ‖ uid)` (dérivation exacte et vecteurs côté client ; pour Fatoom : `docs/TRD.md` §5.4). Argon2id ne sert qu'en cas de faille de l'enclave, où la clé OPRF fuirait. À la création du coffre, la copie serveur n'est écrite chez le client qu'**après** l'enrôlement (§11.8) et le dépôt `nouveau_pin` : Sésame injoignable ou en pause ⇒ « Réessayer », rien n'est écrit.
+**Côté app** : l'app « aveugle » le PIN, Sésame évalue l'OPRF sans voir ni le PIN ni une empreinte du PIN, l'app retire l'aveuglement et obtient `y`. La clé de la copie serveur de la KMU est `Argon2id(y, sel)` et la copie est `AES-256-GCM(clé, KMU, aad "fatoom-kmu-pin|" ‖ uid)` (dérivation exacte et vecteurs côté client ; pour Fatoom : `docs/technique/chiffrement.md` du dépôt Fatoom). Argon2id ne sert qu'en cas de faille de l'enclave, où la clé OPRF fuirait. À la création du coffre, la copie serveur n'est écrite chez le client qu'**après** l'enrôlement (§11.8) et le dépôt `nouveau_pin` : Sésame injoignable ou en pause ⇒ « Réessayer », rien n'est écrit.
 
 ### 9.2 Opérations
 
@@ -382,7 +382,7 @@ enveloppe = AES-256-GCM(KTS_env, iv aléatoire 12 o, clé du contenu (32 o), aad
 
 Le client range, pour chaque contenu, `sharedKeys.{contactId} = {enveloppe, iv}` et `sharedWith` = liste des `contactId`, avec l'invariant **`c ∈ sharedWith ⇔ sharedKeys.c` existe** et une borne de 100 destinataires par contenu. Le client ne peut pas vérifier l'AAD : c'est Sésame qui, à l'ouverture, refuse une enveloppe dont l'AAD ne correspond pas à l'uid, au type, à l'identifiant du contenu, au proche authentifié et à la génération courante de KTS. Une enveloppe copiée d'un contenu à un autre, ou d'un proche à un autre, ne s'ouvre pas. Un contenu dont `sharedWith` devient vide perd toutes ses enveloppes : il redevient « gardé pour vous ».
 
-**Types `mot` et `volontes`** (pour Fatoom : mot pour un proche, `contentId = contactId` ; dernières volontés, une enveloppe par proche, `contentId = "courant"`) : aucune construction nouvelle, mêmes enveloppes. Sésame n'ouvre le type `volontes` que pour le **contact de confiance** (charte `role: gardien`), de son vivant compris, ou, pour les autres proches, dans une transmission **après décès** (signalement `deces` arrivé à terme, sans annulation) ; jamais pour un autre proche dans une transmission par inactivité.
+**Types `mot` et `volontes`** (pour Fatoom : mot pour un proche, `contentId = contactId` ; dernières volontés, une enveloppe par proche, `contentId = "courant"`) : aucune construction nouvelle, mêmes enveloppes. Le type `volontes` s'ouvre comme les autres types : pour le **contact de confiance** (charte `role: gardien`), de son vivant compris, et pour les autres proches dans toute transmission arrivée à terme, après décès ou par inactivité.
 
 ### 10.4 Charte d'un proche
 
@@ -426,20 +426,20 @@ Le registre tient `chartes.{contactId}` = génération courante : une charte d'u
 Messages app → Sésame (canal §5), **signés Ed25519 par `cleVie`** et vérifiés avec `cleViePub` du registre, **sans rien desceller**. La preuve de vie, l'annulation et la preuve d'enrôlement répondent à un **défi** tiré par Sésame :
 
 ```
-défi       = POST /defi → {defi: <32 o base64>, expireLe}   # tiré par Sésame, usage unique, 5 min, lié au canal
+défi       = POST /defi → {defi: <32 o base64>, expireLe, grappeId}   # tiré par Sésame, usage unique, 5 min, lié au canal
 vie        = Ed25519(cleVie, "fatoom-sesame-vie|1|" ‖ uid ‖ JSON canonique {"v":1,"uid","defi"})
 annulation = Ed25519(cleVie, "fatoom-sesame-annulation|1|" ‖ uid ‖ "|" ‖ signalementId
                              ‖ JSON canonique {"v":1,"uid","signalementId","defi"})
 charteGen  = Ed25519(cleVie, "fatoom-sesame-gen|1|" ‖ uid ‖ "|" ‖ contactId ‖ JSON canonique {"v":1,"uid","contactId","generation":<int>})
-enroler    = Ed25519(cleVie, "fatoom-sesame-enroler|1|" ‖ uid ‖ JSON canonique portant uid, défi et génération)
+enroler    = Ed25519(cleVie, "fatoom-sesame-enroler|1|" ‖ uid ‖ JSON canonique {"v":1, uid, defi, generation, cleViePub})
 depot PIN  = Ed25519(cleVie, "fatoom-pin-depot|1|" ‖ uid ‖ "|" ‖ grappeId ‖ JSON canonique, §9.2)
-fiche      = Ed25519(cleVie, "fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation ‖ JSON canonique de la fiche, §11.10)
+fiche      = Ed25519(cleVie, "fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation ‖ JSON canonique de la fiche, §11.10 ; champs encore à fixer : question ouverte Q-90 du client)
 # message signé = chaîne de domaine ‖ JSON canonique (RFC 8785), UTF-8 ; l'alphabet des identifiants exclut « { » :
 # la frontière est sans ambiguïté ; encodage exact figé par les vecteurs de test
 ```
 
 - Sésame n'accepte une preuve de vie, une annulation ou une preuve d'enrôlement que si son `defi` est un défi qu'il a lui-même tiré pour ce canal, non expiré et non encore utilisé ; il l'efface aussitôt. Un défi refusé donne `defi_invalide`. Chaque message n'est valable qu'une fois et seulement juste après sa demande ; aucune preuve de vie ne peut être calculée d'avance.
-- `charteGen` n'a pas de défi : la génération strictement croissante du registre suffit à refuser un rejeu. `generation = -1` signifie « proche supprimé ».
+- `charteGen` n'a pas de défi : la génération strictement croissante du registre suffit à refuser un rejeu. `generation = -1` signifie « proche supprimé » ou « rôle refusé » ; `chartesDerniere.{contactId}` garde alors la dernière génération positive, et seule une génération supérieure est acceptée après un refus du rôle.
 - L'**annulation** est la construction de la preuve de vie avec sa propre chaîne de domaine et l'identifiant du signalement : une preuve de vie ordinaire ne peut jamais être prise pour une annulation, ni une annulation rejouée sur un autre signalement. Elle n'est produite que sur le geste « Je suis en vie, annuler la transmission », coffre déverrouillé, sur n'importe quel appareil où le titulaire a ouvert son coffre ; Sésame l'accepte seulement pour le signalement courant non annulé du titulaire. Aucune voie support n'existe.
 - La KTS ne sort de KMS que pour une ouverture par un proche (§11.2) et la lettre (§11.9). La charte reste chiffrée et authentifiée sous `KTS_auth`, illisible pour le client.
 - La vérification quotidienne `/etat` (coffre verrouillé) n'est pas signée : elle est authentifiée par l'`idToken` seul, n'a aucun effet de bord et ne permet ni preuve de vie ni annulation (§11.10). Aucune clé d'appareil n'est inscrite chez Sésame.
@@ -502,20 +502,20 @@ POST /session/ouvrir {code, lookup} ─▶ lookup calculé par le navigateur (Ar
 saisit le dernier code
 POST /session/verifier {sessionId, otp} ─▶ Twilio Verify check ; 5 essais / 15 min
                                       registre.ouvertures += 1 ; notifie le client
-◀─── {jeton de session (ES256, 1 h), scope: destine, base: vivant | deces | inactivite}
+◀─── {jeton de session (ES256, 1 h, scope: destine, base: vivant | deces | inactivite), role, expireLe, prenom, titulaireAffiche}
 GET liste des contenus (jeton) ──────────────────────────────────────────────▶ vérifie la signature session-sign
 ◀─── contenus chiffrés (aucun nom en clair) et la seule enveloppe sharedKeys[contactId]
 POST /session/ouvrir-cles {sessionId, enveloppes: [{type, id, contactId, enveloppe, iv}]} ─▶
                                       pour chaque : vérifie aad_env (uid, type, id, contactId authentifié, génération ;
-                                      type volontes seulement si base = deces ou role = gardien)
+                                      type volontes comme les autres types)
                                       ouvre sous KTS_env ; efface KTS après réponse
-◀─── {cles: [{id, cle}], jeton renouvelé} (sous K_res)
+◀─── {cles: [{type, id, cle}], refusees, jeton renouvelé, expireLe} (sous K_res)
 GET URL signée (jeton, id) ─────────────────────────────────────────────────▶ URL signée de l'objet chiffré (10 min)
 télécharge et déchiffre par blocs dans le navigateur
 POST /session/fermer, ou 1 h sans appel ─▶ notifie le client (contenus ouverts pendant la session)
 ```
 
-- **Un seul scope** : chacun, contact de confiance compris, ne reçoit que les enveloppes à son `contactId`. Il n'existe pas d'accès élargi. La `base` du jeton (`vivant` : contact de confiance avant tout signalement ; `deces` ; `inactivite`) décide de l'affichage neutre et, avec le rôle, de l'ouverture des dernières volontés (§10.3). Le contact de confiance peut ouvrir et télécharger de son vivant ce qui lui est destiné ; chaque ouverture est notifiée au client et alertée au titulaire par Sésame (§11.10).
+- **Un seul scope** : chacun, contact de confiance compris, ne reçoit que les enveloppes à son `contactId`. Il n'existe pas d'accès élargi. La `base` du jeton (`vivant` : contact de confiance avant tout signalement ; `deces` ; `inactivite`) décide seulement de l'affichage neutre ; les dernières volontés s'ouvrent comme les autres contenus (§10.3). Le contact de confiance peut ouvrir et télécharger de son vivant ce qui lui est destiné ; chaque ouverture est notifiée au client et alertée au titulaire par Sésame (§11.10).
 - **Code neutre** : `POST /session/ouvrir` renvoie le **même** refus (`code_refuse`) quel que soit le motif (code inconnu, `codeVerifier` faux, charte révoquée, code non remis, proche avant l'échéance, signalement annulé, preuve de vie reçue après une transmission par inactivité) : un porteur de code n'apprend rien sur l'état du titulaire. Le motif est journalisé.
 - **Canaux croisés** : pour un proche dont la charte a un email **et** un téléphone, le client envoie le code d'accès **par email** seulement et Sésame envoie le dernier code **par SMS** : un opérateur d'envoi compromis ne tient qu'un facteur. Proche à email seul : code et dernier code par email ; proche à téléphone seul (dont un contact de confiance sans email) : les deux par SMS ; risque accepté (`THREAT_MODEL.md`, limite 13). Le contact de confiance a un téléphone obligatoire.
 - **Code reçu par courrier** (`charte.courrier == true`) : le proche saisit son code d'invitation ; le second facteur est la vérification d'identité menée par Sésame (§11.9). Le client n'intervient pas.
@@ -534,7 +534,7 @@ POST /session/fermer, ou 1 h sans appel ─▶ notifie le client (contenus ouver
 4. **Ouverture par un proche** : §11.2, rôle `proche`, base `deces` ; même parcours pour le contact de confiance ; les dernières volontés s'ouvrent pour tous.
 5. **La transmission sur décès est définitive.** Après l'échéance, ni un déverrouillage, ni une preuve de vie, ni une annulation ne coupent les ouvertures (`THREAT_MODEL.md`, limite 7). La suppression des contenus gardés et du coffre est pilotée par le client.
 6. **Suppression du titulaire** : le client demande à Sésame `POST /titulaire/supprimer {uid}` (jeton OIDC), qui passe la ligne du titulaire à `supprime` (pierre tombale, §6.2) : plus rien ne s'ouvre, ne s'enrôle ni ne s'évalue pour cet `uid`.
-7. **Décès vérifié après une transmission par inactivité** : Sésame accepte un signalement `deces` même si un signalement `inactivite` a déjà été transmis ; à son terme, la transmission devient complète (dernières volontés ouvertes à tous, base `deces`).
+7. **Décès vérifié après une transmission par inactivité** : Sésame accepte un signalement `deces` même si un signalement `inactivite` a déjà été transmis ; à son terme, la base du jeton devient `deces` (affichage non neutre) ; les contenus ouverts ne changent pas.
 
 **Comment Sésame sait que le décès est vérifié sans faire confiance au client seul.** Il ne vérifie ni le registre officiel ni l'acte : il **mesure** les 7 jours avec sa propre horloge et exige **l'absence d'annulation**, qui ne transite jamais par le client. Un client compromis peut au pire déclencher une fausse alerte ; il ne peut pas transmettre si le titulaire touche « Je suis en vie » dans les 7 jours. Un titulaire qui ouvre son app sans toucher ce bouton est transmis.
 
@@ -550,7 +550,7 @@ Option du client (pour Fatoom : offre Sérénité). Elle réutilise la preuve de
 2. **Relances** par le client à partir de l'échéance du délai (pour Fatoom : J0, J7, J14, J30) ; elles demandent seulement d'ouvrir et de déverrouiller l'app.
 3. **Signalement d'inactivité** (J30) : le client appelle `POST /deces/signaler {uid, source: "inactivite"}` ; Sésame crée un signalement `deces: false` et fixe l'échéance (J37, 23 h 59 heure de Paris). Sésame **refuse** l'inscription si sa dernière preuve de vie (`vivantLe`, **initialisé à `enroledAt`**) date de moins de **3 mois + 30 jours**, plus courte combinaison possible du réglage : le client ne peut pas transmettre un titulaire actif, ni un compte récent jamais déverrouillé. Sésame ne connaît pas le délai choisi (`THREAT_MODEL.md`, limite 15).
 4. **Preuve de vie à n'importe quelle étape** : reçue par Sésame après `signaleLe`, elle annule le signalement d'inactivité (`annulePar: preuve_de_vie`) et Sésame le notifie au client (`signalementAnnule`), qui n'envoie aucun code.
-5. **Transmission** (J37) : le client envoie les codes avec un message neutre ; Sésame poste la lettre des proches « courrier » avec un texte neutre (gabarit attesté comme celui de la lettre de décès, §2.3). Sur le portail, la base du jeton est `inactivite` et les dernières volontés ne s'ouvrent pas pour les proches.
+5. **Transmission** (J37) : le client envoie les codes avec un message neutre ; Sésame poste la lettre des proches « courrier » avec un texte neutre (gabarit attesté comme celui de la lettre de décès, §2.3). Sur le portail, la base du jeton est `inactivite` et les dernières volontés s'ouvrent comme les autres contenus.
 6. **Retour du titulaire** : la première preuve de vie après l'échéance coupe les ouvertures suivantes (notification `lifeAfterTransmission`, propre à la transmission par inactivité) ; la réponse de `/vie` porte `transmis`, vrai dès l'échéance passée d'un signalement non annulé, et les ouvertures, pour montrer qui a ouvert quoi.
 7. **Suspension** : le client n'envoie aucune relance et n'inscrit aucun signalement d'inactivité quand l'option n'est plus active, ou tant que l'app signale un appareil qui ne peut pas émettre de preuve de vie (système ou app sous la version minimale, §11.6) : un blocage, jamais une ouverture.
 8. **Décès vérifié ensuite** : §11.3, étape 7.
@@ -614,7 +614,7 @@ Un coffre neuf s'enrôle **pendant** sa création : KTS, `cleVie` et le code de 
 |---|---|
 | 1 · Vérification de Sésame | `GET /attestation` ; empreinte comparée à la liste des versions compilée ; jeton vérifié (§3) ; canal ouvert. Échec ⇒ §11.7. |
 | 2 · Clés | KTS tirée ; pour un ré-enrôlement après perte du registre ou une rotation : enveloppes recalculées sous `KTS_env` et, pour chaque proche, nouvelle charte. Tout sur l'appareil. |
-| 3 · Envoi sécurisé | `POST /enroler {uid, idToken, ktsGeneration, kts, cleViePub, preuve?}` (`kts` = les 32 octets de KTS, en clair à l'intérieur du corps chiffré par le canal) ⇒ Sésame vérifie l'`idToken` (clés publiques de l'émetteur configuré ; pour Fatoom : Firebase Auth), crée le marqueur d'inscription (premier enrôlement, §6.2), scelle KTS (`sealedKts`), crée ou met à jour `titulaires/{uid}` (`ktsGeneration`, `cleViePub`, `vivantLe = enroledAt`, chartes à leur génération) et renvoie `{sealedKts, ktsGeneration, imageDigest, cleViePub}`. |
+| 3 · Envoi sécurisé | `POST /enroler {uid, idToken, ktsGeneration, kts, cleViePub, preuve?: {defi, signature}}` (`kts` = les 32 octets de KTS, en clair à l'intérieur du corps chiffré par le canal) ⇒ Sésame vérifie l'`idToken` (clés publiques de l'émetteur configuré ; pour Fatoom : Firebase Auth), crée le marqueur d'inscription (premier enrôlement, §6.2), scelle KTS (`sealedKts`), crée ou met à jour `titulaires/{uid}` (`ktsGeneration`, `cleViePub`, `vivantLe = enroledAt` ; les chartes ne sont pas touchées) et renvoie `{sealedKts, ktsGeneration, imageDigest, cleViePub}`. |
 
 **Enrôlement prouvé** : le premier enrôlement (aucune ligne au registre) n'exige que l'`idToken`. Tout ré-enrôlement ou rotation (une ligne existe) exige en plus une **preuve signée par la `cleVie` courante** sur un défi (§10.5), avec la génération : supérieure pour une rotation ; **égale** pour la reprise d'une création interrompue (rescellement seul : la preuve doit se vérifier avec la `cleViePub` déjà inscrite, la `cleViePub` reçue doit lui être égale, ni `chartes` ni `grappePin` ne changent) ; inférieure refusée (`generation_non_croissante`). Sans preuve valide : `preuve_requise`. Le client, qui peut fabriquer un `idToken`, ne peut donc pas faire sceller une KTS de son choix pour un titulaire déjà enrôlé.
 

@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Spécification de Sésame », décision 1), §16.3.4, §16.4.2 -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0002 · Cloud KMS HSM conditionné à l'attestation, une clé de transmission par titulaire
 

@@ -112,7 +112,7 @@ L'enclave fournit une attestation : un jeton signé par Google, qui porte l'empr
 # chaque claim exigé (ARCHITECTURE.md, « Attestation ») et que l'empreinte attestée est en_service
 ```
 
-Ces scripts sont livrés avec le code ; leur contrat est décrit dans `RELEASE.md`.
+Ces scripts sont livrés avec le code ; leur contrat est décrit par ce `README`.
 
 ### Et après : les journaux publics
 
@@ -141,7 +141,7 @@ Toutes les limites, adversaire par adversaire : `THREAT_MODEL.md` §2.
 
 ## État du projet
 
-Sésame est **en construction**. Aucune version n'est publiée, `versions.json` est vide, aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
+Sésame est **en construction**. Aucune version n'est publiée, `versions.json` n'existe pas encore, aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
 
 Ordre de construction :
 

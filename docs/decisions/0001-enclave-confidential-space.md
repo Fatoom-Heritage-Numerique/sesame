@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/PRD.md §9 (2026-10-12, « Chiffrement : cible Sésame »), docs/TRD.md §12 (2026-10-12, « Décisions produit ») -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0001 · Les clés des contenus destinés s'ouvrent dans une enclave au code public
 

@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Clé de release et réglages de Sésame »), §16.3.1 (« Fournisseurs et réglages ») -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0010 · Fournisseurs nommés dans le code, réglages du client en variables attestées, clés d'API dans Secret Manager
 

@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Clé de release et réglages de Sésame »), §16.5.5, §16.9 #12 -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0009 · Une clé de release sur clé matérielle au départ, nombre de signatures gravé dans les clients
 
