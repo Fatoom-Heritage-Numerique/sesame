@@ -2,7 +2,7 @@
 
 # 0002 · Cloud KMS HSM conditionné à l'attestation, une clé de transmission par titulaire
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur)
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md)) : le contrôle CI compare la condition KMS aux versions `en_service` de `versions.json`, qui remplace le manifeste
 
 ## Contexte et menace
 

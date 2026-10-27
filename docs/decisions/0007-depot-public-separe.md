@@ -2,7 +2,7 @@
 
 # 0007 · Un dépôt public séparé du client
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur)
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md)) : le dépôt contient la liste des versions `versions.json` au lieu d'un manifeste, et il n'y a plus de clé de release ; la sécurité repose sur l'attestation, KMS, les clés des titulaires et les comptes de publication
 
 ## Contexte et menace
 

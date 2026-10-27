@@ -22,7 +22,7 @@ Ce dépôt ne contient pas de cahier des charges ni de document technique unique
 | comment une version est construite, publiée et retirée | `RELEASE.md` |
 | comment contribuer, comment signaler une faille | `CONTRIBUTING.md`, `SECURITY.md` |
 
-Les trois premiers disent le **quoi** et le **pourquoi** ; les suivants disent le **comment**. Chaque fichier commence par un commentaire qui indique la section de la spécification dont il dérive, pour que les deux restent alignés.
+Les trois premiers disent le **quoi** et le **pourquoi** ; les suivants disent le **comment**. Chaque document Markdown commence par un commentaire qui indique la section de la spécification dont il dérive, pour que les deux restent alignés.
 
 ## Pour qui
 

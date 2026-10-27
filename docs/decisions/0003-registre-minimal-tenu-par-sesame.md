@@ -2,7 +2,7 @@
 
 # 0003 · Un registre minimal tenu par Sésame : 7 jours, preuve de vie, générations
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** : annulation explicite d'un signalement au lieu de la preuve de vie, transmission sur décès définitive après l'échéance, registre en ajout seul signé par `registre-sign` et borné par une borne publique, export horaire et toute restauration par une reprise publiée, ré-enrôlement après une perte sans sauvegarde vérifié contre la `cleViePub` fournie par le client (limite 54) ; l'état actuel est dans `ARCHITECTURE.md`
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** : annulation explicite d'un signalement au lieu de la preuve de vie, transmission sur décès définitive après l'échéance, registre en ajout seul signé par `registre-sign` et borné par une borne publique, export horaire et toute restauration par une reprise publiée, ré-enrôlement d'un coffre sans ligne après une reprise, avec ou sans sauvegarde, vérifié contre la `cleViePub` fournie par le client (limite 54) ; l'état actuel est dans `ARCHITECTURE.md`
 
 ## Contexte et menace
 
