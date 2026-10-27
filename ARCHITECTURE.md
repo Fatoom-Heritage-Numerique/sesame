@@ -353,7 +353,7 @@ PIN ─► KDP ─► KMU (clé maître du coffre, sur le téléphone)
               │        dépôts du PIN, fiche d'alerte (vers Sésame)
               └─ KTS (clé de transmission) → encryptedKts / ktsIv, rangés par le client
                     ├─ HKDF info "fatoom-sesame-enveloppe" ─► KTS_env
-                    │     └─ enveloppe = AES-GCM(KTS_env, KMF | KME | KMO | KMV, aad contenu+proche) → sharedKeys.{contactId}
+                    │     └─ enveloppe = AES-GCM(KTS_env, KMF | KME | KMO | KMV, aad contenu+proche) → enveloppes.{contactId}
                     ├─ HKDF info "fatoom-sesame-charte"    ─► KTS_auth
                     │     └─ charte du proche → charte / charteIv, rangés par le client
                     └─ scellée pour Sésame : sealedKts = KMS(kts-seal).encrypt(KTS, aad uid|génération)
@@ -380,7 +380,7 @@ aad_env = "fatoom-sesame-env|1|" ‖ uid ‖ "|" ‖ type ‖ "|" ‖ contentId 
 enveloppe = AES-256-GCM(KTS_env, iv aléatoire 12 o, clé du contenu (32 o), aad_env)   → 48 octets
 ```
 
-Le client range, pour chaque contenu, `sharedKeys.{contactId} = {enveloppe, iv}` et `sharedWith` = liste des `contactId`, avec l'invariant **`c ∈ sharedWith ⇔ sharedKeys.c` existe** et une borne de 100 destinataires par contenu. Le client ne peut pas vérifier l'AAD : c'est Sésame qui, à l'ouverture, refuse une enveloppe dont l'AAD ne correspond pas à l'uid, au type, à l'identifiant du contenu, au proche authentifié et à la génération courante de KTS. Une enveloppe copiée d'un contenu à un autre, ou d'un proche à un autre, ne s'ouvre pas. Un contenu dont `sharedWith` devient vide perd toutes ses enveloppes : il redevient « gardé pour vous ».
+Le client range, pour chaque contenu, `enveloppes.{contactId} = {enveloppe, iv}` et `destinataires` = liste des `contactId`, avec l'invariant **`c ∈ destinataires ⇔ enveloppes.c` existe** et une borne de 100 destinataires par contenu. Le client ne peut pas vérifier l'AAD : c'est Sésame qui, à l'ouverture, refuse une enveloppe dont l'AAD ne correspond pas à l'uid, au type, à l'identifiant du contenu, au proche authentifié et à la génération courante de KTS. Une enveloppe copiée d'un contenu à un autre, ou d'un proche à un autre, ne s'ouvre pas. Un contenu dont `destinataires` devient vide perd toutes ses enveloppes : il redevient « gardé pour vous ».
 
 **Types `mot` et `volontes`** (pour Fatoom : mot pour un proche, `contentId = contactId` ; dernières volontés, une enveloppe par proche, `contentId = "courant"`) : aucune construction nouvelle, mêmes enveloppes. Le type `volontes` s'ouvre comme les autres types : pour le **contact de confiance** (charte `role: gardien`), de son vivant compris, et pour les autres proches dans toute transmission arrivée à terme, après décès ou par inactivité.
 
@@ -414,7 +414,7 @@ La charte ne porte aucun lien de parenté. `normalize(code)` retire tirets et es
 Le client range `charte`, `charteIv`, `charteGeneration` et l'**index du code** :
 
 ```
-accessLookup = hex(Argon2id(UTF-8(normalize(code)), sel = UTF-8("fatoom-lookup-v1"), m ≥ 64 Mio, t = 3, p = 1))
+indexAcces = hex(Argon2id(UTF-8(normalize(code)), sel = UTF-8("fatoom-lookup-v1"), m ≥ 64 Mio, t = 3, p = 1))
 ```
 
 (paramètres exacts figés à l'étude du lot 1 du client), qui sert à retrouver le proche à partir de son code. Il est calculé par l'app à la création et à la régénération du code, et par le navigateur à la saisie (`POST /session/ouvrir {code, lookup}`) ; Sésame ne le calcule jamais sur le chemin chaud et vérifie le code par le `codeVerifier` de la charte. L'étirement rend coûteuse la recherche d'un code sur une copie de la base ; un code trouvé n'ouvre rien sans le second facteur.
@@ -465,7 +465,7 @@ Le client fait respecter : le bloc complet dès la création du coffre ; `ktsGen
 | Charte, enveloppes, KTS, graine de vie | non | §10 |
 | Contenus et leurs noms (pour Fatoom : noms de fichiers, services des mots de passe, photos des proches, messages, mots, dernières volontés) | non | chiffrés sur l'appareil |
 | Adresse postale, nom, date de naissance des proches | non | la lettre et la comparaison d'identité sont faites par Sésame depuis la charte |
-| `sharedWith`, dates, tailles, catégories | oui | listes, quotas, limites |
+| `destinataires`, dates, tailles, catégories | oui | listes, quotas, limites |
 | Coordonnées d'envoi des proches (téléphone, email, prénom) | oui | envois par le client ; la **copie qui fait foi** pour le second facteur est celle de la charte |
 
 La liste complète des métadonnées vues par le client est tenue par lui (`THREAT_MODEL.md`, limite 5).
@@ -476,8 +476,8 @@ La liste complète des métadonnées vues par le client est tenue par lui (`THRE
 
 1. L'utilisateur choisit les proches. Coffre déverrouillé exigé.
 2. Pour chaque contenu : l'app déchiffre la clé du contenu puis, pour chaque proche **ajouté**, calcule l'enveloppe (§10.3). Pour un proche retiré, rien à calculer. Clés effacées aussitôt.
-3. Un seul appel au client avec, pour chaque contenu, `sharedWith` et `sharedKeys` (≤ 500 contenus par appel). Interface optimiste avec retour arrière.
-4. Le client vérifie : propriétaire, contenu chiffré de bout en bout, chaque `contactId` existe, `|sharedWith| ≤ 100`, invariant du §10.3, forme (48 octets, IV 12 octets) ; écrit en transaction ; aucune cryptographie.
+3. Un seul appel au client avec, pour chaque contenu, `destinataires` et `enveloppes` (≤ 500 contenus par appel). Interface optimiste avec retour arrière.
+4. Le client vérifie : propriétaire, contenu chiffré de bout en bout, chaque `contactId` existe, `|destinataires| ≤ 100`, invariant du §10.3, forme (48 octets, IV 12 octets) ; écrit en transaction ; aucune cryptographie.
 
 Aucun appel à Sésame, aucun réseau autre que le client : destiner 100 fichiers à 100 proches coûte 10 000 AES-GCM et un appel. Les règles commerciales (offre, compte limité) sont appliquées par le client seul.
 
@@ -504,7 +504,7 @@ POST /session/verifier {sessionId, otp} ─▶ Twilio Verify check ; 5 essais / 
                                       registre.ouvertures += 1 ; notifie le client
 ◀─── {jeton de session (ES256, 1 h, scope: destine, base: vivant | deces | inactivite), role, expireLe, prenom, titulaireAffiche}
 GET liste des contenus (jeton) ──────────────────────────────────────────────▶ vérifie la signature session-sign
-◀─── contenus chiffrés (aucun nom en clair) et la seule enveloppe sharedKeys[contactId]
+◀─── contenus chiffrés (aucun nom en clair) et la seule enveloppe enveloppes[contactId]
 POST /session/ouvrir-cles {sessionId, enveloppes: [{type, id, contactId, enveloppe, iv}]} ─▶
                                       pour chaque : vérifie aad_env (uid, type, id, contactId authentifié, génération ;
                                       type volontes comme les autres types)
@@ -565,7 +565,7 @@ Option du client (pour Fatoom : offre Sérénité). Elle réutilise la preuve de
 | **Remplacer le contact de confiance** | l'ancien reçoit une charte `role: proche` avec un nouveau code non remis de son vivant ; le nouveau, sa charte `gardien` | `charteGen` pour l'ancien | charte de l'ancien, création du nouveau, statut |
 | **Changer le téléphone ou l'email d'un proche** | nouvelle charte (mêmes code et rôle) : la copie qui fait foi pour le second facteur est la charte | `charteGen` | charte et coordonnées |
 | **Retirer un destinataire d'un contenu** | enveloppe retirée | rien | destinataires du contenu |
-| **Supprimer un proche** | — | `charteGen(-1)` | retire `sharedKeys.{contactId}` et `sharedWith` de tous les contenus, supprime l'index et le proche |
+| **Supprimer un proche** | — | `charteGen(-1)` | retire `enveloppes.{contactId}` et `destinataires` de tous les contenus, supprime l'index et le proche |
 | **Rotation de KTS** (sur demande du titulaire, après le PIN ou la biométrie) | nouvelle KTS, `ktsGeneration + 1`, nouvelle graine de `cleVie` ; **toutes** les enveloppes et chartes re-chiffrées | `/enroler` avec la nouvelle génération et une preuve signée par la `cleVie` courante (§11.8) ; le registre passe `ktsGeneration` et `cleViePub` | écriture en lots, sous une preuve signée par l'ancienne `cleVie` ; les anciennes enveloppes deviennent inutilisables (AAD) |
 
 Toute action sur une charte passe **d'abord** par Sésame : tant que le registre n'a pas la nouvelle génération, rien n'est écrit chez le client. Si Sésame est injoignable, l'action échoue proprement et l'ancien code reste valide : on ne laisse jamais un état où le client croit l'accès révoqué alors que Sésame l'ouvrirait encore. Une récupération du coffre par le code de récupération rend la même KMU et la même KTS : aucune rotation n'est imposée.
