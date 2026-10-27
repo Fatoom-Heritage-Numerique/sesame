@@ -49,31 +49,31 @@ Format exact, à la racine du dépôt, sur la branche `main` protégée :
     {
       "version": "1.2.0",
       "imageDigest": "sha256:…",
-      "imageReference": "<dépôt d'images de l'opérateur>/sesame@sha256:…",
+      "referenceImage": "<dépôt d'images de l'opérateur>/sesame@sha256:…",
       "envDigest": "sha256:…",
       "hwmodels": ["GCP_AMD_SEV", "GCP_INTEL_TDX"],
       "tag": "v1.2.0",
       "commit": "<sha git>",
-      "publishedAt": "<ISO 8601 UTC>",
-      "status": "en_service" | "retiree",
-      "retiredAt": "<ISO 8601 UTC>" | null,
+      "publieLe": "<ISO 8601 UTC>",
+      "statut": "en_service" | "retiree",
+      "retireLe": "<ISO 8601 UTC>" | null,
       "notes": "<français, une phrase>"
     }
   ],
-  "sessionSign": [
-    {"kid": "session-sign/<version KMS>", "cle": "<base64, ECDSA P-256 publique>", "depuis": "<ISO 8601 UTC>"}
-  ]
+  "clesSession": {
+    "session-sign/<version KMS>": {"cle": "<base64, ECDSA P-256 publique>", "depuis": "<ISO 8601 UTC>"}
+  }
 }
 ```
 
 | Champ | Règle |
 |---|---|
 | `imageDigest` | l'empreinte attestée (`submods.container.image_digest`) et autorisée dans KMS |
-| `imageReference` | la référence complète de l'image ; les clients exigent qu'elle commence par le préfixe du dépôt d'images de l'opérateur (pour Fatoom : `europe-west9-docker.pkg.dev/<projet-sesame>/sesame/`) |
+| `referenceImage` | la référence complète de l'image ; les clients exigent qu'elle commence par le préfixe du dépôt d'images de l'opérateur (pour Fatoom : `europe-west9-docker.pkg.dev/<projet-sesame>/sesame/`) |
 | `envDigest` | `SHA-256` du JSON canonique de `submods.container.env_override`, c'est-à-dire des variables non secrètes propres au client (`ARCHITECTURE.md`, « Fournisseurs et réglages ») ; les clients le comparent au jeton |
-| `sessionSign` | clés publiques de `session-sign` par `kid` ; les clients la lisent dans la liste compilée, jamais par téléchargement ; une rotation ajoute une entrée |
+| `clesSession` | clés publiques de `session-sign`, par `kid` : `cle` et `depuis` ; la clé publique `session-sign` est lue par `kid` dans `clesSession` de la liste des versions compilée, jamais téléchargée ni épinglée à part ; une rotation ajoute une entrée |
 | `hwmodels` | les valeurs de `hwmodel` acceptées pour cette version, par les clients comme par la condition KMS (§6) |
-| `status` | `en_service` à l'ajout ; `retiree` avec `retiredAt` au retrait |
+| `statut` | `en_service` à l'ajout ; `retiree` avec `retireLe` au retrait |
 
 `versions.json` ne change que par un commit sur `main` : son historique est public. Le client le recopie à la construction de chacune de ses versions (pour Fatoom : l'app, le portail et la passerelle). Une empreinte absente de la liste compilée ou `retiree`, ou un `hwmodel` hors de `hwmodels`, fait refuser l'attestation. La passerelle applique la même règle aux appels de Sésame.
 
@@ -97,13 +97,13 @@ Règles :
 
 - **Jamais deux versions de Sésame à moins de 30 jours d'écart**, sauf retrait d'urgence : un titulaire entré dans une grappe depuis moins de 30 jours ne peut pas en changer (`THREAT_MODEL.md` §2, limite 19).
 - **Téléphone trop ancien** : sur un appareil sous la version minimale du système exigée par la dernière app, l'app laisse ouvrir et consulter le coffre localement, sans aucun appel à Sésame, et le signe de vie y est suspendu. Les fonctions de Sésame se font depuis un appareil à jour.
-- Le client publie sa version minimale de l'app dans un fichier statique versionné (pour Fatoom : `fatoom.fr/.well-known/fatoom-version-minimale.json`), que `build/verifier-journaux.sh` lit avec son historique (§7).
+- Le client publie sa version minimale de l'app dans un fichier statique versionné (pour Fatoom : `fatoom.fr/.well-known/fatoom-version-minimale.json`, `ARCHITECTURE.md` §8.3), que `build/verifier-journaux.sh` lit avec son historique (§7).
 
 ## 5. Retrait d'urgence
 
 À tout moment, sans délai :
 
-1. ligne passée `retiree`, avec `retiredAt` ;
+1. ligne passée `retiree`, avec `retireLe` ;
 2. empreinte retirée de la condition KMS **immédiatement** : la version ne descelle plus rien ;
 3. version minimale de l'app relevée ;
 4. VM de la version retirée arrêtées dès que la nouvelle est en service (effacement de sa grappe, redépôt).
