@@ -43,7 +43,7 @@ On ne modifie jamais un vecteur à la main.
 - Les documents mis à jour si le changement les rend faux, et un fichier `docs/decisions/` si une décision est prise ou revue (une décision revue est un **nouveau** fichier, jamais une réécriture).
 - La CI verte : build reproductible (double construction), budget, vecteurs, schéma de `versions.json`, cohérence KMS ⇔ `versions.json`, dépendances, image sans shell, borne du registre (`RELEASE.md` §8).
 
-Une PR qui touche l'attestation, le canal, KMS, le registre, le protocole de PIN, les protocoles ou `versions.json` est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Tant qu'il n'y a qu'un administrateur, une telle PR cite une décision écrite (`docs/decisions/`) et reste publique au moins 7 jours avant sa fusion ; dès qu'une seconde personne de confiance existe, elle approuve aussi.
+Une PR qui touche l'attestation, le canal, KMS, le registre, le protocole de PIN, les protocoles ou `versions.json` est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Tant qu'il n'y a qu'un administrateur, une telle PR cite une décision écrite (`docs/decisions/`) et reste publique au moins 7 jours avant sa fusion ; dès qu'une seconde personne de confiance existe, elle approuve aussi. L'équipe des propriétaires (`CODEOWNERS`) n'a aujourd'hui qu'un membre : l'auteur d'une telle PR en est aussi l'approbateur, et la décision écrite et les 7 jours de publicité tiennent lieu de second regard.
 
 ## Vérifier et signaler
 

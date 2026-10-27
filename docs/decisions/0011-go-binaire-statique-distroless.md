@@ -2,7 +2,7 @@
 
 # 0011 · Go, binaire statique, image distroless, scripts gcloud ; ordre de construction
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · Résout une question ouverte du client · **revue depuis** : budget porté à 6 000 lignes de Go hors tests (grappe Raft du protocole de PIN), `github.com/cloudflare/circl` admise pour l'OPRF, `golang.org/x/crypto/argon2` pour l'index des lettres d'invitation, `go.etcd.io/raft/v3` pour la grappe ; état actuel dans `ARCHITECTURE.md` §2.4
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · Résout une question ouverte du client · **revue depuis** ([0015](0015-budget-de-code-6000-lignes.md), [0016](0016-bibliotheques-oprf-argon2-raft.md))
 
 ## Contexte et menace
 

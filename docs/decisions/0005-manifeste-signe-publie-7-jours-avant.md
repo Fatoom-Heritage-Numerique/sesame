@@ -2,7 +2,7 @@
 
 # 0005 · Manifeste signé sur clé matérielle, publié 7 jours avant, retrait immédiat, sans voie rapide
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md)) : remplacée ; plus de manifeste signé ni de délai de 7 jours, la liste des versions `versions.json` est compilée dans les clients et une version se met en service par mise à jour forcée
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md)), qui la remplace
 
 ## Contexte et menace
 

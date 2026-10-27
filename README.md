@@ -146,10 +146,10 @@ Sésame est **en construction**. Ce dépôt ne contient encore que sa documentat
 Ordre de construction :
 
 1. **Documentation** : ce dépôt tel que vous le lisez (en cours).
-2. **Contrat exécutable** : OpenAPI, vecteurs de test partagés avec les clients, `sesame-fake` (un double local de Sésame pour développer l'app, le portail et la passerelle sans enclave).
+2. **Contrat exécutable** : OpenAPI, vecteurs de test partagés avec les clients, `sesame-fake` (un double local de Sésame pour développer l'app, le portail et la passerelle sans enclave), `Dockerfile` et `build/reproduire.sh`.
 3. **Cœur** : attestation, canal chiffré, KMS, registre, protocoles, grappe du protocole de PIN.
 4. **Fournisseurs** : SMS et email, alertes, vérification d'identité, lettre.
-5. **Infrastructure** : scripts `gcloud` du projet, du trousseau, du pool d'identités, des machines, du bucket d'audit.
+5. **Infrastructure** : scripts `gcloud` du projet, du trousseau, du pool d'identités, des machines, du bucket d'audit ; `build/verifier-attestation.sh` et `build/verifier-journaux.sh`.
 6. **Version 1.0.0** inscrite à `versions.json`, compilée dans les clients, puis mise en service.
 
 Les décisions prises et les alternatives écartées sont dans `docs/decisions/`.

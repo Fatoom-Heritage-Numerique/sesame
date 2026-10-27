@@ -2,7 +2,7 @@
 
 # 0001 · Les clés des contenus destinés s'ouvrent dans une enclave au code public
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur, question par question) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md)) : le manifeste est remplacé par la liste des versions `versions.json`, compilée dans les clients
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur, question par question) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md))
 
 ## Contexte et menace
 

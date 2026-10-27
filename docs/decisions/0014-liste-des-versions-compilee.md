@@ -2,7 +2,7 @@
 
 # 0014 · Liste des versions compilée dans les clients, mise à jour forcée
 
-**Date** : 2026-10-25 · **Statut** : actée (décision explicite de l'opérateur) · remplace [0005](0005-manifeste-signe-publie-7-jours-avant.md) et [0009](0009-cle-de-release-sur-cle-materielle.md) · **revue depuis** : champs de `versions.json` nommés en français ; clés publiques de `session-sign` ajoutées à la liste (`clesSession`, par `kid`), où les clients les lisent ; état actuel dans `RELEASE.md` §2
+**Date** : 2026-10-25 · **Statut** : actée (décision explicite de l'opérateur) · remplace [0005](0005-manifeste-signe-publie-7-jours-avant.md) et [0009](0009-cle-de-release-sur-cle-materielle.md) · **revue depuis** ([0025](0025-noms-francais-des-champs.md), [0026](0026-cles-session-sign-dans-la-liste-des-versions.md))
 
 ## Contexte et menace
 

@@ -2,7 +2,7 @@
 
 # 0006 · Vérification de Sésame en direct pour enrôler et changer une charte, par manifeste en cache pour destiner
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md)) : plus de manifeste en cache, la liste des versions est compilée dans les clients ; Sésame est aussi joint pour le PIN, l'annulation et la vérification en arrière-plan
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md), [0017](0017-protocole-de-pin-grappe-de-trois-vm.md), [0020](0020-annulation-explicite-et-transmission-definitive.md), [0023](0023-alertes-envoyees-par-sesame-et-fiche-d-alerte.md))
 
 ## Contexte et menace
 

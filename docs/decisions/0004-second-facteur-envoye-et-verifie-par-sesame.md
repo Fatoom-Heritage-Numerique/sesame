@@ -2,7 +2,7 @@
 
 # 0004 · Le dernier code est envoyé et vérifié par Sésame
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur)
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0029](0029-dernier-code-par-email-envoye-par-sesame.md))
 
 ## Contexte et menace
 

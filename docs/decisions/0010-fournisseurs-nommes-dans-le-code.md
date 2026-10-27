@@ -2,7 +2,7 @@
 
 # 0010 · Fournisseurs nommés dans le code, réglages du client en variables attestées, clés d'API dans Secret Manager
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** : réglages du client en `env_override` dont tout le dictionnaire est exigé par la condition KMS, textes longs dans des fichiers de l'image ; Twilio Messaging et SendGrid nommés aussi, pour les alertes envoyées par Sésame lui-même (`ARCHITECTURE.md` §11.10) ; plus de délai de 7 jours ([0014](0014-liste-des-versions-compilee.md))
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md), [0023](0023-alertes-envoyees-par-sesame-et-fiche-d-alerte.md), [0028](0028-reglages-du-client-env-override-entier.md), [0029](0029-dernier-code-par-email-envoye-par-sesame.md))
 
 ## Contexte et menace
 
