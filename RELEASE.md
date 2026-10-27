@@ -24,7 +24,7 @@ git tag -v vX.Y.Z                      # tag signé par une clé SSH (§3)
 ./build/reproduire.sh vX.Y.Z           # construit, puis affiche sha256:<empreinte>
 ```
 
-Le script n'a besoin que de `docker` (ou `podman`) et de `git`. Le dépôt publie, pour chaque version, le journal de la construction reproductible officielle, à comparer au vôtre ; son emplacement est fixé avec le script de build.
+Le script n'a besoin que de `docker` (ou `podman`) et de `git`. Le dépôt publie, pour chaque version, le journal de la construction reproductible officielle, à comparer au vôtre ; son emplacement est écrit ici avec `build/reproduire.sh`, livré à l'étape du contrat exécutable (`README.md`, « État du projet »).
 
 ### 1.2 Double construction en CI
 
@@ -135,7 +135,7 @@ Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit l
 | Budget | plus de 6 000 lignes de Go hors tests et hors bibliothèques épinglées |
 | Vecteurs | les vecteurs de test diffèrent de ceux du client de référence |
 | `versions.json` | le fichier n'est pas conforme à son schéma |
-| KMS ⇔ `versions.json` | les empreintes, la clause `dbgstat` ou le dictionnaire `env_override` de la condition ne correspondent pas (§7) |
+| KMS ⇔ `versions.json` | les empreintes, la clause `dbgstat`, les valeurs de `hwmodel` ou le dictionnaire `env_override` de la condition ne correspondent pas (§7) |
 | Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` |
 | Image | un shell ; une variable de lanceur factice lue hors du paquet de test |
 | Borne du registre | borne non signée ou non déposée toutes les 10 minutes en création seule ; pas d'échec fermé sans borne ; une version activée de la clé de signature refusée |

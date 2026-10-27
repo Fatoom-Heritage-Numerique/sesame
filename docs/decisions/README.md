@@ -2,7 +2,7 @@
 
 # Décisions
 
-Un fichier par décision, en ajout seul : une décision revue est un **nouveau** fichier qui cite l'ancien, jamais une réécriture. Le corps d'une décision ne se réécrit pas ; seuls les renvois (sections, documents), les identifiants (noms de champs, de routes, de limites) et la ligne « revue depuis » se mettent à jour, pour que la décision reste lisible avec les documents actuels. C'est ici que vit l'historique du projet ; les autres documents décrivent l'état cible sans dates ni numéros de version.
+Un fichier par décision, en ajout seul : une décision revue est un **nouveau** fichier qui cite l'ancien, jamais une réécriture. Le corps d'une décision ne se réécrit pas ; seuls les renvois (sections, documents), les identifiants (noms de champs, de routes, de limites) et la ligne « revue depuis » se mettent à jour, pour que la décision reste lisible avec les documents actuels. La ligne de statut d'une décision revue s'écrit « **revue depuis** », suivie, s'il y a lieu, de la décision qui la revoit, puis de ce qui a changé, sans date. C'est ici que vit l'historique du projet ; les autres documents décrivent l'état cible sans dates ni numéros de version.
 
 Chaque fichier suit le même gabarit : date et statut, contexte et menace, décision, alternatives écartées (telles que consignées au moment de la décision ; quand le registre d'origine n'en consigne pas, le fichier le dit), conséquences et limites, documents de ce dépôt concernés.
 
