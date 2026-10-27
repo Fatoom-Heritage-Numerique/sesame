@@ -97,6 +97,7 @@ Toute autre réponse (statut ou forme hors contrat, erreur du répartiteur, coup
 | App du titulaire, `pin/deposer` | `idToken` **et** signature `cleVie` ; l'`idToken` n'est jamais suffisant seul |
 | Portail d'un proche | code d'accès ou d'invitation, puis dernier code (SMS ou email) ou vérification d'identité, puis `sessionId`. Une session est **liée au canal** qui l'a ouverte (`instanceId`, `cliPub`) : présentée depuis un autre canal, elle est refusée (`canal_invalide`) |
 | Serveur du client | jeton OIDC Google d'un compte de service (pour Fatoom : `<compte-deces>`), dans le champ `jetonFatoom` du corps chiffré, jamais en en-tête (l'en-tête traverse le répartiteur en clair). Accepté seulement si la signature Google est valide, `exp` non passé, `iss` = `https://accounts.google.com`, `aud` = `https://sesame.fatoom.fr`, `email` = compte de service en variable attestée et `email_verified` vrai ; sinon `jeton_invalide` |
+| Exploitant de Sésame (`grappe/amorcer`) | jeton OIDC Google du compte d'exploitation de Sésame (`<compte-exploitation>`), dans le champ `jetonExploitation` du corps chiffré, vérifié comme `jetonFatoom` : signature Google valide, `exp` non passé, `iss` = `https://accounts.google.com`, `aud` = `https://sesame.fatoom.fr`, `email` = compte d'exploitation en variable attestée et `email_verified` vrai ; sinon `jeton_invalide` |
 | VM de Sésame | canal mutuellement attesté entre VM : même `image_digest`, `hwmodel` admis (§4) |
 
 L'`idToken` est accepté seulement si sa signature est valide pour les clés publiques de l'émetteur, `exp` non passé, `iss` et `aud` ceux de l'émetteur en variable attestée (pour Fatoom : `iss` = `https://securetoken.google.com/<identifiant du projet Firebase>`, `aud` = cet identifiant) et `sub` égal à l'`uid` du corps ; sinon `jeton_invalide`.
@@ -657,18 +658,18 @@ Commandé par l'exploitant après le remplacement des trois VM (nouvelle version
 | | |
 |---|---|
 | Appelant | l'exploitant, après avoir remplacé les trois VM, une par zone |
-| Authentification | aucune au-delà du canal (§1.2) : la route n'agit que sur trois VM sans grappe et ne donne ni état, ni essai, ni clé |
+| Authentification | `jetonExploitation` (§1.4), en plus du canal (§1.2) ; la route n'agit que sur trois VM sans grappe et ne donne ni état, ni essai, ni clé |
 | Limite | 2 / min par IP (valeur initiale, révisable avec les tests de charge du lot 1 bis) |
 
-Route du canal du §1.2 : `POST /n/{a|b|c}/canal`, `{"route": "grappe/amorcer", "corps": {}}`, vers l'une des trois VM ; statuts dans le corps chiffré (§1.3).
+Route du canal du §1.2 : `POST /n/{a|b|c}/canal`, `{"route": "grappe/amorcer", "corps": {…}}`, vers l'une des trois VM ; statuts dans le corps chiffré (§1.3).
 
-**Corps** : `{}`
+**Corps** : `{"jetonExploitation": "<OIDC>"}`
 
-**Traitement** : servie seulement par une VM qui n'est dans aucune grappe et n'a réservé aucune configuration. Elle joint les deux autres VM à leur adresse DNS interne zonale sur le canal entre VM et vérifie leur attestation (§3 : même `image_digest`, `hwmodel` admis) ; elle exige exactement trois VM, une par zone, aucune dans une grappe. Elle compose la configuration initiale, la fait réserver par les deux autres (`grappe/preparer`), puis ordonne leur démarrage (`grappe/demarrer`) et démarre la dernière. Les trois démarrent Raft en état `new`, les trois membres votants, avec la même configuration initiale. La grappe neuve est publiée dans la borne de chaque VM (`grappe`, `ARCHITECTURE.md`) ; l'amorçage est journalisé (`grappe_amorcee`).
+**Traitement** : servie seulement par une VM qui n'est dans aucune grappe et n'a réservé aucune configuration. Elle joint les deux autres VM à leur adresse DNS interne zonale sur le canal entre VM et vérifie leur attestation (§3 : même `image_digest`, `hwmodel` admis) ; elle exige exactement trois VM, une par zone, aucune dans une grappe. Elle compose la configuration initiale, la fait réserver par les deux autres (`grappe/preparer`), puis ordonne leur démarrage (`grappe/demarrer`) et démarre la dernière. Les trois démarrent Raft en état `new`, les trois membres votants, avec la même configuration initiale. La grappe neuve est publiée dans la borne de chaque VM (`grappe`, `ARCHITECTURE.md`) ; l'amorçage est journalisé (`grappe_amorcee`, avec l'`email` du jeton).
 
 **Réponse `200`**, une fois une première entrée validée par la majorité de la grappe neuve : `{"grappeId": "<hex, 64 caractères>", "votants": 3}`
 
-**Erreurs** : `amorcage_refuse` (409 ; VM déjà dans une grappe ou configuration réservée, autre VM injoignable, déjà dans une grappe ou d'une autre empreinte, attestation refusée, deux VM dans une même zone, réservation refusée) ; `pin_indisponible_temporaire` (503 ; grappe démarrée sans majorité dans le délai de réservation : elle reste en pause) ; `trop_d_appels` (429).
+**Erreurs** : `jeton_invalide` (401) ; `amorcage_refuse` (409 ; VM déjà dans une grappe ou configuration réservée, autre VM injoignable, déjà dans une grappe ou d'une autre empreinte, attestation refusée, deux VM dans une même zone, réservation refusée) ; `pin_indisponible_temporaire` (503 ; grappe démarrée sans majorité dans le délai de réservation : elle reste en pause) ; `trop_d_appels` (429).
 
 #### `grappe/preparer`
 
