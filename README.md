@@ -107,16 +107,16 @@ Si elles diffèrent, ouvrez un rapport de vérification (gabarit d'issue « Rapp
 L'enclave fournit une attestation : un jeton signé par Google, qui porte l'empreinte du programme en cours d'exécution et les clés publiques du canal chiffré. L'app Fatoom et fatoom.fr/acces la vérifient automatiquement avant chaque échange. Vous pouvez la demander vous-même :
 
 ```bash
-./build/verifier-attestation.sh https://sesame.fatoom.fr versions.json
+./build/verifier-attestation.sh https://sesame.fatoom.fr versions.json <numero-projet-sesame> <registre-images>
 # GET /attestation, vérifie la chaîne de certificats jusqu'à la racine Confidential Space de Google,
 # chaque claim exigé (ARCHITECTURE.md, « Attestation ») et que l'empreinte attestée est en_service
 ```
 
-Ces scripts sont livrés avec le code ; leur contrat est décrit par ce `README`.
+Ces scripts sont livrés avec le code ; leur contrat est décrit par ce `README`. Ce dépôt ne cite aucun nom de projet, de dépôt d'images ni de bucket : ils les reçoivent en arguments (`<numero-projet-sesame>`, `<registre-images>`, `<bucket-audit>`), dont les valeurs sont publiées sur fatoom.fr/sesame.
 
 ### Et après : les journaux publics
 
-Une étape de plus pour qui veut contrôler l'opérateur lui-même : `build/verifier-journaux.sh` lit le bucket d'audit public de Sésame et vérifie que chaque descellement vient d'une version publiée (`RELEASE.md` §7). La CI de ce dépôt l'exécute chaque jour et publie son résultat.
+Une étape de plus pour qui veut contrôler l'opérateur lui-même : `build/verifier-journaux.sh <bucket-audit> <numero-projet-sesame> versions.json` lit le bucket d'audit public de Sésame et vérifie que chaque descellement vient d'une version publiée (`RELEASE.md` §7). La CI de ce dépôt l'exécute chaque jour et publie son résultat.
 
 ## La liste des versions
 

@@ -2,7 +2,7 @@
 
 # 0025 · Noms français des champs des formats publiés
 
-**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0014](0014-liste-des-versions-compilee.md)
+**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0014](0014-liste-des-versions-compilee.md) · **revue depuis** ([0032](0032-chemin-du-depot-d-images-hors-de-la-liste.md))
 
 ## Contexte et menace
 

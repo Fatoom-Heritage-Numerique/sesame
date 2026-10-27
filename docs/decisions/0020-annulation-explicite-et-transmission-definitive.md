@@ -2,7 +2,7 @@
 
 # 0020 · Annulation explicite d'un signalement de décès, transmission définitive après l'échéance
 
-**Date** : 2026-10-22 (annulation explicite) et 2026-10-26 (transmission définitive) · **Statut** : actée (validée par l'opérateur) · revoit [0003](0003-registre-minimal-tenu-par-sesame.md)
+**Date** : 2026-10-22 (annulation explicite) et 2026-10-26 (transmission définitive) · **Statut** : actée (validée par l'opérateur) · revoit [0003](0003-registre-minimal-tenu-par-sesame.md) et [0006](0006-verification-en-direct-et-par-cache.md)
 
 ## Contexte et menace
 

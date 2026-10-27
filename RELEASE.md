@@ -49,7 +49,6 @@ Format exact, à la racine du dépôt, sur la branche `main` protégée :
     {
       "version": "1.2.0",
       "imageDigest": "sha256:…",
-      "referenceImage": "<dépôt d'images de l'opérateur>/sesame@sha256:…",
       "envDigest": "sha256:…",
       "hwmodels": ["GCP_AMD_SEV", "GCP_INTEL_TDX"],
       "tag": "v1.2.0",
@@ -68,8 +67,7 @@ Format exact, à la racine du dépôt, sur la branche `main` protégée :
 
 | Champ | Règle |
 |---|---|
-| `imageDigest` | l'empreinte attestée (`submods.container.image_digest`) et autorisée dans KMS |
-| `referenceImage` | la référence complète de l'image ; les clients exigent qu'elle commence par le préfixe du dépôt d'images de l'opérateur (pour Fatoom : `europe-west9-docker.pkg.dev/<projet-sesame>/sesame/`) |
+| `imageDigest` | l'empreinte attestée (`submods.container.image_digest`) et autorisée dans KMS ; seule désignation de l'image : le chemin du dépôt d'images, propre à l'opérateur, n'est pas dans ce fichier, c'est une constante compilée dans les clients et un argument des scripts publics (`<registre-images>`, `ARCHITECTURE.md` §3) |
 | `envDigest` | `SHA-256` du JSON canonique de `submods.container.env_override`, c'est-à-dire des variables non secrètes propres au client (`ARCHITECTURE.md`, « Fournisseurs et réglages ») ; les clients le comparent au jeton |
 | `clesSession` | clés publiques de `session-sign`, par `kid` : `cle` et `depuis` ; la clé publique `session-sign` est lue par `kid` dans `clesSession` de la liste des versions compilée, jamais téléchargée ni épinglée à part ; une rotation ajoute une entrée |
 | `hwmodels` | les valeurs de `hwmodel` acceptées pour cette version, par les clients comme par la condition KMS (§6) |

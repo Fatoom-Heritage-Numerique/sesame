@@ -2,7 +2,7 @@
 
 # 0029 · Dernier code par email tiré et envoyé par Sésame lui-même ; Twilio Verify pour le SMS seulement
 
-**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0004](0004-second-facteur-envoye-et-verifie-par-sesame.md) et [0010](0010-fournisseurs-nommes-dans-le-code.md)
+**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0004](0004-second-facteur-envoye-et-verifie-par-sesame.md) et [0010](0010-fournisseurs-nommes-dans-le-code.md) · **revue depuis** ([0033](0033-textes-du-client-attestes-par-leur-empreinte.md))
 
 ## Contexte et menace
 

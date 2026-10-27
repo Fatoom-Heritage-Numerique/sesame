@@ -10,7 +10,7 @@ Avec la décision 0012, un attaquant qui lisait tout ce qui passe chez un seul f
 
 ## Décision
 
-Pour un proche qui a un email et un téléphone, les canaux sont **croisés** : le code d'accès part par email, le dernier code par SMS ; il faut alors compromettre les deux comptes d'envoi. L'opérateur email (SendGrid) appartient au même groupe que l'opérateur SMS (Twilio) : les deux canaux reposent sur deux infrastructures et deux comptes distincts (celui de Sésame pour le dernier code), pas sur deux sociétés.
+Pour un proche qui a un email et un téléphone, les canaux sont **croisés** : le code d'accès part par email, le dernier code par SMS ; il faut alors compromettre les deux comptes d'envoi. L'opérateur email appartient au même groupe que l'opérateur SMS : les deux canaux reposent sur deux infrastructures et deux comptes distincts (celui de Sésame pour le dernier code), pas sur deux sociétés.
 
 ## Alternatives écartées
 

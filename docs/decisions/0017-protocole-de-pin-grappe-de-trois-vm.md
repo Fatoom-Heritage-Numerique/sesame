@@ -2,7 +2,7 @@
 
 # 0017 · Protocole de PIN en mémoire, sur une grappe de trois VM à majorité, et règle des 30 jours
 
-**Date** : 2026-10-24 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0018](0018-amorcage-commande-d-une-grappe-neuve.md))
+**Date** : 2026-10-24 · **Statut** : actée (validée par l'opérateur) · revoit [0006](0006-verification-en-direct-et-par-cache.md) · **revue depuis** ([0018](0018-amorcage-commande-d-une-grappe-neuve.md))
 
 ## Contexte et menace
 
