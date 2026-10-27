@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Spécification de Sésame », décision 6), §16.1, §16.5.1 ; docs/PRD.md §9 (R-PARTAGE-07) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0006 · Vérification de Sésame en direct pour enrôler et changer une charte, par manifeste en cache pour destiner
 

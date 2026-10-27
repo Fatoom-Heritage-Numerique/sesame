@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Proche prévenu par lettre : tout dans Sésame »), §16.5.8 ; docs/PRD.md §9 (R-DECES-03, R-PORTAIL-01), §10 (Q-30) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0008 · Lettre au proche sans téléphone ni email et vérification d'identité menées par Sésame
 

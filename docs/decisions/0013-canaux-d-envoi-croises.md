@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/TRD.md §16.5.2, §16.9 #13, registre §12 (2026-10-22, septième tour, décision 10) ; docs/PRD.md R-DECES-02, R-PORTAIL-01 (Q-31, tranchée) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0013 · Canaux d'envoi croisés : code d'accès par email, dernier code par SMS
 
@@ -23,4 +23,4 @@ Risque accepté : un proche à email seul reçoit code et dernier code par email
 
 ## Documents concernés
 
-`THREAT_MODEL.md` §2 (13) ; `ARCHITECTURE.md` (à réécrire, voir son bandeau).
+`THREAT_MODEL.md` §2 (13) ; `ARCHITECTURE.md`.

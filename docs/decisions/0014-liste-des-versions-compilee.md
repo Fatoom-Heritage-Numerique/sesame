@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/TRD.md §16.5.5, §16.9 #12, registre §12 (2026-10-25 ; revu le 2026-10-26, second audit, S-01) ; docs/PRD.md R-PARTAGE-09, R-COMPTE-17 -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0014 · Liste des versions compilée dans les clients, mise à jour forcée
 
@@ -24,4 +24,4 @@ L'ancre de confiance devient l'ensemble des comptes qui publient l'app, le site,
 
 ## Documents concernés
 
-`RELEASE.md`, `README.md`, `ARCHITECTURE.md` (à réécrire, voir leurs bandeaux) ; `THREAT_MODEL.md` §2 (8, 12) ; `SECURITY.md` ; `CODEOWNERS`.
+`RELEASE.md`, `README.md`, `ARCHITECTURE.md` ; `THREAT_MODEL.md` §2 (8, 12) ; `SECURITY.md` ; `CODEOWNERS`.

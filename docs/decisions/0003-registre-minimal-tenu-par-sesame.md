@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Spécification de Sésame », décision 2), §16.3.6 ; docs/PRD.md §9 (R-PARTAGE-10, R-DECES-12) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0003 · Un registre minimal tenu par Sésame : 7 jours, preuve de vie, générations
 

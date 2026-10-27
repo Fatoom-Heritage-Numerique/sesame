@@ -57,7 +57,7 @@ Seules les erreurs hors canal sont renvoyées **en clair**, avec leur statut HTT
 | App du titulaire, `enroler` | `idToken` ; en plus, une preuve `cleVie` dès qu'une ligne existe pour cet `uid` |
 | App du titulaire, `pin/deposer` | `idToken` **et** signature `cleVie` ; l'`idToken` n'est jamais suffisant seul |
 | Portail d'un proche | code d'accès ou d'invitation, puis dernier code (SMS ou email) ou vérification d'identité, puis `sessionId`. Une session est **liée au canal** qui l'a ouverte (`instanceId`, `cliPub`) : présentée depuis un autre canal, elle est refusée (`canal_invalide`) |
-| Serveur du client | jeton OIDC Google d'un compte de service (pour Fatoom : `fatoom-death@…`), dans le champ `jetonFatoom` du corps chiffré, jamais en en-tête (l'en-tête traverse le répartiteur en clair). Accepté seulement si la signature Google est valide, `exp` non passé, `iss` = `https://accounts.google.com`, `aud` = `https://sesame.fatoom.fr`, `email` = compte de service en variable attestée et `email_verified` vrai ; sinon `jeton_invalide` |
+| Serveur du client | jeton OIDC Google d'un compte de service (pour Fatoom : `<compte-deces>`), dans le champ `jetonFatoom` du corps chiffré, jamais en en-tête (l'en-tête traverse le répartiteur en clair). Accepté seulement si la signature Google est valide, `exp` non passé, `iss` = `https://accounts.google.com`, `aud` = `https://sesame.fatoom.fr`, `email` = compte de service en variable attestée et `email_verified` vrai ; sinon `jeton_invalide` |
 | VM de Sésame | canal mutuellement attesté entre VM : même `image_digest`, `hwmodel` admis (§4) |
 
 ### 1.4 Défis
@@ -493,7 +493,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 Les enveloppes viennent du client (contenus listés avec le jeton de session) ; Sésame ne les a jamais vues.
 
-**Traitement** : pour chaque enveloppe, Sésame reconstruit l'aad (`uid`, `type`, `id`, proche authentifié, génération du registre) et l'ouvre sous la KTS ; une enveloppe destinée à un autre proche est refusée ; le type `volontes` n'est ouvert que si `base = deces` ou `role = gardien`. La KTS est effacée après la réponse.
+**Traitement** : pour chaque enveloppe, Sésame reconstruit l'aad (`uid`, `type`, `id`, proche authentifié, génération du registre) et l'ouvre sous la KTS ; une enveloppe destinée à un autre proche est refusée ; le type `volontes` s'ouvre comme les autres types. La KTS est effacée après la réponse.
 
 **Réponse `200`** (sous le canal : les clés ne sont lisibles que par le navigateur) :
 

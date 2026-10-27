@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Spécification de Sésame », décision 3), §16.5.2 ; docs/PRD.md §9 (R-PORTAIL-01, R-PARTAGE-08) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0004 · Le dernier code est envoyé et vérifié par Sésame
 

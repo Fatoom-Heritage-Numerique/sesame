@@ -66,7 +66,7 @@ Format exact, à la racine du dépôt, sur la branche `main` protégée :
 | Champ | Règle |
 |---|---|
 | `imageDigest` | l'empreinte attestée (`submods.container.image_digest`) et autorisée dans KMS |
-| `imageReference` | la référence complète de l'image ; les clients exigent qu'elle commence par le préfixe du dépôt d'images de l'opérateur (pour Fatoom : `europe-west9-docker.pkg.dev/fatoom-sesame-prod/sesame/`) |
+| `imageReference` | la référence complète de l'image ; les clients exigent qu'elle commence par le préfixe du dépôt d'images de l'opérateur (pour Fatoom : `europe-west9-docker.pkg.dev/<projet-sesame>/sesame/`) |
 | `envDigest` | `SHA-256` du JSON canonique de `submods.container.env_override`, c'est-à-dire des variables non secrètes propres au client (`ARCHITECTURE.md`, « Fournisseurs et réglages ») ; les clients le comparent au jeton |
 | `hwmodels` | les valeurs de `hwmodel` acceptées pour cette version, par les clients comme par la condition KMS (§6) |
 | `status` | `en_service` à l'ajout ; `retiree` avec `retiredAt` au retrait |
@@ -128,7 +128,7 @@ Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit l
 | Contrôle | Échoue si |
 |---|---|
 | Double construction | les deux digests diffèrent |
-| Budget | plus de 6 000 lignes de Go hors tests |
+| Budget | plus de 6 000 lignes de Go hors tests et hors bibliothèques épinglées |
 | Vecteurs | les vecteurs de test diffèrent de ceux du client de référence |
 | `versions.json` | le fichier n'est pas conforme à son schéma |
 | KMS ⇔ `versions.json` | les empreintes, la clause `dbgstat` ou le dictionnaire `env_override` de la condition ne correspondent pas (§7) |

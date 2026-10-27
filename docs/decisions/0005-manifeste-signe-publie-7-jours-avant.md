@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Spécification de Sésame », décision 4), §16.5.5 ; docs/PRD.md §9 (R-PARTAGE-09) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0005 · Manifeste signé sur clé matérielle, publié 7 jours avant, retrait immédiat, sans voie rapide
 

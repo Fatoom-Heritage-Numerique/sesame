@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12, docs/PRD.md §9 (entrées concernant Sésame) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # Décisions
 

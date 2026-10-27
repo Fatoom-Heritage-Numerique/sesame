@@ -1,4 +1,4 @@
-<!-- Source : fatoom-app docs/TRD.md §12 (2026-10-12, « Stack de Sésame (Q-29) »), §16.3.2 ; docs/PRD.md §10 (Q-29) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
 
 # 0011 · Go, binaire statique, image distroless, scripts gcloud ; ordre de construction
 
