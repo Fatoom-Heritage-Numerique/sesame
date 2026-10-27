@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) -->
+<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/contrat-http.md -->
 
 # API de Sésame
 
-Ce document est le contrat des routes que Sésame expose et des routes que le client doit exposer à Sésame (la passerelle). L'OpenAPI, les vecteurs de test et le double local `sesame-fake` en dérivent ; en cas d'écart, ce document se corrige d'abord.
+Ce document est le contrat des routes que Sésame expose et des routes que le client doit exposer à Sésame (la passerelle). Il publie `docs/technique/sesame/contrat-http.md` du dépôt Fatoom, qui fait foi ; l'OpenAPI, les vecteurs de test et le double local `sesame-fake` en dérivent. En cas d'écart, la source se corrige d'abord.
 
 Les limites de débit du §7 sont des valeurs initiales, à ajuster avec les mesures du double local ; celles notées « à fixer au lot 1 bis » le seront avec les tests de charge. Tout le reste est fixé par la spécification de référence.
 
@@ -178,7 +178,7 @@ Sésame scelle la KTS sous la clé KMS `kts-seal`, crée ou met à jour la ligne
  "ouvertures": [{"contactId": "<id>", "role": "proche" | "gardien", "ouvertLe": "<ISO>", "contenus": [{"type": "<type>", "id": "<id>"}]}]}
 ```
 
-`ouvertures` : sessions de proches depuis la dernière preuve de vie. `transmis` vaut `true` quand une ouverture a eu lieu après `transmissibleLe` : l'app affiche le cas « transmission définitive ». `pinPresent: false` : l'enregistrement du PIN manque dans la grappe en service, l'app redépose. `pinBloque: true` : le plafond d'essais est atteint, seul un nouveau PIN en sort.
+`ouvertures` : sessions de proches depuis la dernière preuve de vie. `transmis` vaut `true` dès que `transmissibleLe` d'un signalement non annulé est passé, qu'une ouverture ait eu lieu ou non : l'app affiche alors `TransmissionDefinitive` (R-DECES-22) ; `signalement` et `ouvertures` disent de quoi il s'agit et qui a ouvert quoi. `pinPresent: false` : l'enregistrement du PIN manque dans la grappe en service, l'app redépose. `pinBloque: true` : le plafond d'essais est atteint, seul un nouveau PIN en sort.
 
 **Erreurs** : `defi_invalide` ; `message_refuse` (signature invalide) ; `titulaire_indisponible` (ligne absente ou `supprime`) ; `trop_d_appels`.
 
@@ -386,7 +386,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 | Authentification | le code |
 | Limite | 20 / 15 min par IP ; 5 essais / 15 min par IP ; 3 sessions simultanées par `contactId` |
 
-**Corps** : `{"code": "<code saisi>", "lookup": "<hex>"}`. `lookup` est l'index du code, étiré par Argon2id et calculé par le navigateur ; Sésame ne calcule aucun Argon2id.
+**Corps** : `{"code": "<code saisi>", "lookup": "<hex>"}`. `lookup` est l'index du code, étiré par Argon2id et calculé par le navigateur ; Sésame ne calcule un Argon2id que pour l'index d'un code d'invitation, une fois par lettre (§2.10).
 
 **Traitement** :
 
