@@ -66,7 +66,7 @@ Un défi est tiré par Sésame (`defi`, §2.2) : 32 octets, à usage unique, val
 
 ### 1.5 Pièces signées par `session-sign`
 
-Toutes sont signées par la clé KMS `session-sign` (ECDSA P-256, SHA-256), en `ES256` seul : `alg` est imposé, tout autre est refusé. La clé publique est épinglée par le client. Le client conserve un reçu ; il ne lui donne aucun droit : Sésame ne lit jamais un reçu, il relit son registre.
+Toutes sont signées par la clé KMS `session-sign` (ECDSA P-256, SHA-256), en `ES256` seul : `alg` est imposé, tout autre est refusé. La clé publique est lue par `kid` dans le champ `sessionSign` de la liste des versions compilée dans le client (`ARCHITECTURE.md`) ; le Sésame factice du lot 1 bis signe avec une clé fixe épinglée dans sa configuration. Le client conserve un reçu ; il ne lui donne aucun droit : Sésame ne lit jamais un reçu, il relit son registre.
 
 | Pièce | Forme |
 |---|---|
@@ -129,10 +129,11 @@ Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux 
 
 ```json
 {"uid": "<uid>", "idToken": "<jeton d'identité>", "ktsGeneration": 1, "kts": "<base64, 32 octets>",
- "cleViePub": "<base64, Ed25519>", "preuve": {"defi": "<base64>", "signature": "<base64>"}}
+ "cleViePub": "<base64, Ed25519>", "preuve": {"defi": "<base64>", "signature": "<base64>"},
+ "cleViePubAttendue": "<base64, Ed25519>"}
 ```
 
-`kts` est la KTS en clair **à l'intérieur du corps chiffré** par le canal. `preuve` est absente au premier enrôlement. Sinon, c'est la signature par la `cleVie` courante de :
+`kts` est la KTS en clair **à l'intérieur du corps chiffré** par le canal. `cleViePubAttendue` n'existe que pendant une reprise sans sauvegarde (ci-dessous). `preuve` est absente au premier enrôlement. Sinon, c'est la signature par la `cleVie` courante de :
 
 ```
 "fatoom-sesame-enroler|1|" ‖ uid ‖ JSON canonique {"v":1, "uid", "defi", "generation", "cleViePub"}
@@ -149,9 +150,11 @@ Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux 
 
 Sésame scelle la KTS sous la clé KMS `kts-seal`, crée ou met à jour la ligne, puis efface `kts`.
 
+**Reprise sans sauvegarde** : pendant une reprise publiée marquée `sansSauvegarde` (`ARCHITECTURE.md`), une ligne absente dont le marqueur d'inscription existe admet un enrôlement avec `preuve`, vérifiée contre `cleViePubAttendue`, champ ajouté au corps, que l'app lit dans `users/{uid}.sesame.cleViePub`. Hors reprise, ce champ est refusé. Fatoom pourrait y substituer une autre clé : limite assumée (LIM-54). Le titulaire est alerté par Fatoom du ré-enrôlement.
+
 **Réponse `200`** : `{"sealedKts": "<base64>", "ktsGeneration": 1, "imageDigest": "sha256:…", "cleViePub": "<base64>"}`
 
-**Erreurs** : `jeton_invalide` ; `preuve_requise` (ligne existante, preuve absente ou invalide) ; `defi_invalide` ; `generation_non_croissante` ; `message_refuse` (corps mal formé, `cleViePub` absente) ; `titulaire_indisponible` (ligne `supprime` ou rejetée, ou ligne absente alors qu'un marqueur d'inscription existe) ; `registre_indisponible` (bucket des marqueurs illisible : aucun premier enrôlement) ; `trop_d_appels`.
+**Erreurs** : `jeton_invalide` ; `preuve_requise` (ligne existante, preuve absente ou invalide) ; `defi_invalide` ; `generation_non_croissante` ; `message_refuse` (corps mal formé, `cleViePub` absente, `cleViePubAttendue` hors reprise) ; `titulaire_indisponible` (ligne `supprime` ou rejetée, ou ligne absente alors qu'un marqueur d'inscription existe) ; `registre_indisponible` (bucket des marqueurs illisible : aucun premier enrôlement) ; `trop_d_appels`.
 
 ### 2.4 `vie`
 
@@ -242,7 +245,7 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 | Authentification | signature `cleVie` |
 | Limite | à fixer au lot 1 bis |
 
-**Corps** : `{"uid": "<uid>", "generation": 1, "telephone": "<E.164>", "email": "<adresse>", "signature": "<base64>"}`, signature sur `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation` et le JSON canonique de la fiche.
+**Corps** : `{"uid": "<uid>", "generation": 1, "telephone": "<E.164>" | null, "email": "<adresse>", "signature": "<base64>"}`, signature sur `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation` et le JSON canonique de la fiche : `{"email":"<adresse>","generation":1,"telephone":"<E.164>"|null,"uid":"<uid>","v":1}`, clés triées, UTF-8, sans espace ni retour à la ligne. La génération empêche de rejouer une ancienne fiche. Les vecteurs sont générés par script (A-27).
 
 **Traitement** : exige une génération strictement croissante ; scelle la fiche sous la clé KMS `alerte-seal` (aad `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation`) et la garde au registre (`ficheGeneration`, `ficheScellee`). Le client n'en garde aucune copie. Sésame l'ouvre seul pour envoyer ses alertes au titulaire.
 
@@ -372,7 +375,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Corps** : `{"uid": "<uid>", "idToken": "<jeton d'identité>", "elementAveugle": "<base64>"}`
 
-**Traitement** : le leader de la grappe lit la ligne du registre, puis **décompte un essai**, validé par la majorité, **avant** d'évaluer. Délai croissant entre essais : aucun pour les 3 premiers, puis 1 min, 5 min, 15 min, 1 h, 4 h, 12 h, 24 h. Le dernier essai perdu efface `cleOprf`. Sésame alerte le titulaire à chaque essai décompté (au plus un message par heure). Sésame ne sait jamais si le PIN est juste : il n'existe pas de `pin_refuse`.
+**Traitement** : le leader de la grappe lit la ligne du registre, puis **décompte un essai**, validé par la majorité, **avant** d'évaluer. Délai croissant entre essais : aucun pour les 3 premiers, puis 1 min, 5 min, 15 min, 1 h, 4 h, 12 h, 24 h. Le 10ᵉ essai est évalué et répondu comme les autres (l'app vérifie le PIN sur place) ; `essaisRestants` tombe alors à 0 et `cleOprf` est effacée : un dépôt `ouverture` ultérieur est refusé (`pin_bloque`). Un 10ᵉ PIN juste n'ouvre donc pas : seul le code de récupération reste possible (R-PIN-02). Sésame alerte le titulaire à chaque essai décompté (au plus un message par heure). Sésame ne sait jamais si le PIN est juste : il n'existe pas de `pin_refuse`.
 
 **Réponse `200`** : `{"evaluation": "<base64>"}`, sans nombre d'essais restants.
 
@@ -404,7 +407,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 - `identite` : parcours « courrier » ; le portail enchaîne sur §2.16 (`masque: null`).
 - `aucun` : invitation dont l'identité est déjà vérifiée (`identiteVerifieeLe`) : le proche entre avec son code seul, sans nouvelle vérification ni dernier code (`masque: null`). La réponse porte en plus les champs de §2.15 (`jeton`, `scope`, `role`, `expireLe`, `prenom`, `titulaireAffiche`) ; l'ouverture est inscrite et notifiée comme au §2.15.
 
-**Erreurs** : `code_refuse`, **identique quel que soit le motif** (code inconnu, `codeVerifier` faux, charte révoquée, code non remis, proche avant l'échéance, signalement annulé, preuve de vie après une transmission par inactivité, `bundle` refusé par la passerelle, ligne rejetée), avec `details.essaisRestants` ; le motif est journalisé par Sésame. `trop_d_essais` (5 codes faux en 15 min, `details.reessayerLe`) ; `trop_d_appels` (y compris une 4ᵉ session simultanée pour le même proche) ; `passerelle_indisponible` ; `fournisseur_indisponible`.
+**Erreurs** : `code_refuse`, **identique quel que soit le motif** (code inconnu, `codeVerifier` faux, charte révoquée, code non remis, proche avant l'échéance, signalement annulé, preuve de vie après une transmission par inactivité, `bundle` refusé par la passerelle, ligne rejetée), avec `details.essaisRestants` ; le motif est journalisé par Sésame. `trop_d_essais` (5 codes faux en 15 min, `details.reessayerLe`) ; `reessayer_plus_tard` (contrôle anti-retour du registre en cours, sans détail ni raison, sans décompter les essais) ; `trop_d_appels` (y compris une 4ᵉ session simultanée pour le même proche) ; `passerelle_indisponible` ; `fournisseur_indisponible`.
 
 ### 2.15 `session/verifier`
 
@@ -426,7 +429,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 `prenom` et `titulaireAffiche` sont lus dans la charte, pour l'affichage du portail (« Bonjour Léa »).
 
-**Erreurs** : `otp_refuse` (`details.essaisRestants`) ; `trop_d_essais` (`details.reessayerLe`) ; `session_expiree` ; `canal_invalide` ; `fournisseur_indisponible` ; `trop_d_appels`.
+**Erreurs** : `otp_refuse` (`details.essaisRestants`) ; `trop_d_essais` (`details.reessayerLe`) ; `reessayer_plus_tard` (contrôle anti-retour, sans décompte) ; `session_expiree` ; `canal_invalide` ; `fournisseur_indisponible` ; `trop_d_appels`.
 
 ### 2.16 `session/identite/demarrer`
 
@@ -674,6 +677,7 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 | `trop_d_essais` | 429 | 5 essais de code ou de dernier code en 15 min, ou délai d'essai du PIN en cours (`details.reessayerLe`) |
 | `trop_d_appels` | 429 | limite d'une route dépassée (`details.reessayerLe`) |
 | `pin_indisponible_temporaire` | 503 | pas de majorité, registre illisible, transaction refusée, mémoire pleine |
+| `reessayer_plus_tard` | 503 | le contrôle anti-retour global refuse d'ouvrir (`ARCHITECTURE.md`) ; aucun détail, aucun essai décompté |
 | `registre_indisponible` | 503 | registre ou bucket des marqueurs illisible |
 | `passerelle_indisponible` | 503 | la passerelle ne répond pas ou répond hors contrat |
 | `fournisseur_indisponible` | 503 | Twilio, Stripe ou le prestataire d'impression en échec |
@@ -705,3 +709,4 @@ Valeurs initiales pour le reste :
 | `pin/deposer`, `pin/evaluer` au-delà du délai croissant, `alerte/fiche`, `session/identite/bascule`, `session/fermer`, `session/refuser-role`, `grappe/rejoindre` | à fixer au lot 1 bis |
 
 Un dépassement renvoie `429 trop_d_appels` avec `details.reessayerLe`.
+
