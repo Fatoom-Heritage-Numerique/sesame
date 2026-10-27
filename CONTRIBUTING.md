@@ -17,7 +17,7 @@ La prose est en **français** : documents, commentaires, messages de commit, des
 ## Règles du code
 
 - **Go**, dernière version stable épinglée dans `go.mod` et dans la CI ; module unique ; binaire statique.
-- **Cryptographie de la bibliothèque standard** (`crypto/ecdh`, `crypto/aes`, `crypto/ed25519`, `crypto/ecdsa`, `crypto/hkdf`, `crypto/mlkem`). Seule exception : `github.com/cloudflare/circl` pour l'OPRF du protocole de PIN, épinglée. Aucune autre bibliothèque cryptographique.
+- **Cryptographie de la bibliothèque standard** (`crypto/ecdh`, `crypto/aes`, `crypto/ed25519`, `crypto/ecdsa`, `crypto/hkdf`, `crypto/mlkem`). Deux exceptions, épinglées : `github.com/cloudflare/circl` pour l'OPRF du protocole de PIN et `golang.org/x/crypto/argon2` pour l'Argon2id de l'index des lettres d'invitation. Aucune autre bibliothèque cryptographique.
 - **Dépendances** : SDK Google officiels (KMS, Firestore, Secret Manager) ; `go.etcd.io/raft/v3`, épinglée, pour la grappe du protocole de PIN ; `net/http` brut pour Twilio Verify, Twilio Messaging, SendGrid, Stripe Identity et Pingen. Toute nouvelle dépendance se justifie dans la PR et entre dans la liste d'`ARCHITECTURE.md` §2.1 ; la CI refuse une dépendance réseau hors liste.
 - **Adresses des fournisseurs en dur** dans le code, jamais lues au démarrage. Ce qui est propre à un client (identifiants de compte, textes, gabarit de lettre, adresse de la passerelle) est une variable attestée ; les clés d'API sont dans Secret Manager. **Rien de propre à un client dans ce dépôt** : ni identifiant, ni texte de marque, ni adresse.
 - **Budget** : au plus 6 000 lignes de Go hors tests, contrôlé en CI. Une PR qui le dépasse doit retirer autant qu'elle ajoute.
