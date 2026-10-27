@@ -39,7 +39,7 @@ On ne modifie jamais un vecteur à la main.
 ## Ce qu'une PR contient
 
 - Un titre et une description en français : ce qui change, pourquoi, quelle section d'`ARCHITECTURE.md` ou d'`API.md` est concernée.
-- Les tests : chaque décision de Sésame (charte périmée, rôle insuffisant, signalement trop récent, enveloppe à AAD étranger, défi rejoué, annulation d'un autre signalement, …) a son test unitaire ; la lettre est comparée octet pour octet ; les fournisseurs sont rejoués par des doubles HTTP locaux.
+- Les tests : chaque décision de Sésame (charte périmée, rôle insuffisant, signalement trop récent, enveloppe à AAD étranger, défi rejoué, annulation d'un autre signalement, …) a son test unitaire ; la lettre est comparée octet pour octet ; les fournisseurs sont rejoués par des doubles : Twilio et SendGrid en mémoire, Stripe et Pingen en doubles HTTP locaux (`ARCHITECTURE.md` §2.4).
 - Les documents mis à jour si le changement les rend faux, et un fichier `docs/decisions/` si une décision est prise ou revue (une décision revue est un **nouveau** fichier, jamais une réécriture).
 - La CI verte : build reproductible (double construction), budget, vecteurs, schéma de `versions.json`, cohérence KMS ⇔ `versions.json`, dépendances, image sans shell, borne du registre (`RELEASE.md` §8).
 

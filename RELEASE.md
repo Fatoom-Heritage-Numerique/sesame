@@ -125,7 +125,7 @@ La condition du fournisseur du pool d'identités est le seul point d'autorisatio
 
 Un contrôle CI lit la condition avec `gcloud` et échoue au moindre écart. Une empreinte autorisée dans KMS mais absente de `versions.json` signifie qu'une image non publiée pourrait desceller des clés (`THREAT_MODEL.md` §2, limite 2).
 
-Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit le bucket d'audit public (journaux d'administration de Google exportés et bornes du registre) et signale : tout appel aux clés qui ne vient pas d'une empreinte `en_service` dans l'historique de `versions.json` à cette date ; toute modification d'IAM, de pool, de fournisseur, de journalisation ou de verrou sans commit de `versions.json` correspondant ; tout import de matériel de clé ; tout trou de plus de 3 heures dans les bornes. La CI l'exécute chaque jour et publie son résultat ; n'importe qui peut l'exécuter.
+Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit le bucket d'audit public (journaux d'administration de Google exportés et bornes du registre) et signale, entre autres (liste complète : `ARCHITECTURE.md` §8.3) : tout appel aux clés qui ne vient pas d'une empreinte `en_service` dans l'historique de `versions.json` à cette date ; toute modification d'IAM, de pool, de fournisseur, de journalisation ou de verrou sans commit de `versions.json` correspondant ; tout import de matériel de clé ; tout trou de plus de 3 heures dans les bornes. La CI l'exécute chaque jour et publie son résultat ; n'importe qui peut l'exécuter.
 
 ## 8. Contrôles CI du dépôt
 
