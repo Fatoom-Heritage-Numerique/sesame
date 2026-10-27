@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0004 · Le dernier code est envoyé et vérifié par Sésame
 
@@ -18,8 +18,8 @@ Le **dernier code** est envoyé par **Sésame** (Twilio Verify, appelé depuis l
 
 ## Conséquences et limites
 
-Sésame embarque un client REST pour le fournisseur de SMS et d'email, et ses identifiants dans Secret Manager sous condition d'attestation. Le client conserve malgré tout les codes d'accès (scellés sous sa propre clé KMS) : limite assumée et compensée par ce second facteur (`THREAT_MODEL.md` §2, limite 3). Un fournisseur d'envoi piraté qui lit les deux facteurs d'un même canal reste un risque : décision 0012.
+Sésame embarque un client REST pour le fournisseur de SMS et d'email, et ses identifiants dans Secret Manager sous condition d'attestation. Le client conserve malgré tout les codes d'accès (scellés sous sa propre clé KMS) : limite assumée et compensée par ce second facteur (`THREAT_MODEL.md` §2, limite 3). Un fournisseur d'envoi piraté qui lit les deux facteurs d'un même canal reste un risque : décisions 0012 puis 0013.
 
 ## Documents concernés
 
-`ARCHITECTURE.md` §9.2 ; `API.md` §2.5, §2.6 ; `THREAT_MODEL.md` §2 (3, 13).
+`ARCHITECTURE.md` §11.2 ; `API.md` (`session/ouvrir`, `session/verifier`) ; `THREAT_MODEL.md` §2 (3, 13).

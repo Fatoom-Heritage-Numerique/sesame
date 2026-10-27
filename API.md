@@ -4,32 +4,65 @@
 
 Ce document est le contrat des routes que Sésame expose et des routes que le client doit exposer à Sésame (la passerelle). Il publie `docs/technique/sesame/contrat-http.md` du dépôt Fatoom, qui fait foi ; l'OpenAPI, les vecteurs de test et le double local `sesame-fake` en dérivent. En cas d'écart, la source se corrige d'abord.
 
-Les limites de débit du §7 sont des valeurs initiales, à ajuster avec les mesures du double local ; celles notées « à fixer au lot 1 bis » le seront avec les tests de charge. Tout le reste est fixé par la spécification de référence.
+Les limites de débit du §7 sont des valeurs initiales, révisables avec les tests de charge du lot 1 bis, sauf celles que le §7 dit spécifiées ou décidées. Tout le reste est fixé par la spécification de référence.
 
 ## 1. Conventions
 
 ### 1.1 Adresse et transport
 
 - Sésame est joint à l'adresse publique de l'instance (pour Fatoom : `https://sesame.fatoom.fr`). TLS est terminé par le répartiteur de charge, hors de l'enclave : il ne protège rien à lui seul.
-- Sésame tourne sur trois VM, une par zone. `GET /attestation` est servie sans préfixe, par n'importe quelle VM, hors canal. Elle renvoie l'`instanceId` de la VM, dont le client déduit la zone (`a`, `b` ou `c`) ; il n'y a pas de champ `zone`.
+- Sésame tourne sur trois VM, une par zone. `GET /attestation` est servie sans préfixe, par n'importe quelle VM, hors canal. Elle renvoie l'`instanceId` de la VM, dont le client déduit le préfixe de la VM (`a`, `b` ou `c`, §1.2) ; il n'y a pas de champ `zone`.
 - Toute autre route passe par le **canal chiffré** d'`ARCHITECTURE.md`, à **un seul chemin** : `POST /n/{a|b|c}/canal`, adressé à la VM dont le client a vérifié l'attestation. Le nom de la route est dans le corps chiffré : le répartiteur, que l'administrateur règle, ne distingue pas une annulation d'une ouverture par un proche.
-- Le canal est hybride X25519 + ML-KEM-768, avec une clé par sens (`K_req` pour les requêtes, `K_res` pour les réponses). Sur le fil, chaque requête est :
+- Le canal est hybride X25519 + ML-KEM-768, avec une clé par sens (`K_req` pour les requêtes, `K_res` pour les réponses), dérivées comme le décrit `ARCHITECTURE.md`. Les messages du canal sont décrits au §1.2.
+- Requêtes et réponses sont en `Content-Type: application/json; charset=utf-8` ; toute réponse porte `Cache-Control: no-store`.
+- Le portail appelle Sésame depuis une autre origine. Toute réponse porte `Access-Control-Allow-Origin: *` ; une requête `OPTIONS` sur `/attestation` ou `/n/{a|b|c}/canal` reçoit `204` avec `Access-Control-Allow-Methods: GET, POST`, `Access-Control-Allow-Headers: Content-Type` et `Access-Control-Max-Age: 86400`. Sésame ne lit ni cookie ni en-tête d'authentification : l'origine ne protège rien, le canal protège tout.
+- L'adresse IP d'un appelant, clé des limites par IP (§7), est l'avant-dernière valeur de `X-Forwarded-For`, celle qu'ajoute le répartiteur. Elle sert contre l'abus, jamais contre l'administrateur, qui règle le répartiteur.
+
+### 1.2 Messages du canal
+
+**Requête**, corps de `POST /n/{a|b|c}/canal` :
 
 ```json
-{"instanceId": "<id>", "cliPub": "<base64, X25519>", "kemCt": "<base64, ML-KEM-768>", "n": 1, "body": "<base64>"}
+{"instanceId": "<id>", "cliPub": "<base64, X25519, 32 octets>", "kemCt": "<base64, ML-KEM-768, 1088 octets>",
+ "ivPrefixe": "<base64, 4 octets>", "n": 1, "body": "<base64>"}
 ```
 
-- `body` = AES-256-GCM(`K_req`, `IV_n`, UTF-8(JSON), aad `"fatoom-sesame-req|" ‖ n`). `n` est un compteur strictement croissant par client ; `IV_n` = 4 octets tirés à la création du canal ‖ `n` sur 8 octets gros-boutiste. La réponse à la requête `n` est chiffrée sous `K_res`, avec le même `IV_n` et l'aad `"fatoom-sesame-res|" ‖ n`.
-- Le corps déchiffré d'une requête nomme la route et porte ses données :
+- Un **canal** est désigné par (`instanceId`, `cliPub`). Le client le crée : il tire une paire X25519 (`cliPriv`, `cliPub`), encapsule vers `kemPub` (`kemCt`) et tire `ivPrefixe`, 4 octets de la primitive d'aléa. `kemCt` et `ivPrefixe` sont les mêmes sur toutes les requêtes du canal ; une requête qui présente un `cliPub` connu avec un autre `kemCt` ou un autre `ivPrefixe` est refusée (`canal_invalide`). Le client ne réutilise jamais une paire X25519 d'un canal à l'autre.
+- `n` est le compteur des requêtes du client sur ce canal : entier de 1 à 2³² − 1, strictement supérieur au dernier `n` accepté sur ce canal. Les trous sont admis : une requête perdue ne bloque pas le canal. Le client n'a qu'une requête en cours par canal ; pour des requêtes parallèles, il ouvre plusieurs canaux.
+- `IV_n` = `ivPrefixe` ‖ `n` en entier non signé sur 8 octets, gros-boutiste : 12 octets.
+- `body` = AES-256-GCM(`K_req`, `IV_n`, UTF-8(JSON canonique de `{"route", "corps"}`), aad = UTF-8(`"fatoom-sesame-req|"` ‖ `n` en décimal)), chiffré ‖ tag de 16 octets, en base64 standard. Le corps déchiffré nomme la route et porte ses données :
 
 ```json
 {"route": "deces/annuler", "corps": {…}}
 ```
 
-- Les corps décrits ci-dessous sont les JSON **en clair, avant chiffrement**. JSON canonique (RFC 8785), UTF-8 ; octets en base64 standard ; horodatages en ISO 8601 UTC (`2026-10-12T14:03:00Z`) ; identifiants dans `[A-Za-z0-9_-]`.
-- Taille d'un corps déchiffré : 64 Kio au plus, 256 Kio pour `session/ouvrir-cles`.
+- Sésame n'avance le dernier `n` d'un canal qu'une fois la requête déchiffrée : une requête indéchiffrable ne consomme rien.
 
-### 1.2 Statut HTTP et erreurs
+**Réponse**, en `HTTP 200` :
+
+```json
+{"n": 1, "body": "<base64>"}
+```
+
+- `n` est celui de la requête ; `body` = AES-256-GCM(`K_res`, `IV_n`, UTF-8(JSON canonique de la réponse, §1.3), aad = UTF-8(`"fatoom-sesame-res|"` ‖ `n` en décimal)).
+- Il n'y a pas de compteur des réponses : la réponse à la requête `n` reprend `IV_n` sous l'autre clé. Chaque couple (clé, IV) ne sert qu'une fois : `K_req` avec `IV_n` pour la seule requête `n`, `K_res` avec `IV_n` pour sa seule réponse. Sésame ne chiffre jamais deux réponses pour un même `n` d'un même canal : une requête rejouée, ou renvoyée avec le même `n`, reçoit `400 canal_invalide` en clair.
+- Le client refuse une réponse dont `n` n'est pas celui de sa requête, ou qui ne s'ouvre pas sous `K_res` ; il abandonne alors le canal. Il ne sait pas si la requête a été traitée : il ne la renvoie qu'avec un nouveau `n` ou sur un nouveau canal, et chaque route dit ce que donne une répétition.
+
+**Vie d'un canal** :
+
+- Le client ouvre un nouveau canal (nouvelle paire X25519, nouvelle encapsulation, nouveau `ivPrefixe`) avant que `n` dépasse 2³² − 1, après `410 instance_inconnue`, après `400 canal_invalide`, après une réponse refusée et après 1 h sans requête sur le canal. Vers la même instance, il reprend `sessionPub` et `kemPub` déjà vérifiées tant que le jeton vérifié n'a pas expiré (`exp`) ; sinon il refait `GET /attestation`.
+- Sésame ferme un canal resté 1 h sans requête (valeur initiale, révisable avec les tests de charge du lot 1 bis) : ses clés, ses défis et ses sessions de portail sont effacés. L'instance garde jusqu'à son arrêt l'empreinte de chaque canal qu'elle a fermé et refuse toute requête qui le présente (`400 canal_invalide`) : elle ne chiffre plus jamais sous ses clés.
+- Un redémarrage de la VM ferme tous ses canaux : `410 instance_inconnue`.
+
+**`instanceId`** :
+
+- Forme : `<p>-<22 caractères>`, expression `^[abc]-[A-Za-z0-9_-]{22}$`. `<p>` est le préfixe de routage de la VM : le répartiteur envoie `/n/<p>/…` à cette VM, et `<p>` est le dernier caractère du nom de la VM, qui se termine par `-a`, `-b` ou `-c` ; une VM dont le nom ne se termine pas ainsi refuse de démarrer. Les 22 caractères sont 16 octets de la primitive d'aléa, en base64url sans remplissage.
+- Tiré par l'instance à son démarrage, en mémoire seulement, jamais réutilisé : une VM redémarrée en tire un nouveau. Il est distinct de l'identifiant de nœud de la grappe (§4.1).
+- Émis : inscrit à `instances/{instanceId}` au démarrage (`ARCHITECTURE.md`), renvoyé par `GET /attestation`, porté par les bornes du registre et les journaux.
+- Vérifié par l'instance sur chaque requête du canal : un `instanceId` autre que le sien reçoit `410 instance_inconnue`. Le client en lit `<p>` pour choisir son chemin.
+- Il n'est pas attesté : un `instanceId` faux ne peut que faire échouer les requêtes, jamais exposer un message, car les clés du canal sont liées à `sessionPub` et `kemPub`, attestées.
+
+### 1.3 Statut HTTP et erreurs
 
 Toute réponse que l'enclave chiffre part en **`HTTP 200`**. Le vrai statut est dans le corps chiffré :
 
@@ -38,21 +71,27 @@ Toute réponse que l'enclave chiffre part en **`HTTP 200`**. Le vrai statut est 
 {"statut": 403, "erreur": "<code>", "message": "<phrase en français, non destinée à l'affichage>", "details": {…}}
 ```
 
-Un `403` ou un `409` en clair dirait au répartiteur quelle action a eu lieu. `erreur` est un code stable en `snake_case` français (liste §6) ; `message` peut changer ; `details` est présent quand indiqué (`essaisRestants`, `reessayerLe`). Les clients décident de l'affichage d'après `erreur`, jamais d'après `message`.
+- `statut` est un entier : `200`, ou le statut du code au §6.
+- `corps` n'existe que pour `200` ; `erreur` et `message` n'existent que pour une erreur ; `details` n'existe que quand le code l'indique : `essaisRestants` (entier ≥ 0), `reessayerLe` (horodatage). Aucun autre champ.
 
-Seules les erreurs hors canal sont renvoyées **en clair**, avec leur statut HTTP : l'instance ne peut pas chiffrer pour un canal qu'elle ne reconnaît pas.
+Un `403` ou un `409` en clair dirait au répartiteur quelle action a eu lieu. `erreur` est un code stable en `snake_case` français (liste §6) ; `message` peut changer. Les clients décident de l'affichage d'après `erreur`, jamais d'après `message`.
+
+Seules les erreurs hors canal sont renvoyées **en clair**, avec leur statut HTTP et le corps `{"erreur": "<code>", "message": "<phrase>"}` (plus `details.reessayerLe` pour `429`) : l'instance ne peut pas chiffrer pour un canal qu'elle ne reconnaît pas.
 
 | Statut en clair | Code | Quand |
 |---|---|---|
 | `410` | `instance_inconnue` | `instanceId` inconnu (VM redémarrée) : le client recommence à `GET /attestation` |
-| `400` | `canal_invalide` | corps indéchiffrable, `n` non strictement croissant, secret X25519 nul, ou session présentée depuis un autre canal que celui qui l'a ouverte |
+| `400` | `canal_invalide` | enveloppe de requête mal formée ou de plus de 400 Kio, corps indéchiffrable, `n` hors de 1 à 2³² − 1 ou non strictement croissant, `kemCt` ou `ivPrefixe` différent pour un même `cliPub`, canal fermé, secret X25519 nul, ou session présentée depuis un autre canal que celui qui l'a ouverte |
 | `503` | `attestation_indisponible` | `GET /attestation` avant que l'instance ait obtenu son jeton |
+| `429` | `trop_d_appels` | `GET /attestation` au-delà de sa limite (`details.reessayerLe`) |
 
-### 1.3 Authentification
+Toute autre réponse (statut ou forme hors contrat, erreur du répartiteur, coupure) est pour le client une panne réseau : il ne sait pas si la requête a été traitée (§1.2).
+
+### 1.4 Authentification
 
 | Appelant | Comment Sésame l'authentifie |
 |---|---|
-| App du titulaire, coffre ouvert | signature Ed25519 par la clé de vie `cleVie`, vérifiée avec la `cleViePub` du registre, sur un message « chaîne de domaine ‖ JSON canonique » ; la plupart des messages portent un **défi** (§1.4) |
+| App du titulaire, coffre ouvert | signature Ed25519 par la clé de vie `cleVie`, vérifiée avec la `cleViePub` du registre, sur un message « chaîne de domaine ‖ JSON canonique » ; la plupart des messages portent un **défi** (§1.5) |
 | App du titulaire, coffre verrouillé (`etat`) et essai de PIN (`pin/evaluer`) | jeton d'identité du titulaire émis par le fournisseur d'identité du client (pour Fatoom : `idToken` Firebase) |
 | App du titulaire, `enroler` | `idToken` ; en plus, une preuve `cleVie` dès qu'une ligne existe pour cet `uid` |
 | App du titulaire, `pin/deposer` | `idToken` **et** signature `cleVie` ; l'`idToken` n'est jamais suffisant seul |
@@ -60,27 +99,49 @@ Seules les erreurs hors canal sont renvoyées **en clair**, avec leur statut HTT
 | Serveur du client | jeton OIDC Google d'un compte de service (pour Fatoom : `<compte-deces>`), dans le champ `jetonFatoom` du corps chiffré, jamais en en-tête (l'en-tête traverse le répartiteur en clair). Accepté seulement si la signature Google est valide, `exp` non passé, `iss` = `https://accounts.google.com`, `aud` = `https://sesame.fatoom.fr`, `email` = compte de service en variable attestée et `email_verified` vrai ; sinon `jeton_invalide` |
 | VM de Sésame | canal mutuellement attesté entre VM : même `image_digest`, `hwmodel` admis (§4) |
 
-### 1.4 Défis
+L'`idToken` est accepté seulement si sa signature est valide pour les clés publiques de l'émetteur, `exp` non passé, `iss` et `aud` ceux de l'émetteur en variable attestée (pour Fatoom : `iss` = `https://securetoken.google.com/<identifiant du projet Firebase>`, `aud` = cet identifiant) et `sub` égal à l'`uid` du corps ; sinon `jeton_invalide`.
 
-Un défi est tiré par Sésame (`defi`, §2.2) : 32 octets, à usage unique, valable 5 minutes, lié au canal qui l'a demandé, gardé en mémoire de l'instance. Il sert à la preuve de vie, à l'annulation d'un signalement, à la preuve d'enrôlement et au dépôt du PIN. Sésame l'efface dès qu'il l'a vérifié. Un défi inconnu, expiré ou déjà utilisé est refusé (`defi_invalide`). Une VM redémarrée a perdu ses défis : le client reçoit `410` et recommence.
+### 1.5 Défis
 
-### 1.5 Pièces signées par `session-sign`
+Un défi est tiré par Sésame (`defi`, §2.2) : 32 octets, à usage unique, valable 5 minutes, lié au canal qui l'a demandé et à l'`uid` du corps, gardé en mémoire de l'instance. Il sert à la preuve de vie, à l'annulation d'un signalement, à la preuve d'enrôlement et au dépôt du PIN. Sésame l'efface dès qu'il l'a vérifié, que la signature soit juste ou non. Un défi inconnu, expiré, déjà utilisé, demandé pour un autre `uid` ou sur un autre canal est refusé (`defi_invalide`). Une VM redémarrée a perdu ses défis : le client reçoit `410` et recommence. Un canal fermé perd aussi les siens.
+
+### 1.6 Pièces signées par `session-sign`
 
 Toutes sont signées par la clé KMS `session-sign` (ECDSA P-256, SHA-256), en `ES256` seul : `alg` est imposé, tout autre est refusé. La clé publique est lue par `kid` dans le champ `sessionSign` de la liste des versions compilée dans le client (`ARCHITECTURE.md`) ; le Sésame factice du lot 1 bis signe avec une clé fixe épinglée dans sa configuration. Le client conserve un reçu ; il ne lui donne aucun droit : Sésame ne lit jamais un reçu, il relit son registre.
 
+- Chaque pièce est un JWS compact (RFC 7515) d'en-tête `{"alg": "ES256", "kid": "session-sign/<version KMS>"}`, plus `"typ": "JWT"` pour le jeton de session.
+- La signature est au format JWS, `R ‖ S` sur 64 octets (RFC 7518) ; KMS rend une signature DER, que Sésame convertit.
+- `iat` et `exp` sont en secondes depuis l'époque Unix ; les autres dates sont des horodatages (§1.7).
+
 | Pièce | Forme |
 |---|---|
-| Jeton de session | JWT, en-tête `{"alg": "ES256", "typ": "JWT", "kid": "session-sign/<version KMS>"}` ; claims `{iss: "sesame", sub: <contactId>, uid, scope: "destine", base: "vivant" \| "deces" \| "inactivite", role: "proche" \| "gardien", iat, exp}`, `exp = iat + 3600` ; pas de `sid` |
-| Reçu de signalement | JWS compact, `{iss: "sesame", typ: "signalement", uid, signalementId, source, signaleLe, transmissibleLe, iat}` |
-| Reçu d'annulation | JWS compact, `{iss: "sesame", typ: "annulation", uid, signalementId, annuleLe, iat}` |
-| Reçu de génération | JWS compact, `{iss: "sesame", typ: "generation", uid, contactId, generation, iat}` |
-| Réponse de `etat` | JWS compact, `{iss: "sesame", typ: "etat", …}` (§2.5) |
+| Jeton de session | JWT ; claims `{iss: "sesame", sub: <contactId>, uid, scope: "destine", base: "vivant" \| "deces" \| "inactivite", role: "proche" \| "gardien", iat, exp}`, `exp = iat + 3600` ; pas de `sid` |
+| Reçu de signalement | `{iss: "sesame", typ: "signalement", uid, signalementId, source, signaleLe, transmissibleLe, iat}` |
+| Reçu d'annulation | `{iss: "sesame", typ: "annulation", uid, signalementId, annuleLe, iat}` |
+| Reçu de génération | `{iss: "sesame", typ: "generation", uid, contactId, generation, iat}` |
+| Réponse de `etat` | `{iss: "sesame", typ: "etat", …}` (§2.5) |
 
-Le `typ` sépare les domaines : une pièce d'un type n'est jamais acceptée pour un autre.
+Le `typ` sépare les domaines : une pièce d'un type n'est jamais acceptée pour un autre. Le jeton de session n'a pas de claim `typ` : il se reconnaît à son `scope`.
+
+### 1.7 Formats des champs
+
+- Les corps décrits ci-dessous sont les JSON **en clair, avant chiffrement**, écrits en JSON canonique (RFC 8785), UTF-8. Sésame refuse un corps à clé dupliquée, à champ inconnu, à champ obligatoire absent, à `null` hors contrat ou à type faux, et une route inconnue (`message_refuse`).
+- Taille d'un corps déchiffré : 64 Kio au plus, 256 Kio pour `session/ouvrir-cles` ; au-delà, `message_refuse`.
+- Octets : base64 standard avec remplissage (RFC 4648, §4), sauf mention de base64url ou d'hexadécimal (en minuscules). Une longueur fausse est refusée (`message_refuse`). Longueurs : `defi` 32 octets ; `signature` Ed25519 64 ; `cleViePub` 32 ; `kts` 32 ; `elementAveugle` et `evaluation` 32 (élément ristretto255 sérialisé, mode OPRF de la RFC 9497, suite `ristretto255-SHA512`) ; `enveloppe` 48 ; `iv` 12 ; `cle` 32 ; `sessionPub` et `cliPub` 32 ; `kemPub` 1184 ; `kemCt` 1088.
+- Identifiants : `uid`, `contactId` et `id` d'un contenu ont de 1 à 128 caractères dans `[A-Za-z0-9_-]` (`ARCHITECTURE.md`). Ceux que Sésame tire viennent de la primitive d'aléa, en base64url sans remplissage : `signalementId` (16 octets, 22 caractères), `sessionId` (32 octets, 43 caractères), `instanceId` (§1.2). `grappeId` est un hexadécimal de 64 caractères (`ARCHITECTURE.md`).
+- Horodatages : ISO 8601 UTC à la milliseconde, suffixe `Z` (`2026-10-12T14:03:00.000Z`). Dates civiles : `AAAA-MM-JJ`.
+- Nombres : entiers JSON sans fraction ni exposant, de −(2⁵³ − 1) à 2⁵³ − 1.
+- Dans une chaîne de domaine ou une aad, un entier s'écrit en décimal ASCII sans zéro en tête, `-1` avec son signe.
+- Téléphone : E.164, `^\+[1-9][0-9]{1,14}$`.
+- Chaînes saisies par une personne : en NFC (`ARCHITECTURE.md`) ; Sésame refuse une chaîne qui n'est pas en NFC (`message_refuse`) au lieu de la normaliser. Seul le code d'accès est envoyé tel que saisi : Sésame le normalise lui-même (`normalize`, `ARCHITECTURE.md`).
 
 ## 2. Routes de Sésame
 
-Sauf `GET /attestation`, chaque route s'appelle par `POST /n/{a|b|c}/canal` avec `{"route": "<nom>", "corps": {…}}` ; le nom est donné en titre. Toute route peut renvoyer `429 trop_d_appels` (`details.reessayerLe`) au-delà de sa limite (§7).
+Sauf `GET /attestation`, chaque route s'appelle par `POST /n/{a|b|c}/canal` avec `{"route": "<nom>", "corps": {…}}` ; le nom est donné en titre. Les statuts sont ceux du corps chiffré (§1.3). En plus des erreurs de chaque route, toute route du canal peut renvoyer :
+
+- `message_refuse` (400) : route inconnue, corps hors contrat (§1.7) ;
+- `trop_d_appels` (429, `details.reessayerLe`) : au-delà de sa limite (§7) ;
+- `registre_indisponible` (503) : registre illisible, pour une route qui lit ou écrit le registre, hors routes du PIN (`pin_indisponible_temporaire`).
 
 ### 2.1 `GET /attestation`
 
@@ -91,15 +152,15 @@ Sauf `GET /attestation`, chaque route s'appelle par `POST /n/{a|b|c}/canal` avec
 | Entrée | aucune |
 | Limite | 60 / min par IP |
 
-**Réponse `200`** :
+**Réponse `200`**, en clair :
 
 ```json
-{"jwt": "<JWT signé par Google>", "sessionPub": "<base64, X25519>", "kemPub": "<base64, ML-KEM-768>", "instanceId": "<id>"}
+{"jwt": "<JWT signé par Google>", "sessionPub": "<base64, X25519, 32 octets>", "kemPub": "<base64, ML-KEM-768, 1184 octets>", "instanceId": "<id>"}
 ```
 
-Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux valeurs, `base64url(SHA-256(sessionPub))` et `base64url(SHA-256(kemPub))` ; sinon il n'envoie rien.
+Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux valeurs, `base64url(SHA-256(sessionPub))` et `base64url(SHA-256(kemPub))` ; sinon il n'envoie rien. `instanceId` a la forme du §1.2.
 
-**Erreurs** : `503 attestation_indisponible`, en clair (jeton pas encore obtenu du lanceur : l'instance ne sert rien d'autre).
+**Erreurs**, en clair : `attestation_indisponible` (503 ; jeton pas encore obtenu du lanceur : l'instance ne sert rien d'autre) ; `trop_d_appels` (429).
 
 ### 2.2 `defi`
 
@@ -111,11 +172,13 @@ Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux 
 
 **Corps** : `{"uid": "<uid>"}`
 
-**Réponse `200`** : `{"defi": "<base64, 32 octets>", "expireLe": "<ISO>", "grappeId": "<id>"}`
+**Traitement** : Sésame tire le défi, le lie au canal et à l'`uid` (§1.5) ; il ne lit pas le registre : un défi s'obtient pour tout `uid`.
+
+**Réponse `200`** : `{"defi": "<base64, 32 octets>", "expireLe": "<ISO>", "grappeId": "<hex, 64 caractères>"}`
 
 `grappeId` identifie la grappe du protocole de PIN en service : l'app en a besoin pour signer un dépôt (§2.12), y compris à la création du coffre, où aucune évaluation ne précède.
 
-**Erreurs** : `trop_d_appels`.
+**Erreurs** : seulement les erreurs communes.
 
 ### 2.3 `enroler`
 
@@ -129,11 +192,11 @@ Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux 
 
 ```json
 {"uid": "<uid>", "idToken": "<jeton d'identité>", "ktsGeneration": 1, "kts": "<base64, 32 octets>",
- "cleViePub": "<base64, Ed25519>", "preuve": {"defi": "<base64>", "signature": "<base64>"},
- "cleViePubAttendue": "<base64, Ed25519>"}
+ "cleViePub": "<base64, Ed25519, 32 octets>", "preuve": {"defi": "<base64>", "signature": "<base64>"},
+ "cleViePubAttendue": "<base64, Ed25519, 32 octets>"}
 ```
 
-`kts` est la KTS en clair **à l'intérieur du corps chiffré** par le canal. `cleViePubAttendue` n'existe que pendant une reprise sans sauvegarde (ci-dessous). `preuve` est absente au premier enrôlement. Sinon, c'est la signature par la `cleVie` courante de :
+`ktsGeneration` est un entier ≥ 1. `kts` est la KTS en clair **à l'intérieur du corps chiffré** par le canal. `cleViePubAttendue` n'existe que pendant une reprise sans sauvegarde (ci-dessous). `preuve` est absente au premier enrôlement. Sinon, c'est la signature par la `cleVie` courante de :
 
 ```
 "fatoom-sesame-enroler|1|" ‖ uid ‖ JSON canonique {"v":1, "uid", "defi", "generation", "cleViePub"}
@@ -148,13 +211,15 @@ Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux 
 - **génération égale** : rescellement seul (reprise d'une création interrompue) ; la preuve doit se vérifier avec la `cleViePub` inscrite, la `cleViePub` reçue doit lui être égale, ni les chartes ni l'enregistrement du PIN ne sont touchés ;
 - **génération inférieure** : refusée.
 
-Sésame scelle la KTS sous la clé KMS `kts-seal`, crée ou met à jour la ligne, puis efface `kts`.
+Sésame scelle la KTS sous la clé KMS `kts-seal`, crée ou met à jour la ligne, puis efface `kts`. Une répétition à la même génération, avec une preuve sur un nouveau défi, est un rescellement : même effet.
 
 **Reprise sans sauvegarde** : pendant une reprise publiée marquée `sansSauvegarde` (`ARCHITECTURE.md`), une ligne absente dont le marqueur d'inscription existe admet un enrôlement avec `preuve`, vérifiée contre `cleViePubAttendue`, champ ajouté au corps, que l'app lit dans `users/{uid}.sesame.cleViePub`. Hors reprise, ce champ est refusé. Fatoom pourrait y substituer une autre clé : limite assumée (LIM-54). Le titulaire est alerté par Fatoom du ré-enrôlement.
 
-**Réponse `200`** : `{"sealedKts": "<base64>", "ktsGeneration": 1, "imageDigest": "sha256:…", "cleViePub": "<base64>"}`
+**Réponse `200`** : `{"sealedKts": "<base64>", "ktsGeneration": 1, "imageDigest": "sha256:<hex, 64 caractères>", "cleViePub": "<base64>", "enroledAt": "<ISO>"}`
 
-**Erreurs** : `jeton_invalide` ; `preuve_requise` (ligne existante, preuve absente ou invalide) ; `defi_invalide` ; `generation_non_croissante` ; `message_refuse` (corps mal formé, `cleViePub` absente, `cleViePubAttendue` hors reprise) ; `titulaire_indisponible` (ligne `supprime` ou rejetée, ou ligne absente alors qu'un marqueur d'inscription existe) ; `registre_indisponible` (bucket des marqueurs illisible : aucun premier enrôlement) ; `trop_d_appels`.
+`sealedKts` est le chiffré rendu par KMS, opaque pour le client. `enroledAt` est la date du premier enrôlement de la ligne, inchangée par une rotation ou un rescellement.
+
+**Erreurs** : `jeton_invalide` (401) ; `preuve_requise` (403 ; ligne existante, preuve absente ou invalide) ; `defi_invalide` (409) ; `generation_non_croissante` (409) ; `message_refuse` (400 ; corps mal formé, `cleViePub` absente, `cleViePub` différente de l'inscrite à génération égale, `cleViePubAttendue` hors reprise) ; `titulaire_indisponible` (409 ; ligne `supprime` ou rejetée, ou ligne absente alors qu'un marqueur d'inscription existe) ; `registre_indisponible` (503 ; registre ou bucket des marqueurs illisible : aucun premier enrôlement).
 
 ### 2.4 `vie`
 
@@ -181,9 +246,9 @@ Sésame scelle la KTS sous la clé KMS `kts-seal`, crée ou met à jour la ligne
  "ouvertures": [{"contactId": "<id>", "role": "proche" | "gardien", "ouvertLe": "<ISO>", "contenus": [{"type": "<type>", "id": "<id>"}]}]}
 ```
 
-`ouvertures` : sessions de proches depuis la dernière preuve de vie. `transmis` vaut `true` dès que `transmissibleLe` d'un signalement non annulé est passé, qu'une ouverture ait eu lieu ou non : l'app affiche alors `TransmissionDefinitive` (R-DECES-22) ; `signalement` et `ouvertures` disent de quoi il s'agit et qui a ouvert quoi. `pinPresent: false` : l'enregistrement du PIN manque dans la grappe en service, l'app redépose. `pinBloque: true` : le plafond d'essais est atteint, seul un nouveau PIN en sort.
+`signalement` est le signalement courant : le dernier inscrit, annulé ou non. `ouvertures` : sessions de proches depuis la dernière preuve de vie. `transmis` vaut `true` dès que `transmissibleLe` d'un signalement non annulé est passé, qu'une ouverture ait eu lieu ou non : l'app affiche alors `TransmissionDefinitive` (R-DECES-22) ; `signalement` et `ouvertures` disent de quoi il s'agit et qui a ouvert quoi. `pinPresent: false` : l'enregistrement du PIN manque dans la grappe en service, l'app redépose. `pinBloque: true` : le plafond d'essais est atteint, seul un nouveau PIN en sort.
 
-**Erreurs** : `defi_invalide` ; `message_refuse` (signature invalide) ; `titulaire_indisponible` (ligne absente ou `supprime`) ; `trop_d_appels`.
+**Erreurs** : `defi_invalide` (409) ; `message_refuse` (400 ; signature invalide) ; `titulaire_indisponible` (409 ; ligne absente ou `supprime`).
 
 ### 2.5 `etat`
 
@@ -200,7 +265,7 @@ Sésame scelle la KTS sous la clé KMS `kts-seal`, crée ou met à jour la ligne
 {"uid": "<uid>", "idToken": "<jeton d'identité>", "repere": {"ouvertures": "<ISO>" | null, "evaluations": 0}}
 ```
 
-Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ouverture qu'elle a vue ; `evaluations` est la dernière valeur qu'elle a reçue du compteur des évaluations du PIN décomptées, tenu par la grappe. L'app avance son repère après sa propre évaluation. Le compteur repart de zéro dans une nouvelle grappe.
+Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ouverture qu'elle a vue ; `evaluations` est la dernière valeur qu'elle a reçue du compteur des évaluations du PIN décomptées, tenu par la grappe (entier ≥ 0). L'app avance son repère après sa propre évaluation. Le compteur repart de zéro dans une nouvelle grappe : un `repere.evaluations` supérieur au compteur courant est traité comme `0`.
 
 **Réponse `200`** : `{"etat": "<JWS compact ES256>"}`, de charge utile :
 
@@ -210,9 +275,9 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
  "evaluationsDepuis": 0, "repere": {"ouvertures": "<ISO>" | null, "evaluations": 0}}
 ```
 
-`signalement` et les éléments d'`ouvertures` ont la forme de `vie` ; `ouvertures` ne contient que celles postérieures au repère. `evaluationsDepuis` = compteur courant − `repere.evaluations` ; non nul, l'app affiche une alerte locale. `repere` est le repère à jour, que l'app garde.
+`signalement` et les éléments d'`ouvertures` ont la forme de `vie` ; `ouvertures` ne contient que celles dont `ouvertLe` est strictement postérieur au repère. `evaluationsDepuis` = compteur courant − `repere.evaluations` ; non nul, l'app affiche une alerte locale. `repere` est le repère à jour, que l'app garde.
 
-**Erreurs** : `jeton_invalide` ; `titulaire_indisponible` (ligne absente, `supprime` ou rejetée) ; `trop_d_appels`.
+**Erreurs** : `jeton_invalide` (401) ; `titulaire_indisponible` (409 ; ligne absente, `supprime` ou rejetée).
 
 ### 2.6 `charte/generation`
 
@@ -222,7 +287,7 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 | Authentification | signature `cleVie`, sans défi : la génération strictement croissante refuse le rejeu |
 | Limite | 30 / min par `uid` |
 
-**Corps** : `{"uid": "<uid>", "contactId": "<id>", "generation": 2, "signature": "<base64>"}`, signature sur :
+**Corps** : `{"uid": "<uid>", "contactId": "<id>", "generation": 2, "signature": "<base64>"}`, `generation` entier ≥ 1 ou `-1`, signature sur :
 
 ```
 "fatoom-sesame-gen|1|" ‖ uid ‖ "|" ‖ contactId ‖ JSON canonique {"v":1, "uid", "contactId", "generation"}
@@ -233,9 +298,11 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 - posé par une **suppression** du proche, `-1` est **définitif** : aucune génération n'est plus acceptée pour ce `contactId` ;
 - posé par un **refus du rôle** (`session/refuser-role`, §2.21), `-1` accepte ensuite une génération supérieure à la dernière génération positive, que le registre garde : le titulaire peut republier la charte de ce proche et le réinviter.
 
+La même requête renvoyée après son succès reçoit `generation_non_croissante` : le reçu déjà obtenu fait foi pour l'app.
+
 **Réponse `200`** : `{"contactId": "<id>", "generation": 2, "recu": "<JWS, reçu de génération>"}`
 
-**Erreurs** : `generation_non_croissante` (y compris toute génération après une suppression) ; `message_refuse` (signature invalide) ; `titulaire_indisponible` (ligne absente, `supprime` ou rejetée) ; `trop_d_appels`.
+**Erreurs** : `generation_non_croissante` (409 ; y compris toute génération après une suppression) ; `message_refuse` (400 ; signature invalide) ; `titulaire_indisponible` (409 ; ligne absente, `supprime` ou rejetée).
 
 ### 2.7 `alerte/fiche`
 
@@ -243,23 +310,23 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 |---|---|
 | Appelant | app : fin de la création du coffre (non bloquant, retenté à chaque déverrouillage jusqu'au succès), changement du téléphone ou de l'email du titulaire |
 | Authentification | signature `cleVie` |
-| Limite | à fixer au lot 1 bis |
+| Limite | 10 / jour par `uid` (valeur initiale, révisable avec les tests de charge du lot 1 bis) |
 
-**Corps** : `{"uid": "<uid>", "generation": 1, "telephone": "<E.164>" | null, "email": "<adresse>", "signature": "<base64>"}`, signature sur `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation` et le JSON canonique de la fiche : `{"email":"<adresse>","generation":1,"telephone":"<E.164>"|null,"uid":"<uid>","v":1}`, clés triées, UTF-8, sans espace ni retour à la ligne. La génération empêche de rejouer une ancienne fiche. Les vecteurs sont générés par script (A-27).
+**Corps** : `{"uid": "<uid>", "generation": 1, "telephone": "<E.164>" | null, "email": "<adresse>", "signature": "<base64>"}`. `generation` est un entier ≥ 1 ; `email`, l'adresse du compte, en NFC (§1.7). La signature porte sur `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation ‖ JSON canonique de la fiche`, la fiche étant `{"email":"<adresse>","generation":1,"telephone":"<E.164>"|null,"uid":"<uid>","v":1}` : clés triées, UTF-8, sans espace ni retour à la ligne. La génération empêche de rejouer une ancienne fiche. Les vecteurs sont générés par script (A-27).
 
-**Traitement** : exige une génération strictement croissante ; scelle la fiche sous la clé KMS `alerte-seal` (aad `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation`) et la garde au registre (`ficheGeneration`, `ficheScellee`). Le client n'en garde aucune copie. Sésame l'ouvre seul pour envoyer ses alertes au titulaire.
+**Traitement** : exige une génération strictement supérieure à `ficheGeneration` (absente ⇒ `0`) ; scelle la fiche sous la clé KMS `alerte-seal` (aad `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation`) et la garde au registre (`ficheGeneration`, `ficheScellee`). Le client n'en garde aucune copie. Sésame l'ouvre seul pour envoyer ses alertes au titulaire.
 
 **Réponse `200`** : `{"ficheGeneration": 1}`
 
-**Erreurs** : `generation_non_croissante` ; `message_refuse` (signature invalide) ; `titulaire_indisponible` ; `trop_d_appels`.
+**Erreurs** : `generation_non_croissante` (409) ; `message_refuse` (400 ; signature invalide, `email` ou `telephone` hors format, chaîne qui n'est pas en NFC) ; `titulaire_indisponible` (409 ; ligne absente, `supprime` ou rejetée).
 
 ### 2.8 `deces/signaler`
 
 | | |
 |---|---|
 | Appelant | serveur du client (pour Fatoom : décès trouvé dans le fichier de l'INSEE, acte de décès validé, inactivité) |
-| Authentification | `jetonFatoom` (§1.3) |
-| Limite | 100 / min |
+| Authentification | `jetonFatoom` (§1.4) |
+| Limite | 100 / min pour le compte de service appelant |
 
 **Corps** :
 
@@ -267,13 +334,13 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 {"jetonFatoom": "<OIDC>", "uid": "<uid>", "source": "insee" | "acte" | "inactivite", "dateDeces": "<AAAA-MM-JJ>", "preuve": "<hex, SHA-256 du fichier de l'acte>"}
 ```
 
-`preuve` est obligatoire pour `acte`. Pour `inactivite`, le corps est `{jetonFatoom, uid, source: "inactivite"}`, sans `dateDeces`.
+`dateDeces` est obligatoire pour `insee` et `acte`. `preuve` (64 caractères hexadécimaux) est obligatoire pour `acte` et absente pour `insee`. Pour `inactivite`, le corps est `{jetonFatoom, uid, source: "inactivite"}`, sans `dateDeces`.
 
-**Traitement** : crée le signalement à **l'heure de Sésame** ; `transmissibleLe` = 23 h 59 min 59 s, heure de Paris, du 7ᵉ jour calendaire. Un signalement non annulé **de même nature** déjà présent est renvoyé sans en créer un second. Un signalement `deces` est accepté après une transmission par inactivité. Un signalement d'inactivité est refusé tant que `vivantLe` a moins de 3 mois et 30 jours. Sésame envoie lui-même ses alertes au titulaire (à l'inscription, puis à J3 et J6).
+**Traitement** : crée le signalement à **l'heure de Sésame** ; `transmissibleLe` = 23 h 59 min 59 s, heure de Paris, du 7ᵉ jour calendaire. Un signalement non annulé **de même nature** déjà présent est renvoyé sans en créer un second : même `signalementId`, `signaleLe` et `transmissibleLe`. Un signalement `deces` est accepté après une transmission par inactivité. Un signalement d'inactivité est refusé tant que `vivantLe` a moins de 3 mois et 30 jours. Sésame envoie lui-même ses alertes au titulaire (à l'inscription, puis à J3 et J6).
 
 **Réponse `200`** : `{"signalementId": "<id>", "signaleLe": "<ISO>", "transmissibleLe": "<ISO>", "recu": "<JWS, reçu de signalement>"}`
 
-**Erreurs** : `jeton_invalide` ; `message_refuse` (source inconnue, `acte` sans `preuve`) ; `inactivite_trop_recente` ; `titulaire_indisponible` (ligne absente, `supprime` ou rejetée) ; `trop_d_appels`.
+**Erreurs** : `jeton_invalide` (401) ; `message_refuse` (400 ; source inconnue, `acte` sans `preuve`, `dateDeces` absente pour `insee` ou `acte`) ; `inactivite_trop_recente` (409) ; `titulaire_indisponible` (409 ; ligne absente, `supprime` ou rejetée).
 
 ### 2.9 `deces/annuler`
 
@@ -298,7 +365,7 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
  "recu": "<JWS, reçu d'annulation>"}
 ```
 
-**Erreurs** : `deja_transmis` (`transmissibleLe` passé) ; `defi_invalide` ; `message_refuse` (signature invalide, ou signalement autre que le signalement courant) ; `trop_d_appels`.
+**Erreurs** : `deja_transmis` (409 ; `transmissibleLe` passé) ; `defi_invalide` (409) ; `message_refuse` (400 ; signature invalide, ou signalement autre que le signalement courant) ; `titulaire_indisponible` (409 ; ligne absente ou `supprime`).
 
 ### 2.10 `lettre/secours`
 
@@ -306,15 +373,15 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 |---|---|
 | Appelant | serveur du client, quand l'email **et** le téléphone d'un proche ont échoué techniquement |
 | Authentification | `jetonFatoom` |
-| Limite | 100 / min |
+| Limite | 100 / min pour le compte de service appelant |
 
 **Corps** : `{"jetonFatoom": "<OIDC>", "uid": "<uid>", "contactId": "<id>"}`
 
 **Traitement** : Sésame lit la charte du proche à la passerelle (§5.4) et vérifie que la transmission est ouverte (signalement à terme, non annulé) et que la charte a une adresse ; il tire alors un code d'invitation, inscrit `invitations/{lookup}` et commande la lettre ; le proche vérifiera son identité sur le portail. Le client ne peut que déclencher une lettre vers l'adresse scellée par le titulaire, jamais la rediriger.
 
-**Réponse `200`** : `{"commandee": true | false}`. `false` quand la transmission n'est pas ouverte, que la charte n'a pas d'adresse ou qu'une lettre est déjà commandée ; le motif est journalisé par Sésame, jamais renvoyé : le client ne doit rien apprendre de la charte.
+**Réponse `200`** : `{"commandee": true | false}`. `false` quand la transmission n'est pas ouverte, que la charte n'a pas d'adresse ou qu'une lettre est déjà commandée ; le motif est journalisé par Sésame, jamais renvoyé : le client ne doit rien apprendre de la charte. Une répétition après une lettre commandée reçoit donc `false`.
 
-**Erreurs** : `jeton_invalide` ; `titulaire_indisponible` (ligne rejetée) ; `passerelle_indisponible` ; `fournisseur_indisponible` ; `trop_d_appels`.
+**Erreurs** : `jeton_invalide` (401) ; `titulaire_indisponible` (409 ; ligne absente, `supprime` ou rejetée) ; `reessayer_plus_tard` (503 ; contrôle anti-retour du registre en cours) ; `passerelle_indisponible` (503) ; `fournisseur_indisponible` (503).
 
 ### 2.11 `titulaire/supprimer`
 
@@ -322,7 +389,7 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 |---|---|
 | Appelant | serveur du client : suppression du compte, suppression planifiée, suppression du coffre après une transmission |
 | Authentification | `jetonFatoom` |
-| Limite | 100 / min |
+| Limite | 100 / min pour le compte de service appelant |
 
 **Corps** : `{"jetonFatoom": "<OIDC>", "uid": "<uid>"}`
 
@@ -330,7 +397,7 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 
 **Réponse `200`** : `{"etat": "supprime"}`, ou `{"etat": "absent"}` pour un `uid` jamais enrôlé. Idempotente : un second appel répond pareil.
 
-**Erreurs** : `jeton_invalide` ; `titulaire_indisponible` (ligne rejetée : le client réessaie après la reprise) ; `trop_d_appels`.
+**Erreurs** : `jeton_invalide` (401) ; `titulaire_indisponible` (409 ; ligne rejetée : le client réessaie après la reprise).
 
 ### 2.12 `pin/deposer`
 
@@ -338,12 +405,12 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 |---|---|
 | Appelant | app, coffre ouvert : création du coffre (après `enroler`, avant toute écriture chez le client), changement de PIN, nouveau PIN après une récupération, ouverture réussie sur un nouvel appareil, redépôt (enregistrement effacé ou nouvelle grappe) |
 | Authentification | `idToken` **et** signature `cleVie` sur un défi |
-| Limite | à fixer au lot 1 bis |
+| Limite | 10 / h par `uid` (valeur initiale, révisable avec les tests de charge du lot 1 bis) |
 
 **Corps** :
 
 ```json
-{"uid": "<uid>", "idToken": "<jeton d'identité>", "grappeId": "<id>", "elementAveugle": "<base64>",
+{"uid": "<uid>", "idToken": "<jeton d'identité>", "grappeId": "<hex, 64 caractères>", "elementAveugle": "<base64, 32 octets>",
  "defi": "<base64>", "motif": "nouveau_pin" | "ouverture" | "redepot", "signature": "<base64>"}
 ```
 
@@ -353,17 +420,19 @@ Signature sur :
 "fatoom-pin-depot|1|" ‖ uid ‖ "|" ‖ grappeId ‖ JSON canonique {"v":1, "uid", "grappeId", "elementAveugle": hex(SHA-256(élément)), "defi", "motif"}
 ```
 
+`élément` est l'élément aveuglé sérialisé (32 octets) ; son empreinte s'écrit en hexadécimal de 64 caractères.
+
 **Traitement** : exige une ligne `actif` ; chaque changement est validé par la majorité de la grappe avant la réponse.
 
 - `nouveau_pin` (création du coffre, changement de PIN, nouveau PIN après une récupération) : nouvelle `cleOprf`, 10 essais ; seul motif admis au plafond ;
 - `ouverture` : seulement juste après une évaluation sur **le même canal**, pour le même `elementAveugle` ; garde `cleOprf`, remet 10 essais, sans évaluation ;
 - `redepot` (même PIN) : nouvelle `cleOprf`, garde le compteur d'essais.
 
-Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours après l'entrée dans la grappe inscrite. Mémoire de la grappe à 90 % : les nouveaux dépôts sont refusés.
+Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours après l'entrée dans la grappe inscrite. Mémoire de la grappe à 90 % : les nouveaux dépôts sont refusés. Une répétition demande un nouveau défi : un `nouveau_pin` ou un `redepot` répété tire encore une nouvelle `cleOprf`, et seule la dernière évaluation reçue vaut.
 
-**Réponse `200`** : `{"evaluation": "<base64>" | null, "grappeId": "<id>"}` (`null` pour `ouverture`)
+**Réponse `200`** : `{"evaluation": "<base64, 32 octets>" | null, "grappeId": "<hex, 64 caractères>"}` (`null` pour `ouverture`)
 
-**Erreurs** : `jeton_invalide` ; `message_refuse` (signature absente ou d'une autre clé) ; `defi_invalide` ; `pin_bloque` (plafond atteint, motif autre que `nouveau_pin`) ; `grappe_recente` ; `pin_indisponible` (ligne absente, rejetée ou `supprime`) ; `pin_indisponible_temporaire` (pas de majorité, registre illisible, transaction refusée, mémoire pleine) ; `trop_d_appels`.
+**Erreurs** : `jeton_invalide` (401) ; `message_refuse` (400 ; signature absente ou d'une autre clé, `ouverture` sans évaluation notée sur ce canal ou pour un autre élément) ; `defi_invalide` (409) ; `pin_bloque` (409 ; plafond atteint, motif autre que `nouveau_pin`) ; `grappe_recente` (409) ; `pin_indisponible` (409 ; ligne absente, rejetée ou `supprime`) ; `pin_indisponible_temporaire` (503 ; pas de majorité, registre illisible, transaction refusée, mémoire pleine).
 
 ### 2.13 `pin/evaluer`
 
@@ -371,15 +440,15 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 |---|---|
 | Appelant | app : ouverture du coffre sur un nouvel appareil, ou sur un appareil connu après une déconnexion |
 | Authentification | `idToken` seul |
-| Limite | délai croissant ci-dessous ; au-delà, à fixer au lot 1 bis |
+| Limite | délai croissant ci-dessous ; au-delà, 20 appels / h par `uid` et 60 / h par IP (valeur initiale, révisable avec les tests de charge du lot 1 bis) |
 
-**Corps** : `{"uid": "<uid>", "idToken": "<jeton d'identité>", "elementAveugle": "<base64>"}`
+**Corps** : `{"uid": "<uid>", "idToken": "<jeton d'identité>", "elementAveugle": "<base64, 32 octets>"}`
 
-**Traitement** : le leader de la grappe lit la ligne du registre, puis **décompte un essai**, validé par la majorité, **avant** d'évaluer. Délai croissant entre essais : aucun pour les 3 premiers, puis 1 min, 5 min, 15 min, 1 h, 4 h, 12 h, 24 h. Le 10ᵉ essai est évalué et répondu comme les autres (l'app vérifie le PIN sur place) ; `essaisRestants` tombe alors à 0 et `cleOprf` est effacée : un dépôt `ouverture` ultérieur est refusé (`pin_bloque`). Un 10ᵉ PIN juste n'ouvre donc pas : seul le code de récupération reste possible (R-PIN-02). Sésame alerte le titulaire à chaque essai décompté (au plus un message par heure). Sésame ne sait jamais si le PIN est juste : il n'existe pas de `pin_refuse`.
+**Traitement** : le leader de la grappe lit la ligne du registre, puis **décompte un essai**, validé par la majorité, **avant** d'évaluer. Délai croissant entre essais : aucun pour les 3 premiers, puis 1 min, 5 min, 15 min, 1 h, 4 h, 12 h, 24 h. Le 10ᵉ essai est évalué et répondu comme les autres (l'app vérifie le PIN sur place) ; `essaisRestants` tombe alors à 0 et `cleOprf` est effacée : un dépôt `ouverture` ultérieur est refusé (`pin_bloque`). Un 10ᵉ PIN juste n'ouvre donc pas : seul le code de récupération reste possible (R-PIN-02). Sésame alerte le titulaire à chaque essai décompté (au plus un message par heure). Sésame ne sait jamais si le PIN est juste : il n'existe pas de `pin_refuse`. Sésame note sur le canal la dernière évaluation, pour un dépôt `ouverture` (§2.12).
 
-**Réponse `200`** : `{"evaluation": "<base64>"}`, sans nombre d'essais restants.
+**Réponse `200`** : `{"evaluation": "<base64, 32 octets>"}`, sans nombre d'essais restants.
 
-**Erreurs** : `jeton_invalide` ; `pin_indisponible` (aucun enregistrement, compte inconnu, ligne absente, rejetée ou `supprime` ; sans décompte, même réponse dans tous ces cas) ; `pin_indisponible_temporaire` (registre illisible, pas de majorité) ; `pin_bloque` ; `trop_d_essais` (délai en cours, `details.reessayerLe`) ; `trop_d_appels`.
+**Erreurs** : `jeton_invalide` (401) ; `pin_indisponible` (409 ; aucun enregistrement, compte inconnu, ligne absente, rejetée ou `supprime` ; sans décompte, même réponse dans tous ces cas) ; `pin_indisponible_temporaire` (503 ; registre illisible, pas de majorité) ; `pin_bloque` (409) ; `trop_d_essais` (429 ; délai en cours, `details.reessayerLe`).
 
 ### 2.14 `session/ouvrir`
 
@@ -389,13 +458,13 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 | Authentification | le code |
 | Limite | 20 / 15 min par IP ; 5 essais / 15 min par IP ; 3 sessions simultanées par `contactId` |
 
-**Corps** : `{"code": "<code saisi>", "lookup": "<hex>"}`. `lookup` est l'index du code, étiré par Argon2id et calculé par le navigateur ; Sésame ne calcule un Argon2id que pour l'index d'un code d'invitation, une fois par lettre (§2.10).
+**Corps** : `{"code": "<code saisi>", "lookup": "<hex>"}`. `code` est envoyé tel que saisi (§1.7). `lookup` est l'index du code (`indexAcces`, hexadécimal en minuscules), étiré par Argon2id et calculé par le navigateur ; Sésame ne calcule un Argon2id que pour l'index d'un code d'invitation, une fois par lettre (§2.10).
 
 **Traitement** :
 
 1. Sésame cherche `invitations/{lookup}` au registre et vérifie le code par son `codeVerifier` ; trouvé : parcours « courrier » (identité, §2.16).
-2. Sinon : `GET /bundle?lookup=` à la passerelle (§5.2), descellement de la KTS, ouverture de la charte ; vérifie `codeVerifier`, `charte.generation == registre.chartes[contactId]`, `ktsGeneration`, `isUnlocked`. Rôle `gardien` : accepté. Rôle `proche` : exige un signalement à terme, non annulé (inactivité : sans preuve de vie reçue après le terme ; décès : définitif).
-3. Envoi du dernier code par Twilio Verify au téléphone de la charte, sinon à son email ; création de la session ; KTS effacée.
+2. Sinon : `GET /bundle?lookup=` à la passerelle (§5.2), descellement de la KTS, ouverture de la charte ; vérifie `codeVerifier`, `charte.generation == registre.chartes[contactId]` (absente du registre ⇒ seule la génération 1 est acceptée, `ARCHITECTURE.md`), `ktsGeneration`, `isUnlocked`. Rôle `gardien` : accepté. Rôle `proche` : exige un signalement à terme, non annulé (inactivité : sans preuve de vie reçue après le terme ; décès : définitif).
+3. Envoi du dernier code par Twilio Verify au téléphone de la charte, sinon à son email ; création de la session, liée au canal ; KTS effacée.
 
 **Réponse `200`** :
 
@@ -405,9 +474,9 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 - `sms`, `email` : le portail demande le dernier code (§2.15). Le masque d'un email garde la première lettre et le domaine entier.
 - `identite` : parcours « courrier » ; le portail enchaîne sur §2.16 (`masque: null`).
-- `aucun` : invitation dont l'identité est déjà vérifiée (`identiteVerifieeLe`) : le proche entre avec son code seul, sans nouvelle vérification ni dernier code (`masque: null`). La réponse porte en plus les champs de §2.15 (`jeton`, `scope`, `role`, `expireLe`, `prenom`, `titulaireAffiche`) ; l'ouverture est inscrite et notifiée comme au §2.15.
+- `aucun` : invitation dont l'identité est déjà vérifiée (`identiteVerifieeLe`) : le proche entre avec son code seul, sans nouvelle vérification ni dernier code (`masque: null`). La réponse porte en plus les champs de §2.15 (`jeton`, `scope`, `base`, `role`, `expireLe`, `prenom`, `titulaireAffiche`) ; l'ouverture est inscrite et notifiée comme au §2.15.
 
-**Erreurs** : `code_refuse`, **identique quel que soit le motif** (code inconnu, `codeVerifier` faux, charte révoquée, code non remis, proche avant l'échéance, signalement annulé, preuve de vie après une transmission par inactivité, `bundle` refusé par la passerelle, ligne rejetée), avec `details.essaisRestants` ; le motif est journalisé par Sésame. `trop_d_essais` (5 codes faux en 15 min, `details.reessayerLe`) ; `reessayer_plus_tard` (contrôle anti-retour du registre en cours, sans détail ni raison, sans décompter les essais) ; `trop_d_appels` (y compris une 4ᵉ session simultanée pour le même proche) ; `passerelle_indisponible` ; `fournisseur_indisponible`.
+**Erreurs** : `code_refuse` (403), **identique quel que soit le motif** (code inconnu, `codeVerifier` faux, charte révoquée, code non remis, proche avant l'échéance, signalement annulé, preuve de vie après une transmission par inactivité, `bundle` refusé par la passerelle, ligne rejetée), avec `details.essaisRestants` ; le motif est journalisé par Sésame. `trop_d_essais` (429 ; 5 codes faux en 15 min, `details.reessayerLe`) ; `reessayer_plus_tard` (503 ; contrôle anti-retour du registre en cours, sans détail ni raison, sans décompter les essais) ; `trop_d_appels` (429 ; y compris une 4ᵉ session simultanée pour le même proche) ; `passerelle_indisponible` (503) ; `fournisseur_indisponible` (503).
 
 ### 2.15 `session/verifier`
 
@@ -415,21 +484,21 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 |---|---|
 | Appelant | portail, saisie du dernier code |
 | Authentification | `sessionId`, sur le canal qui l'a ouverte |
-| Limite | 5 essais / 15 min par proche |
+| Limite | 5 essais / 15 min par proche ; 20 appels / 15 min par session (valeur initiale, révisable avec les tests de charge du lot 1 bis) |
 
-**Corps** : `{"sessionId": "<id>", "otp": "<code reçu>"}`
+**Corps** : `{"sessionId": "<id>", "otp": "<code reçu>"}`, `otp` en chiffres seulement, tel que Twilio Verify l'a envoyé.
 
 **Traitement** : vérification par Twilio Verify ; succès : ouverture inscrite au registre, jeton de session émis, alerte de connexion au client (`openingNotified`, §5.5). Pour le contact de confiance du vivant du titulaire, Sésame alerte aussi lui-même le titulaire, une fois par session.
 
 **Réponse `200`** :
 
 ```json
-{"jeton": "<JWT ES256>", "scope": "destine", "role": "proche" | "gardien", "expireLe": "<ISO>", "prenom": "<prénom de la charte>", "titulaireAffiche": "<nom du titulaire>"}
+{"jeton": "<JWT ES256>", "scope": "destine", "base": "vivant" | "deces" | "inactivite", "role": "proche" | "gardien", "expireLe": "<ISO>", "prenom": "<prénom de la charte>", "titulaireAffiche": "<nom du titulaire>"}
 ```
 
-`prenom` et `titulaireAffiche` sont lus dans la charte, pour l'affichage du portail (« Bonjour Léa »).
+`scope`, `base` et `role` sont ceux du jeton (§1.6) ; `expireLe` est son `exp`. `prenom` et `titulaireAffiche` sont lus dans la charte, pour l'affichage du portail (« Bonjour Léa »).
 
-**Erreurs** : `otp_refuse` (`details.essaisRestants`) ; `trop_d_essais` (`details.reessayerLe`) ; `reessayer_plus_tard` (contrôle anti-retour, sans décompte) ; `session_expiree` ; `canal_invalide` ; `fournisseur_indisponible` ; `trop_d_appels`.
+**Erreurs** : `otp_refuse` (403, `details.essaisRestants`) ; `trop_d_essais` (429, `details.reessayerLe`) ; `reessayer_plus_tard` (503 ; contrôle anti-retour, sans décompte) ; `session_expiree` (410) ; `canal_invalide` (400, en clair) ; `fournisseur_indisponible` (503).
 
 ### 2.16 `session/identite/demarrer`
 
@@ -445,7 +514,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Réponse `200`** : `{"clientSecret": "<client_secret Stripe Identity>"}`
 
-**Erreurs** : `identite_bloquee` (blocage de 24 h après 3 échecs, `details.reessayerLe`) ; `message_refuse` (session ni « courrier » ni basculée) ; `session_expiree` ; `canal_invalide` ; `fournisseur_indisponible` ; `trop_d_appels`.
+**Erreurs** : `identite_bloquee` (423 ; blocage de 24 h après 3 échecs, `details.reessayerLe`) ; `message_refuse` (400 ; session ni « courrier » ni basculée) ; `session_expiree` (410) ; `canal_invalide` (400, en clair) ; `fournisseur_indisponible` (503).
 
 ### 2.17 `session/identite/verifier`
 
@@ -461,7 +530,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Réponse `200`** : comme au §2.15.
 
-**Erreurs** : `identite_non_confirmee` (identité non conforme ou `requires_input` ; message neutre) ; `identite_bloquee` (3ᵉ échec, `details.reessayerLe`) ; `identite_en_attente` (Stripe n'a pas fini : le portail réessaie) ; `session_expiree` ; `canal_invalide` ; `fournisseur_indisponible` ; `trop_d_appels`.
+**Erreurs** : `identite_non_confirmee` (403 ; identité non conforme ou `requires_input` ; message neutre) ; `identite_bloquee` (423 ; 3ᵉ échec, `details.reessayerLe`) ; `identite_en_attente` (409 ; Stripe n'a pas fini : le portail réessaie) ; `reessayer_plus_tard` (503 ; contrôle anti-retour, sans décompte) ; `session_expiree` (410) ; `canal_invalide` (400, en clair) ; `fournisseur_indisponible` (503).
 
 ### 2.18 `session/identite/bascule`
 
@@ -469,7 +538,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 |---|---|
 | Appelant | portail, « Je n'ai plus ce numéro » ou « Je n'ai plus cet email », après `session/ouvrir` |
 | Authentification | `sessionId`, sur le canal qui l'a ouverte |
-| Limite | à fixer au lot 1 bis |
+| Limite | 5 / h par session (valeur initiale, révisable avec les tests de charge du lot 1 bis) |
 
 **Corps** : `{"sessionId": "<id>"}`
 
@@ -477,7 +546,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Réponse `200`** : `{"canal": "identite"}` ; le portail enchaîne sur `session/identite/demarrer`.
 
-**Erreurs** : `bascule_impossible` (charte sans nom ou sans date de naissance ; affiché « Nous n'avons pas pu confirmer votre identité ») ; `session_expiree` ; `canal_invalide` ; `trop_d_appels`.
+**Erreurs** : `bascule_impossible` (403 ; charte sans nom ou sans date de naissance ; affiché « Nous n'avons pas pu confirmer votre identité ») ; `session_expiree` (410) ; `canal_invalide` (400, en clair).
 
 ### 2.19 `session/ouvrir-cles`
 
@@ -491,7 +560,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 ```json
 {"sessionId": "<id>",
- "enveloppes": [{"type": "<type>", "id": "<contentId>", "contactId": "<id>", "enveloppe": "<base64>", "iv": "<base64>"}]}
+ "enveloppes": [{"type": "fichier" | "motdepasse" | "mot" | "volontes", "id": "<contentId>", "contactId": "<id>", "enveloppe": "<base64, 48 octets>", "iv": "<base64, 12 octets>"}]}
 ```
 
 Les enveloppes viennent du client (contenus listés avec le jeton de session) ; Sésame ne les a jamais vues.
@@ -508,7 +577,7 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
 
 `type` accompagne `id` : deux contenus de types différents peuvent avoir le même identifiant. Une enveloppe refusée n'empêche pas les autres. Le jeton renouvelé matérialise l'inactivité : chaque appel réussi prolonge la session ; sans appel pendant 1 h, elle expire.
 
-**Erreurs** : `enveloppe_refusee` (par élément, dans `refusees`) ; `message_refuse` (plus de 500 enveloppes, forme invalide) ; `session_expiree` ; `canal_invalide` ; `trop_d_appels`.
+**Erreurs** : `enveloppe_refusee` (par élément, dans `refusees`) ; `message_refuse` (400 ; plus de 500 enveloppes, forme invalide) ; `reessayer_plus_tard` (503 ; contrôle anti-retour) ; `session_expiree` (410) ; `canal_invalide` (400, en clair).
 
 ### 2.20 `session/fermer`
 
@@ -516,7 +585,7 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
 |---|---|
 | Appelant | portail |
 | Authentification | `sessionId`, sur le canal qui l'a ouverte |
-| Limite | à fixer au lot 1 bis |
+| Limite | 10 / h par canal (valeur initiale, révisable avec les tests de charge du lot 1 bis) |
 
 **Corps** : `{"sessionId": "<id>"}`
 
@@ -524,7 +593,7 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
 
 **Réponse `200`** : `{"fermee": true}`. Idempotente : une session déjà fermée ou expirée reçoit la même réponse.
 
-**Erreurs** : `canal_invalide` ; `trop_d_appels`.
+**Erreurs** : `canal_invalide` (400, en clair).
 
 ### 2.21 `session/refuser-role`
 
@@ -532,7 +601,7 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
 |---|---|
 | Appelant | portail, contact de confiance dans une session |
 | Authentification | `sessionId`, sur le canal qui l'a ouverte, de rôle `gardien` |
-| Limite | à fixer au lot 1 bis |
+| Limite | 5 / h par session (valeur initiale, révisable avec les tests de charge du lot 1 bis) |
 
 **Corps** : `{"sessionId": "<id>"}`
 
@@ -540,7 +609,7 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
 
 **Réponse `200`** : `{"refuse": true}`
 
-**Erreurs** : `role_insuffisant` (session d'un proche qui n'est pas contact de confiance) ; `session_expiree` ; `canal_invalide` ; `trop_d_appels`.
+**Erreurs** : `role_insuffisant` (403 ; session d'un proche qui n'est pas contact de confiance) ; `session_expiree` (410) ; `canal_invalide` (400, en clair).
 
 ## 3. Jetons d'attestation
 
@@ -548,7 +617,7 @@ Les contrôles d'un jeton d'attestation (émetteur, `image_digest` dans la liste
 
 ## 4. Routes entre VM
 
-Servies seulement sur le canal mutuellement attesté entre VM de Sésame, jamais aux clients. Chaque membre est joint à son adresse DNS interne zonale.
+Servies seulement sur le canal mutuellement attesté entre VM de Sésame, jamais aux clients. Chaque membre est joint à son adresse DNS interne zonale, sans passer par le répartiteur : sur ce canal, le statut HTTP est le vrai statut et le corps d'erreur est `{"erreur": "<code>", "message": "<phrase>"}`.
 
 ### 4.1 `grappe/rejoindre`
 
@@ -556,15 +625,15 @@ Servies seulement sur le canal mutuellement attesté entre VM de Sésame, jamais
 |---|---|
 | Appelant | une VM de Sésame qui démarre sans état |
 | Authentification | attestation mutuelle : même `image_digest`, `hwmodel` admis |
-| Limite | à fixer au lot 1 bis |
+| Limite | 2 / min par `nodeId` (valeur initiale, révisable avec les tests de charge du lot 1 bis) |
 
-**Corps** : `{"jwt": "<jeton d'attestation de la VM>", "nodeId": "<id>"}`. Le jeton porte `image_digest`, `hwmodel` et la zone ; il lie l'identifiant de nœud neuf par `eat_nonce`.
+**Corps** : `{"jwt": "<jeton d'attestation de la VM>", "nodeId": "<id>"}`. `nodeId` est l'identifiant de nœud neuf : 16 octets de la primitive d'aléa, en base64url sans remplissage. Le jeton porte `image_digest`, `hwmodel` et la zone ; il lie l'identifiant de nœud neuf par `eat_nonce`.
 
 **Traitement** : la VM est admise sans intervention si elle a le même `image_digest` et un `hwmodel` admis, si elle prend la zone d'un votant injoignable depuis au moins 2 minutes et si aucune autre modification de membres n'est en cours. Elle est ajoutée comme apprenante, promue, puis l'ancien membre est retiré. Sinon elle est refusée et la demande journalisée. Un ancien identifiant de nœud est refusé.
 
-**Réponse** : `{"admise": true, "role": "apprenant"}`
+**Réponse `200`** : `{"admise": true, "role": "apprenant"}`
 
-**Erreurs** : `refusee` (hors de ces conditions) ; `pin_indisponible_temporaire` (pas de majorité).
+**Erreurs** : `refusee` (409 ; hors de ces conditions) ; `pin_indisponible_temporaire` (503 ; pas de majorité) ; `message_refuse` (400) ; `trop_d_appels` (429).
 
 ### 4.2 `grappe/membres`
 
@@ -582,9 +651,9 @@ Chaque appel porte cinq en-têtes :
 |---|---|
 | `X-Sesame-Attestation` | le JWT d'attestation courant de l'instance |
 | `X-Sesame-Session-Pub` | `sessionPub` de l'instance (base64), pour vérifier `eat_nonce` |
-| `X-Sesame-Date` | horodatage ISO 8601 UTC de la requête |
-| `X-Sesame-Request-Id` | UUID v4 unique par requête |
-| `X-Sesame-Signature` | base64 d'une signature ECDSA P-256 / SHA-256 par la clé KMS `session-sign` sur `UTF-8(méthode ‖ "|" ‖ chemin-et-query ‖ "|" ‖ X-Sesame-Date ‖ "|" ‖ X-Sesame-Request-Id ‖ "|" ‖ hex(SHA-256(corps)))` (corps vide ⇒ SHA-256 de zéro octet) |
+| `X-Sesame-Date` | horodatage ISO 8601 UTC de la requête (§1.7) |
+| `X-Sesame-Request-Id` | UUID v4 unique par requête, en minuscules |
+| `X-Sesame-Signature` | base64 de la signature ECDSA P-256 / SHA-256, au format DER que rend KMS, par la clé KMS `session-sign` sur `UTF-8(méthode ‖ "|" ‖ chemin-et-query ‖ "|" ‖ X-Sesame-Date ‖ "|" ‖ X-Sesame-Request-Id ‖ "|" ‖ hex(SHA-256(corps)))` (corps vide ⇒ SHA-256 de zéro octet) |
 
 La passerelle :
 
@@ -593,9 +662,9 @@ La passerelle :
 - refuse un horodatage à plus de 5 min et un `X-Sesame-Request-Id` déjà vu dans les 10 min ;
 - limite les appels à 300 / min par instance.
 
-Échec : `401`, journal `SESAME_ATTESTATION_REJECTED` avec `imageDigest`.
+Échec de l'attestation, de la signature, de l'horodatage ou de l'identifiant : `401`, journal `SESAME_ATTESTATION_REJECTED` avec `imageDigest`. Au-delà de la limite : `429`. Requête hors contrat : `400`. Sésame traite toute réponse autre que celles de ce §5 comme une panne : `passerelle_indisponible` pour la route du canal qui en dépend.
 
-Le trafic Sésame → passerelle n'a pas de canal applicatif : JSON en clair sous TLS. Ce qu'il transporte (chartes et scellés chiffrés, identifiants opaques, statuts) n'est pas exploitable sans l'enclave.
+Le trafic Sésame → passerelle n'a pas de canal applicatif : JSON en clair sous TLS, `Content-Type: application/json`. Ce qu'il transporte (chartes et scellés chiffrés, identifiants opaques, statuts) n'est pas exploitable sans l'enclave.
 
 Les routes sont servies sous l'adresse de la passerelle : `GET /bundle` et `POST /<notification>` (corps JSON).
 
@@ -623,6 +692,8 @@ Les chartes des proches à prévenir par lettre (`courrier == true`).
  "chartes": [{"contactId": "<id>", "charte": "<base64>", "charteIv": "<base64>", "charteGeneration": 1}]}
 ```
 
+`chartes` est vide quand aucun proche n'est « courrier » ; `404` sans motif pour un `uid` inconnu.
+
 ### 5.4 `GET /bundle?uid=<uid>&contactId=<id>`
 
 Un proche par son identifiant : la lettre de secours vise un proche qui n'est pas « courrier », et le parcours « courrier » retrouve le proche par `invitations/{lookup}` (`uid`, `contactId`). Sésame ne garde aucune charte. **Réponse** : comme au §5.2 ; `404` sans motif sinon.
@@ -631,7 +702,7 @@ Le client ne peut que retenir une charte, jamais la modifier (elle est authentif
 
 ### 5.5 Notifications
 
-`POST /<nom>`, corps JSON. La passerelle répond `200 {}` ; tout autre statut, ou une erreur réseau, fait réessayer Sésame avec un délai croissant pendant 24 h, puis la notification est journalisée comme perdue. Toute notification est idempotente côté client sur `X-Sesame-Request-Id`. Les notifications ne portent **jamais** de code, de clé ni de résultat d'identité.
+`POST /<nom>`, corps JSON. La passerelle répond `200 {}` ; tout autre statut, ou une erreur réseau, fait réessayer Sésame avec un délai croissant pendant 24 h, puis la notification est journalisée comme perdue. Toute notification est idempotente côté client sur `X-Sesame-Request-Id`, que Sésame garde d'un essai à l'autre. Les notifications ne portent **jamais** de code, de clé ni de résultat d'identité.
 
 | Route | Quand | Corps |
 |---|---|---|
@@ -651,10 +722,10 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 
 | Code | Statut | Quand |
 |---|---|---|
-| `canal_invalide` | 400, en clair | corps indéchiffrable, `n` non croissant, secret nul, session présentée depuis un autre canal |
+| `canal_invalide` | 400, en clair | enveloppe mal formée ou trop grande, corps indéchiffrable, `n` hors bornes ou non croissant, `kemCt` ou `ivPrefixe` changé, canal fermé, secret nul, session présentée depuis un autre canal (§1.3) |
 | `instance_inconnue` | 410, en clair | `instanceId` inconnu (redémarrage) : le client reprend à `GET /attestation` |
 | `attestation_indisponible` | 503, en clair | jeton d'attestation pas encore obtenu du lanceur |
-| `message_refuse` | 400 | corps mal formé, champ manquant, valeur hors contrat, signature `cleVie` invalide |
+| `message_refuse` | 400 | route inconnue, corps mal formé, champ manquant ou inconnu, valeur hors contrat, longueur fausse, chaîne hors NFC, corps trop grand, signature `cleVie` invalide |
 | `jeton_invalide` | 401 | `idToken` ou jeton OIDC refusé |
 | `code_refuse` | 403 | code d'accès refusé, quel que soit le motif (`details.essaisRestants`) |
 | `otp_refuse` | 403 | dernier code faux (`details.essaisRestants`) |
@@ -664,7 +735,7 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 | `bascule_impossible` | 403 | charte sans nom ou sans date de naissance ; message neutre |
 | `deja_transmis` | 409 | annulation après `transmissibleLe` |
 | `generation_non_croissante` | 409 | génération de KTS, de charte ou de fiche non croissante, ou génération après une suppression de proche |
-| `defi_invalide` | 409 | défi inconnu, expiré ou déjà utilisé |
+| `defi_invalide` | 409 | défi inconnu, expiré, déjà utilisé, ou d'un autre canal ou d'un autre `uid` |
 | `inactivite_trop_recente` | 409 | signalement d'inactivité avant le plancher |
 | `grappe_recente` | 409 | dépôt dans une autre grappe moins de 30 jours après l'entrée dans la grappe inscrite |
 | `pin_bloque` | 409 | plafond de 10 essais atteint |
@@ -675,38 +746,48 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 | `session_expiree` | 410 | session sans activité depuis 1 h, fermée ou inconnue |
 | `identite_bloquee` | 423 | 3 échecs d'identité : 24 h (`details.reessayerLe`) |
 | `trop_d_essais` | 429 | 5 essais de code ou de dernier code en 15 min, ou délai d'essai du PIN en cours (`details.reessayerLe`) |
-| `trop_d_appels` | 429 | limite d'une route dépassée (`details.reessayerLe`) |
+| `trop_d_appels` | 429 | limite d'une route dépassée (`details.reessayerLe`) ; en clair pour `GET /attestation` |
 | `pin_indisponible_temporaire` | 503 | pas de majorité, registre illisible, transaction refusée, mémoire pleine |
-| `reessayer_plus_tard` | 503 | le contrôle anti-retour global refuse d'ouvrir (`ARCHITECTURE.md`) ; aucun détail, aucun essai décompté |
+| `reessayer_plus_tard` | 503 | le contrôle anti-retour global refuse d'ouvrir ou de transmettre (`ARCHITECTURE.md`) ; aucun détail, aucun essai décompté |
 | `registre_indisponible` | 503 | registre ou bucket des marqueurs illisible |
 | `passerelle_indisponible` | 503 | la passerelle ne répond pas ou répond hors contrat |
 | `fournisseur_indisponible` | 503 | Twilio, Stripe ou le prestataire d'impression en échec |
 | `enveloppe_refusee` | — | par enveloppe, dans `refusees` : aad étranger, tag invalide, contenu non ouvrable |
 
-Sauf les trois premiers, le statut est celui du corps chiffré (§1.2) ; la réponse HTTP est `200`.
+Sauf les trois premiers et `trop_d_appels` sur `GET /attestation`, le statut est celui du corps chiffré (§1.3) ; la réponse HTTP est `200`.
 
 ## 7. Limites
 
-Spécifiées : 5 essais / 15 min pour le code d'accès (par IP) et le dernier code (par proche) ; 3 échecs / 24 h pour l'identité ; défi à usage unique valable 5 min ; 10 essais par PIN, avec le délai croissant du §2.13 ; 1 h d'inactivité pour une session de portail.
+Spécifiées : 5 essais / 15 min pour le code d'accès (par IP) et le dernier code (par proche) ; 3 échecs / 24 h pour l'identité ; défi à usage unique valable 5 min ; 10 essais par PIN, avec le délai croissant du §2.13 ; 1 h d'inactivité pour une session de portail ; `n` de 1 à 2³² − 1 par canal.
 
-Valeurs initiales pour le reste :
+Décidée : `etat`, 100 / jour par `uid` (`ARCHITECTURE.md`).
 
-| Route | Limite |
-|---|---|
-| `GET /attestation` | 60 / min par IP |
-| `defi` | 30 / h par `uid` |
-| `enroler` | 5 / h par `uid`, 20 / h par IP |
-| `vie` | 10 / jour par `uid` |
-| `etat` | 100 / jour par `uid`, 60 / min par IP |
-| `charte/generation` | 30 / min par `uid` |
-| `deces/annuler` | 10 / jour par `uid` |
-| `deces/signaler`, `titulaire/supprimer`, `lettre/secours` | 100 / min |
-| `session/ouvrir` | 20 / 15 min par IP ; 3 sessions simultanées par `contactId` |
-| `session/identite/*` | 5 / h par session |
-| `session/ouvrir-cles` | 500 enveloppes par appel, 60 appels / h par session |
-| Corps déchiffré | 64 Kio ; 256 Kio pour `session/ouvrir-cles` |
-| Passerelle (appels de Sésame) | 300 / min par instance |
-| `pin/deposer`, `pin/evaluer` au-delà du délai croissant, `alerte/fiche`, `session/identite/bascule`, `session/fermer`, `session/refuser-role`, `grappe/rejoindre` | à fixer au lot 1 bis |
+Toutes les autres valeurs sont des valeurs initiales :
+
+| Route | Limite | Statut |
+|---|---|---|
+| `GET /attestation` | 60 / min par IP | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `defi` | 30 / h par `uid` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `enroler` | 5 / h par `uid`, 20 / h par IP | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `vie` | 10 / jour par `uid` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `etat` | 100 / jour par `uid` | décidée |
+| `etat` | 60 / min par IP | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `charte/generation` | 30 / min par `uid` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `alerte/fiche` | 10 / jour par `uid` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `deces/signaler`, `titulaire/supprimer`, `lettre/secours` | 100 / min chacune, pour le compte de service appelant | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `deces/annuler` | 10 / jour par `uid` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `pin/deposer` | 10 / h par `uid` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `pin/evaluer`, au-delà du délai croissant | 20 appels / h par `uid`, 60 / h par IP | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `session/ouvrir` | 20 / 15 min par IP ; 3 sessions simultanées par `contactId` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `session/verifier`, au-delà des essais | 20 appels / 15 min par session | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `session/identite/demarrer`, `session/identite/verifier`, `session/identite/bascule` | 5 / h par session, chacune | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `session/ouvrir-cles` | 500 enveloppes par appel, 60 appels / h par session | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `session/fermer` | 10 / h par canal | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `session/refuser-role` | 5 / h par session | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `grappe/rejoindre` | 2 / min par `nodeId` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| Corps déchiffré | 64 Kio ; 256 Kio pour `session/ouvrir-cles` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| Enveloppe HTTP d'une requête du canal | 400 Kio | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| Canal sans requête | fermé après 1 h | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| Passerelle (appels de Sésame) | 300 / min par instance | valeur initiale, révisable avec les tests de charge du lot 1 bis |
 
 Un dépassement renvoie `429 trop_d_appels` avec `details.reessayerLe`.
-

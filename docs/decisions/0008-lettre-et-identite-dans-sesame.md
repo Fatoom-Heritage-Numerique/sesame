@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0008 · Lettre au proche sans téléphone ni email et vérification d'identité menées par Sésame
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur : « tout sur Sésame, en réduisant au maximum la taille du code ») · Résout la question Q-30 du client · **revue depuis** : compte Pingen distinct, identité sur trois champs obligatoires comparés avec tolérance, bascule vers l'identité quand les coordonnées ne fonctionnent plus, lettre de secours ; l'état actuel est dans `ARCHITECTURE.md`
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur : « tout sur Sésame, en réduisant au maximum la taille du code ») · Résout une question ouverte du client · **revue depuis** : compte Pingen distinct, identité sur trois champs obligatoires comparés avec tolérance, bascule vers l'identité quand les coordonnées ne fonctionnent plus, lettre de secours ; l'état actuel est dans `ARCHITECTURE.md`
 
 ## Contexte et menace
 
@@ -25,4 +25,4 @@ Sésame embarque trois appels REST pour Pingen, deux pour Stripe, un générateu
 
 ## Documents concernés
 
-`ARCHITECTURE.md` §9.8 ; `API.md` §2.7, §3.2, §3.3 ; `THREAT_MODEL.md` §2 (4).
+`ARCHITECTURE.md` §11.9 ; `API.md` (`lettre/secours`, `session/identite/demarrer`, `session/identite/verifier`, passerelle `bundle?uid=…&courrier=1`) ; `THREAT_MODEL.md` §2 (4).

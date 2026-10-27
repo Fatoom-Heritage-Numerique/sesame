@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0005 · Manifeste signé sur clé matérielle, publié 7 jours avant, retrait immédiat, sans voie rapide
 
@@ -22,4 +22,4 @@ Une image malveillante est visible publiquement 7 jours avant de pouvoir servir.
 
 ## Documents concernés
 
-`RELEASE.md` ; `ARCHITECTURE.md` §3, §9.5 ; `README.md` (« Le manifeste »).
+`RELEASE.md` ; `ARCHITECTURE.md` §3, §11.6 ; `README.md` (« La liste des versions »).

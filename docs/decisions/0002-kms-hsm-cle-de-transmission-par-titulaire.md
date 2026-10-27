@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0002 · Cloud KMS HSM conditionné à l'attestation, une clé de transmission par titulaire
 
@@ -10,7 +10,7 @@ L'enclave doit pouvoir ouvrir les enveloppes des contenus destinés, et seulemen
 
 ## Décision
 
-Chaque titulaire a une **clé de transmission** (KTS, 32 octets) tirée sur son téléphone, protégée par sa clé maître, et confiée une fois à Sésame qui la **scelle** sous une clé **Cloud KMS HSM** (`kts-seal`, AES-256-GCM, non exportable). Le scellé est rangé par le client ; il ne se descelle que par une charge attestée, car la liaison IAM de la clé porte une condition sur l'empreinte de l'image. L'enclave ne détient aucune clé longue durée : elle descelle une KTS le temps d'une session, puis l'efface. Tout ce que le titulaire destine est chiffré, sur son téléphone, sous des clés dérivées de sa KTS (`ARCHITECTURE.md` §8).
+Chaque titulaire a une **clé de transmission** (KTS, 32 octets) tirée sur son téléphone, protégée par sa clé maître, et confiée une fois à Sésame qui la **scelle** sous une clé **Cloud KMS HSM** (`kts-seal`, AES-256-GCM, non exportable). Le scellé est rangé par le client ; il ne se descelle que par une charge attestée, car la liaison IAM de la clé porte une condition sur l'empreinte de l'image. L'enclave ne détient aucune clé longue durée : elle descelle une KTS le temps d'une session, puis l'efface. Tout ce que le titulaire destine est chiffré, sur son téléphone, sous des clés dérivées de sa KTS (`ARCHITECTURE.md` §10.2).
 
 ## Alternatives écartées
 
@@ -19,8 +19,8 @@ Chaque titulaire a une **clé de transmission** (KTS, 32 octets) tirée sur son 
 
 ## Conséquences et limites
 
-Une faille mémoire n'expose que les KTS des titulaires ouverts pendant la session, jamais les enveloppes stockées ni ce qui est gardé pour soi (`THREAT_MODEL.md` §2, limite 1). L'IAM de la clé est administrée par l'opérateur de Sésame : un administrateur pourrait autoriser une autre image ; compensé par le projet séparé, l'absence de compte humain déchiffreur, le journal d'audit public et le contrôle CI KMS ⇔ manifeste (limite 2). La rotation de KTS re-chiffre toutes les enveloppes et chartes sur le téléphone (`ARCHITECTURE.md` §9.4).
+Une faille mémoire n'expose que les KTS des titulaires ouverts pendant la session, jamais les enveloppes stockées ni ce qui est gardé pour soi (`THREAT_MODEL.md` §2, limite 1). L'IAM de la clé est administrée par l'opérateur de Sésame : un administrateur pourrait autoriser une autre image ; compensé par le projet séparé, l'absence de compte humain déchiffreur, le journal d'audit public et le contrôle CI KMS ⇔ manifeste (limite 2). La rotation de KTS re-chiffre toutes les enveloppes et chartes sur le téléphone (`ARCHITECTURE.md` §11.5).
 
 ## Documents concernés
 
-`ARCHITECTURE.md` §4, §8 ; `RELEASE.md` §5 ; `THREAT_MODEL.md` §2 (1, 2).
+`ARCHITECTURE.md` §4, §10 ; `RELEASE.md` §7 ; `THREAT_MODEL.md` §2 (1, 2).

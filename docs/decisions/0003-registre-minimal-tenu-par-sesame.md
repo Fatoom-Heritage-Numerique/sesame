@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0003 · Un registre minimal tenu par Sésame : 7 jours, preuve de vie, générations
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** : annulation explicite d'un signalement au lieu de la preuve de vie, transmission sur décès définitive après l'échéance, registre en ajout seul signé par `registre-sign` et borné par une borne publique ; l'état actuel est dans `ARCHITECTURE.md`
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** : annulation explicite d'un signalement au lieu de la preuve de vie, transmission sur décès définitive après l'échéance, registre en ajout seul signé par `registre-sign` et borné par une borne publique, export horaire et toute restauration par une reprise publiée, ré-enrôlement après une perte sans sauvegarde vérifié contre la `cleViePub` fournie par le client (limite 54) ; l'état actuel est dans `ARCHITECTURE.md`
 
 ## Contexte et menace
 
@@ -21,8 +21,8 @@ Sésame ne vérifie pas lui-même le décès : il mesure 7 jours et exige l'abse
 
 ## Conséquences et limites
 
-Sésame a un état, petit (quelques Ko par titulaire), sauvegardé chaque nuit ; sa perte ne détruit aucune clé mais remet à zéro signalements et générations : les coffres se ré-enrôlent (`THREAT_MODEL.md` §2, limite 11). Les 7 jours dépendent de l'horloge de la VM (limite 10). Un titulaire qui n'ouvre pas son app pendant 7 jours après un faux signalement est transmis (limite 7). Toute action sur une charte passe d'abord par Sésame : si Sésame est injoignable, l'action échoue et l'ancien code reste valide (`ARCHITECTURE.md` §9.4).
+Sésame a un état, petit (quelques Ko par titulaire), sauvegardé chaque nuit ; sa perte ne détruit aucune clé mais remet à zéro signalements et générations : les coffres se ré-enrôlent (`THREAT_MODEL.md` §2, limite 11). Les 7 jours dépendent de l'horloge de la VM (limite 10). Un titulaire qui n'ouvre pas son app pendant 7 jours après un faux signalement est transmis (limite 7). Toute action sur une charte passe d'abord par Sésame : si Sésame est injoignable, l'action échoue et l'ancien code reste valide (`ARCHITECTURE.md` §11.5).
 
 ## Documents concernés
 
-`ARCHITECTURE.md` §6, §8.5, §9.3, §9.4 ; `API.md` §2.3, §2.4, §2.12 ; `THREAT_MODEL.md` §2 (7, 10, 11).
+`ARCHITECTURE.md` §6, §11.3, §11.5 ; `API.md` (`vie`, `charte/generation`, `deces/signaler`, `deces/annuler`) ; `THREAT_MODEL.md` §2 (7, 10, 11).

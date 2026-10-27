@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0006 · Vérification de Sésame en direct pour enrôler et changer une charte, par manifeste en cache pour destiner
 
@@ -22,4 +22,4 @@ Destiner 100 fichiers à 100 proches coûte 10 000 AES-GCM sur l'appareil et un 
 
 ## Documents concernés
 
-`ARCHITECTURE.md` §1, §9.1, §9.4, §9.5.
+`ARCHITECTURE.md` §1, §11.1, §11.5, §11.6.

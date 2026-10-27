@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), « Sésame : l'enclave » (image reproductible et dépôt public) et « Versions et alertes de Sésame » (versions de Sésame) -->
 
 # Publier une version de Sésame
 

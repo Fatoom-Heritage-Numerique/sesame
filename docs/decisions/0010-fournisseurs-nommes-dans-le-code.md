@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0010 · Fournisseurs nommés dans le code, réglages du client en variables attestées, clés d'API dans Secret Manager
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** : réglages du client en `env_override` dont tout le dictionnaire est exigé par la condition KMS, textes longs dans des fichiers de l'image ; plus de délai de 7 jours ([0014](0014-liste-des-versions-compilee.md))
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** : réglages du client en `env_override` dont tout le dictionnaire est exigé par la condition KMS, textes longs dans des fichiers de l'image ; Twilio Messaging et SendGrid nommés aussi, pour les alertes envoyées par Sésame lui-même (`ARCHITECTURE.md` §11.10) ; plus de délai de 7 jours ([0014](0014-liste-des-versions-compilee.md))
 
 ## Contexte et menace
 
@@ -25,4 +25,4 @@ Changer de fournisseur est une nouvelle version de Sésame, publiée 7 jours ava
 
 ## Documents concernés
 
-`ARCHITECTURE.md` §2.2 ; `RELEASE.md` §2 (`envDigest`) ; `CONTRIBUTING.md`.
+`ARCHITECTURE.md` §2.3 ; `RELEASE.md` §2 (`envDigest`) ; `CONTRIBUTING.md`.

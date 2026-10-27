@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) ; planche SiteSesameV2 -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), « Sésame : principe et modèle de menace » et « Versions et alertes de Sésame » ; planche SiteSesameV2 -->
 
 # Sésame
 
@@ -141,7 +141,7 @@ Toutes les limites, adversaire par adversaire : `THREAT_MODEL.md` §2.
 
 ## État du projet
 
-Sésame est **en construction**. Aucune version n'est publiée, `versions.json` n'existe pas encore, aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
+Sésame est **en construction**. Ce dépôt ne contient encore que sa documentation : ni code, ni scripts de `build/`, ni `versions.json` ; aucune version n'est publiée et aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
 
 Ordre de construction :
 

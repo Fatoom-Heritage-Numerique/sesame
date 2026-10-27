@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0012 · Canaux d'envoi non croisés : un fournisseur piraté peut ouvrir après un décès vérifié
 
-**Date** : 2026-10-12 · **Statut** : actée comme limite assumée (décision de l'opérateur : « garder tel quel ») · **remplacée le 2026-10-22 par [0013](0013-canaux-d-envoi-croises.md)** (Q-31 tranchée)
+**Date** : 2026-10-12 · **Statut** : actée comme limite assumée (décision de l'opérateur : « garder tel quel ») · **remplacée le 2026-10-22 par [0013](0013-canaux-d-envoi-croises.md)** (question tranchée)
 
 ## Contexte et menace
 
@@ -19,8 +19,8 @@ Le modèle est **conservé** : code d'accès par tous les canaux numériques ren
 
 ## Conséquences et limites
 
-C'est la limite 13 de `THREAT_MODEL.md` §2. Raison retenue : simplicité et respect de la règle « personne n'est oublié ». La question est rouverte avant la première mise en service ; une révision sera un nouveau fichier de ce dossier et modifiera `ARCHITECTURE.md` §9.2 et §9.3.
+C'est la limite 13 de `THREAT_MODEL.md` §2. Raison retenue : simplicité et respect de la règle « personne n'est oublié ». La question est rouverte avant la première mise en service ; une révision sera un nouveau fichier de ce dossier et modifiera `ARCHITECTURE.md` §11.2 et §11.3.
 
 ## Documents concernés
 
-`THREAT_MODEL.md` §2 (13) ; `ARCHITECTURE.md` §9.3.
+`THREAT_MODEL.md` §2 (13) ; `ARCHITECTURE.md` §11.2.

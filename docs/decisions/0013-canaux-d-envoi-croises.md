@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0013 · Canaux d'envoi croisés : code d'accès par email, dernier code par SMS
 
@@ -10,7 +10,7 @@ Avec la décision 0012, un attaquant qui lisait tout ce qui passe chez un seul f
 
 ## Décision
 
-Pour un proche qui a un email et un téléphone, les canaux sont **croisés** : le code d'accès part par email, le dernier code par SMS ; il faut alors compromettre les deux comptes d'envoi. L'opérateur email appartient au même groupe que l'opérateur SMS : les deux canaux reposent sur deux infrastructures et deux comptes distincts (celui de Sésame pour le dernier code), pas sur deux sociétés.
+Pour un proche qui a un email et un téléphone, les canaux sont **croisés** : le code d'accès part par email, le dernier code par SMS ; il faut alors compromettre les deux comptes d'envoi. L'opérateur email (SendGrid) appartient au même groupe que l'opérateur SMS (Twilio) : les deux canaux reposent sur deux infrastructures et deux comptes distincts (celui de Sésame pour le dernier code), pas sur deux sociétés.
 
 ## Alternatives écartées
 
@@ -23,4 +23,4 @@ Risque accepté : un proche à email seul reçoit code et dernier code par email
 
 ## Documents concernés
 
-`THREAT_MODEL.md` §2 (13) ; `ARCHITECTURE.md`.
+`THREAT_MODEL.md` §2 (13) ; `ARCHITECTURE.md` §11.2.
