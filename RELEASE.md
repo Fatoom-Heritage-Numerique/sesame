@@ -106,7 +106,7 @@ Règles :
 1. ligne passée `retiree`, avec `retireLe` ;
 2. empreinte retirée de la condition KMS **immédiatement** : la version ne descelle plus rien ;
 3. version minimale de l'app relevée ;
-4. VM de la version retirée arrêtées dès que la nouvelle est en service (effacement de sa grappe, redépôt) ; pour un retrait pour faille, arrêtées aussitôt, sans attendre la nouvelle, car retirer l'empreinte de KMS n'arrête ni le protocole de PIN, tenu en mémoire, ni le canal : Sésame ne sert alors plus rien jusqu'à la version corrective, dont la grappe neuve s'amorce comme au §4, étape 5 (`THREAT_MODEL.md` §2, limite 8).
+4. VM de la version retirée arrêtées dès que la nouvelle est en service (effacement de sa grappe, redépôt) ; pour un retrait pour faille, arrêtées aussitôt, sans attendre la nouvelle, car retirer l'empreinte de KMS n'arrête ni le protocole de PIN, tenu en mémoire, ni le canal : Sésame ne sert alors plus rien jusqu'à la version corrective, dont la grappe neuve s'amorce comme au §4, étape 5 (`THREAT_MODEL.md` §2, limite 8). Hors faille, la nouvelle version attend l'échéance des 30 jours, et Sésame, sans KMS, ne signe ni ne descelle plus rien jusque-là : la version suivante est une reprise publiée (`ARCHITECTURE.md` §11.6, décision 0049).
 
 Google ne garantit aucun délai de propagation : une révocation n'est tenue pour effective qu'après au moins 7 minutes et une vérification.
 

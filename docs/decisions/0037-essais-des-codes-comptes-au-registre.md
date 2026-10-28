@@ -2,7 +2,7 @@
 
 # 0037 · Essais des codes d'un proche comptés au registre
 
-**Date** : 2026-10-28 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0038](0038-blocage-de-15-minutes-apres-le-5e-code-faux.md))
+**Date** : 2026-10-28 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0038](0038-blocage-de-15-minutes-apres-le-5e-code-faux.md), [0048](0048-tout-code-refuse-decompte.md))
 
 ## Contexte et menace
 

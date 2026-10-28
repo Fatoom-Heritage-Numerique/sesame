@@ -2,7 +2,7 @@
 
 # 0042 · Deux versions à moins de 30 jours d'écart seulement pour une faille
 
-**Date** : 2026-10-28 · **Statut** : actée (alignement sur la règle du client, sans changement de cette règle) · précise [0017](0017-protocole-de-pin-grappe-de-trois-vm.md)
+**Date** : 2026-10-28 · **Statut** : actée (alignement sur la règle du client, sans changement de cette règle) · précise [0017](0017-protocole-de-pin-grappe-de-trois-vm.md) · **revue depuis** ([0049](0049-retrait-d-urgence-hors-faille-ecrit.md))
 
 ## Contexte et menace
 
