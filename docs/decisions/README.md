@@ -47,3 +47,6 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0037](0037-essais-des-codes-comptes-au-registre.md) | Essais des codes d'un proche comptés au registre | 2026-10-28 · revue depuis 0038 |
 | [0038](0038-blocage-de-15-minutes-apres-le-5e-code-faux.md) | Blocage de 15 minutes pleines après le 5ᵉ code faux | 2026-10-28 |
 | [0039](0039-ouvertures-sans-detail-des-contenus.md) | Ouvertures sans le détail des contenus ouverts | 2026-10-28 |
+| [0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md) | Les bornes déposées en échec ne comptent pas dans le contrôle anti-retour | 2026-10-28 |
+| [0041](0041-code-d-invitation-verifie-par-son-scelle.md) | Code d'invitation vérifié par son scellé, sans empreinte au registre | 2026-10-28 |
+| [0042](0042-ecart-de-30-jours-sauf-faille.md) | Deux versions à moins de 30 jours d'écart seulement pour une faille | 2026-10-28 |

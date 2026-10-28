@@ -95,7 +95,7 @@ Le client affiche aussi la liste et son historique sur sa page de transparence (
 
 Règles :
 
-- **Jamais deux versions de Sésame à moins de 30 jours d'écart**, sauf retrait d'urgence : un titulaire entré dans une grappe depuis moins de 30 jours ne peut pas en changer (`THREAT_MODEL.md` §2, limite 19).
+- **Jamais deux versions de Sésame à moins de 30 jours d'écart**, sauf retrait pour une faille (tout autre retrait d'urgence attend l'échéance pour la version suivante) : un titulaire entré dans une grappe depuis moins de 30 jours ne peut pas en changer (`THREAT_MODEL.md` §2, limite 19).
 - **Téléphone trop ancien** : sur un appareil sous la version minimale du système exigée par la dernière app, l'app laisse ouvrir et consulter le coffre localement, sans aucun appel à Sésame, et le signe de vie y est suspendu. Les fonctions de Sésame se font depuis un appareil à jour.
 - Le client publie sa version minimale de l'app dans un fichier statique versionné (pour Fatoom : `fatoom.fr/.well-known/fatoom-version-minimale.json`, `ARCHITECTURE.md` §8.3), que `build/verifier-journaux.sh` lit avec son historique (§7).
 
