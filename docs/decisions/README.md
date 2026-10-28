@@ -60,3 +60,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0050](0050-remplacement-d-un-membre-sans-quatrieme-votant.md) | Remplacement d'un membre de la grappe : l'absent est retiré avant la promotion de la remplaçante | 2026-10-28 |
 | [0051](0051-arret-de-plus-de-2-heures-et-premiere-version.md) | Après un arrêt de plus de 2 heures, et à la toute première version, une reprise publiée sans mécanisme nouveau | 2026-10-28 · revue depuis 0052 |
 | [0052](0052-reprise-apres-une-panne-sans-attendre-30-jours.md) | Une reprise publiée après une panne de plus de 2 heures n'attend pas l'échéance des 30 jours | 2026-10-28 |
+| [0053](0053-recopie-au-registre-avant-la-reponse-du-pin.md) | L'état du PIN est recopié au registre avant la réponse ; sans KMS, ni dépôt ni évaluation | 2026-10-28 |
