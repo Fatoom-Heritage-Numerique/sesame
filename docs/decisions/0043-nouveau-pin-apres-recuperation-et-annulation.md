@@ -2,7 +2,7 @@
 
 # 0043 · Après le code de récupération, le nouveau PIN attend la grappe ; l'annulation d'un décès, non
 
-**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option la plus simple qui tient la garantie annoncée, sans changement des règles du client) · précise [0017](0017-protocole-de-pin-grappe-de-trois-vm.md)
+**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option la plus simple qui tient la garantie annoncée, sans changement des règles du client) · précise [0017](0017-protocole-de-pin-grappe-de-trois-vm.md) · **revue depuis** ([0047](0047-recuperation-dans-les-30-jours-d-un-changement-de-grappe.md))
 
 ## Contexte et menace
 

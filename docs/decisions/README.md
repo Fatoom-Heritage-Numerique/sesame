@@ -50,7 +50,8 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md) | Les bornes déposées en échec ne comptent pas dans le contrôle anti-retour | 2026-10-28 |
 | [0041](0041-code-d-invitation-verifie-par-son-scelle.md) | Code d'invitation vérifié par son scellé, sans empreinte au registre | 2026-10-28 |
 | [0042](0042-ecart-de-30-jours-sauf-faille.md) | Deux versions à moins de 30 jours d'écart seulement pour une faille | 2026-10-28 |
-| [0043](0043-nouveau-pin-apres-recuperation-et-annulation.md) | Après le code de récupération, le nouveau PIN attend la grappe ; l'annulation d'un décès, non | 2026-10-28 |
+| [0043](0043-nouveau-pin-apres-recuperation-et-annulation.md) | Après le code de récupération, le nouveau PIN attend la grappe ; l'annulation d'un décès, non | 2026-10-28 · revue depuis 0047 |
 | [0044](0044-requetes-a-la-passerelle-sans-kid.md) | Requêtes à la passerelle vérifiées contre chaque clé de `clesSession` | 2026-10-28 |
 | [0045](0045-version-de-signature-fixee-par-l-image.md) | Version de signature fixée par l'image, une clause de la condition KMS par version en service | 2026-10-28 |
 | [0046](0046-nouvel-envoi-d-une-lettre-au-passage-suivant.md) | Nouvel envoi d'une lettre au passage de la tâche qui relève l'erreur | 2026-10-28 |
+| [0047](0047-recuperation-dans-les-30-jours-d-un-changement-de-grappe.md) | Dans les 30 jours d'un changement de grappe, le code de récupération ne rouvre pas le coffre sur un nouvel appareil ; l'annulation d'un décès reste possible | 2026-10-28 |
