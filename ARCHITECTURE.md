@@ -645,7 +645,7 @@ Un coffre neuf s'enrôle **pendant** sa création : KTS, `cleVie` et le code de 
 
 **Rejeu d'un premier enrôlement** : l'app qui reprend une création interrompue ne sait pas si son premier `/enroler` a abouti ; elle le rejoue à l'identique (même `uid`, `ktsGeneration`, `kts` et `cleViePub`), avec une preuve de la `cleVie` de son brouillon sur un nouveau défi. Le rejeu est idempotent sur l'`uid` et la `cleViePub` : sans ligne ni marqueur, premier enrôlement ; marqueur sans ligne (premier enrôlement interrompu entre le marqueur et la ligne), preuve vérifiée avec la `cleViePub` du marqueur, puis ligne créée comme à un premier enrôlement ; ligne de même `cleViePub`, rescellement. Toute autre `cleViePub`, ou une preuve qui ne se vérifie pas, est refusée (`API.md`, §2.3).
 
-**Coffre enrôlé par un autre** : `/enroler` renvoie la `cleViePub` reçue ; une réponse `preuve_requise` à un premier enrôlement, ou une `cleViePub` renvoyée différente de celle de l'app, signifie que quelqu'un d'autre a enrôlé ce coffre : l'app le signale et ne propose aucune destination (`THREAT_MODEL.md`, limite 24).
+**Coffre enrôlé par un autre** : `/enroler` renvoie la `cleViePub` reçue ; une réponse `preuve_requise` à un premier enrôlement, ou une `cleViePub` renvoyée différente de celle de l'app, signifie que quelqu'un d'autre a enrôlé ce coffre : l'app le signale, sans coffre créé et sans rien écrire, et ne propose aucune destination ; le support supprime ce compte sans coffre, et le titulaire en crée un autre (`THREAT_MODEL.md`, limite 24).
 
 **Coffre perdu** (ni PIN ni code de récupération) : aucune voie de ré-enrôlement ; une requête sans preuve pour un titulaire déjà enrôlé est toujours refusée. Ce qui est déjà destiné reste transmissible (`THREAT_MODEL.md`, limite 20).
 
