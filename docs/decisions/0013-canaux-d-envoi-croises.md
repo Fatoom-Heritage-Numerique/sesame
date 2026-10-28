@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0013 · Canaux d'envoi croisés : code d'accès par email, dernier code par SMS
 
@@ -23,4 +23,4 @@ Risque accepté : un proche à email seul reçoit code et dernier code par email
 
 ## Documents concernés
 
-`THREAT_MODEL.md` §2 (13) ; `ARCHITECTURE.md`.
+`THREAT_MODEL.md` §2 (13) ; `ARCHITECTURE.md` §11.2.

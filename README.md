@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) ; planche SiteSesameV2 -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), « Sésame : principe et modèle de menace » et « Versions et alertes de Sésame » ; planche SiteSesameV2 -->
 
 # Sésame
 
@@ -22,7 +22,7 @@ Ce dépôt ne contient pas de cahier des charges ni de document technique unique
 | comment une version est construite, publiée et retirée | `RELEASE.md` |
 | comment contribuer, comment signaler une faille | `CONTRIBUTING.md`, `SECURITY.md` |
 
-Les trois premiers disent le **quoi** et le **pourquoi** ; les suivants disent le **comment**. Chaque fichier commence par un commentaire qui indique la section de la spécification dont il dérive, pour que les deux restent alignés.
+Les trois premiers disent le **quoi** et le **pourquoi** ; les suivants disent le **comment**. Chaque document Markdown commence par un commentaire qui indique la section de la spécification dont il dérive, pour que les deux restent alignés.
 
 ## Pour qui
 
@@ -61,7 +61,7 @@ Une précision, sans détour : AMD SEV chiffre la mémoire mais ne protège pas 
 
 Promettre « nous ne lisons pas vos fichiers » ne suffit pas. Avec Sésame, chacun peut contrôler ce qui tourne.
 
-- **Un code public.** Le code de Sésame est publié en intégralité sur GitHub. Chacun peut le lire, l'auditer et le reconstruire.
+- **Un code public.** Le code de Sésame entre en intégralité dans ce dépôt à l'étape 3 de sa construction (« État du projet ») : chacun peut alors le lire, l'auditer et le reconstruire.
 - **Une empreinte unique.** Chaque version produit une empreinte (SHA-256). La moindre modification du code la change complètement.
 - **Des clés verrouillées sur cette empreinte.** Le coffre de clés de Google (Cloud KMS) ne descelle qu'au programme dont l'empreinte est autorisée, et un contrôle automatique de ce dépôt vérifie que cette autorisation correspond aux versions publiées.
 - **Une preuve à chaque échange.** Avant d'envoyer quoi que ce soit, l'app et fatoom.fr/acces demandent à l'enclave son attestation, un jeton signé par Google, et vérifient l'empreinte qu'il porte.
@@ -107,16 +107,16 @@ Si elles diffèrent, ouvrez un rapport de vérification (gabarit d'issue « Rapp
 L'enclave fournit une attestation : un jeton signé par Google, qui porte l'empreinte du programme en cours d'exécution et les clés publiques du canal chiffré. L'app Fatoom et fatoom.fr/acces la vérifient automatiquement avant chaque échange. Vous pouvez la demander vous-même :
 
 ```bash
-./build/verifier-attestation.sh https://sesame.fatoom.fr versions.json
+./build/verifier-attestation.sh https://sesame.fatoom.fr versions.json <numero-projet-sesame> <registre-images>
 # GET /attestation, vérifie la chaîne de certificats jusqu'à la racine Confidential Space de Google,
 # chaque claim exigé (ARCHITECTURE.md, « Attestation ») et que l'empreinte attestée est en_service
 ```
 
-Ces scripts sont livrés avec le code ; leur contrat est décrit par ce `README`.
+Ces scripts sont livrés avec le code ; leur contrat est décrit par ce `README`. Ce dépôt ne cite aucun nom de projet, de dépôt d'images ni de bucket : les scripts les reçoivent en arguments (`<numero-projet-sesame>`, `<registre-images>`, `<bucket-audit>`). Leurs valeurs, dont les deux dernières contiennent le nom du projet de Sésame, sont publiées sur fatoom.fr/sesame, la page de Fatoom, pour que chacun puisse exécuter ces scripts : la règle vaut pour ce dépôt, pas pour cette page.
 
 ### Et après : les journaux publics
 
-Une étape de plus pour qui veut contrôler l'opérateur lui-même : `build/verifier-journaux.sh` lit le bucket d'audit public de Sésame et vérifie que chaque descellement vient d'une version publiée (`RELEASE.md` §7). La CI de ce dépôt l'exécute chaque jour et publie son résultat.
+Une étape de plus pour qui veut contrôler l'opérateur lui-même : `build/verifier-journaux.sh <bucket-audit> <numero-projet-sesame> versions.json` lit le bucket d'audit public de Sésame et vérifie que chaque descellement vient d'une version publiée (`RELEASE.md` §7). La CI de ce dépôt l'exécute chaque jour et publie son résultat.
 
 ## La liste des versions
 
@@ -131,7 +131,7 @@ Format exact et procédure : `RELEASE.md`.
 
 ## Les limites, sans détour
 
-- **Le matériel et Google.** Sésame repose sur AMD SEV, sur Confidential Space et sur le service d'attestation de Google. Une faille exposerait les clés présentes en mémoire au moment de la faille, jamais ce que vous gardez pour vous. AMD SEV ne protégeant pas l'intégrité de la mémoire, Google, ou qui contrôlerait ses hyperviseurs, pourrait la manipuler pour en extraire ces clés. C'est le compromis des services les plus exigeants : sans enclave, Fatoom pourrait tout lire.
+- **Le matériel et Google.** Sésame repose sur AMD SEV, sur Confidential Space et sur le service d'attestation de Google. Une faille de l'enclave seule exposerait les clés de transmission des sessions ouvertes à ce moment. Combinée aux données de Fatoom (la copie chiffrée de la clé de votre coffre), elle permettrait de chercher hors ligne votre code PIN à 6 chiffres et d'ouvrir votre coffre entier, ce que vous gardez pour vous compris. AMD SEV ne protégeant pas l'intégrité de la mémoire, Google, ou qui contrôlerait ses hyperviseurs, pourrait la manipuler pour en extraire ces clés. C'est le compromis des services les plus exigeants : sans enclave, Fatoom pourrait tout lire.
 - **L'opérateur administre les clés.** Fatoom administre le projet Google Cloud de Sésame, avec un seul administrateur aujourd'hui. Il pourrait autoriser une autre image dans le coffre de clés : elle n'aurait besoin d'aucun client pour desceller les clés de transmission existantes. Ce n'est pas impossible ; c'est **visible**. L'opération laisse une trace dans les journaux d'administration de Google, exportés vers un bucket public que personne ne peut vider avant 10 ans sans supprimer Sésame entier, et le script public la signale.
 - **Les comptes de publication.** Il n'y a pas de délai d'annonce entre la publication d'une version et sa mise en service. Qui tiendrait à la fois les accès Google Cloud de Sésame et un compte qui publie l'app, le site ou ce dépôt pourrait faire accepter une image malveillante. Ces comptes se connectent par passkey, sans SMS.
 - **Le portail est servi par Fatoom.** Le portail des proches est un JavaScript servi par Fatoom, qui y compile aussi la liste des versions. Un Fatoom compromis qui servirait un portail modifié pourrait lire ce qu'un proche y ouvre. L'app, publiée par les boutiques, n'est pas concernée.
@@ -141,15 +141,15 @@ Toutes les limites, adversaire par adversaire : `THREAT_MODEL.md` §2.
 
 ## État du projet
 
-Sésame est **en construction**. Aucune version n'est publiée, `versions.json` n'existe pas encore, aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
+Sésame est **en construction**. Ce dépôt ne contient encore que sa documentation : ni code, ni scripts de `build/`, ni `versions.json` ; aucune version n'est publiée et aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
 
 Ordre de construction :
 
 1. **Documentation** : ce dépôt tel que vous le lisez (en cours).
-2. **Contrat exécutable** : OpenAPI, vecteurs de test partagés avec les clients, `sesame-fake` (un double local de Sésame pour développer l'app, le portail et la passerelle sans enclave).
+2. **Contrat exécutable** : OpenAPI, vecteurs de test partagés avec les clients, `sesame-fake` (un double local de Sésame pour développer l'app, le portail et la passerelle sans enclave, qui tourne en trois exemplaires pour la grappe du protocole de PIN), `Dockerfile` et `build/reproduire.sh`.
 3. **Cœur** : attestation, canal chiffré, KMS, registre, protocoles, grappe du protocole de PIN.
 4. **Fournisseurs** : SMS et email, alertes, vérification d'identité, lettre.
-5. **Infrastructure** : scripts `gcloud` du projet, du trousseau, du pool d'identités, des machines, du bucket d'audit.
+5. **Infrastructure** : scripts `gcloud` du projet, du trousseau, du pool d'identités, des machines, du bucket d'audit ; `build/verifier-attestation.sh` et `build/verifier-journaux.sh`.
 6. **Version 1.0.0** inscrite à `versions.json`, compilée dans les clients, puis mise en service.
 
 Les décisions prises et les alternatives écartées sont dans `docs/decisions/`.

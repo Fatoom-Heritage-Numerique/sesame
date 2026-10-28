@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0014 · Liste des versions compilée dans les clients, mise à jour forcée
 
-**Date** : 2026-10-25 · **Statut** : actée (décision explicite de l'opérateur) · remplace [0005](0005-manifeste-signe-publie-7-jours-avant.md) et [0009](0009-cle-de-release-sur-cle-materielle.md)
+**Date** : 2026-10-25 · **Statut** : actée (décision explicite de l'opérateur) · remplace [0005](0005-manifeste-signe-publie-7-jours-avant.md) et [0009](0009-cle-de-release-sur-cle-materielle.md) · revoit [0001](0001-enclave-confidential-space.md), [0002](0002-kms-hsm-cle-de-transmission-par-titulaire.md), [0006](0006-verification-en-direct-et-par-cache.md), [0007](0007-depot-public-separe.md) et [0010](0010-fournisseurs-nommes-dans-le-code.md) · **revue depuis** ([0025](0025-noms-francais-des-champs.md), [0026](0026-cles-session-sign-dans-la-liste-des-versions.md), [0032](0032-chemin-du-depot-d-images-hors-de-la-liste.md))
 
 ## Contexte et menace
 
@@ -10,7 +10,7 @@ Les clients doivent refuser toute version de Sésame qui n'a pas été publiée.
 
 ## Décision
 
-Le manifeste signé, sa re-signature, la clé de release, le numéro de séquence, l'expiration et l'annonce de 7 jours sont **retirés**. Les versions autorisées sont listées dans `versions.json` (ce dépôt, branche `main` protégée : `imageDigest`, `imageReference`, `envDigest`, `hwmodels`, `tag`, `commit`, `publishedAt`, `status` ∈ `en_service` | `retiree`, `retiredAt`, `notes`) et **compilées** dans l'app, le portail et la passerelle du client au moment du build : ils ne téléchargent rien et ne vérifient aucune signature. Une empreinte absente ou `retiree`, ou un `hwmodel` hors de `hwmodels`, est refusée.
+Le manifeste signé, sa re-signature, la clé de release, le numéro de séquence, l'expiration et l'annonce de 7 jours sont **retirés**. Les versions autorisées sont listées dans `versions.json` (ce dépôt, branche `main` protégée : `imageDigest`, `referenceImage`, `envDigest`, `hwmodels`, `tag`, `commit`, `publieLe`, `statut` ∈ `en_service` | `retiree`, `retireLe`, `notes`) et **compilées** dans l'app, le portail et la passerelle du client au moment du build : ils ne téléchargent rien et ne vérifient aucune signature. Une empreinte absente ou `retiree`, ou un `hwmodel` hors de `hwmodels`, est refusée.
 
 Mise en service : tag et build reproductible, ligne `en_service` ; versions des clients qui la contiennent publiées et disponibles dans les deux boutiques ; l'IAM KMS autorise l'empreinte (la liste d'abord, l'IAM ensuite) et la version démarre ; la version minimale de l'app est relevée (mise à jour forcée) ; l'ancienne version est arrêtée. Retrait d'urgence : ligne `retiree`, empreinte retirée de KMS immédiatement, version minimale relevée.
 

@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0001 · Les clés des contenus destinés s'ouvrent dans une enclave au code public
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur, question par question)
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur, question par question) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md))
 
 ## Contexte et menace
 

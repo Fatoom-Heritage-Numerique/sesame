@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0006 · Vérification de Sésame en direct pour enrôler et changer une charte, par manifeste en cache pour destiner
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue le 2026-10-25** ([0014](0014-liste-des-versions-compilee.md)) : plus de manifeste en cache, la liste des versions est compilée dans les clients ; Sésame est aussi joint pour le PIN, l'annulation et la vérification en arrière-plan
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md), [0017](0017-protocole-de-pin-grappe-de-trois-vm.md), [0020](0020-annulation-explicite-et-transmission-definitive.md), [0023](0023-alertes-envoyees-par-sesame-et-fiche-d-alerte.md))
 
 ## Contexte et menace
 
@@ -22,4 +22,4 @@ Destiner 100 fichiers à 100 proches coûte 10 000 AES-GCM sur l'appareil et un 
 
 ## Documents concernés
 
-`ARCHITECTURE.md` §1, §9.1, §9.4, §9.5.
+`ARCHITECTURE.md` §1, §11.1, §11.5, §11.6.

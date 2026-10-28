@@ -1,4 +1,4 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ (état du 2026-10-26) -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), « Sésame : l'enclave » (code minimal, budget de code, image reproductible et dépôt public) -->
 
 # Contribuer à Sésame
 
@@ -17,13 +17,13 @@ La prose est en **français** : documents, commentaires, messages de commit, des
 ## Règles du code
 
 - **Go**, dernière version stable épinglée dans `go.mod` et dans la CI ; module unique ; binaire statique.
-- **Cryptographie de la bibliothèque standard** (`crypto/ecdh`, `crypto/aes`, `crypto/ed25519`, `crypto/ecdsa`, `crypto/hkdf`, `crypto/mlkem`). Deux exceptions, épinglées : `github.com/cloudflare/circl` pour l'OPRF du protocole de PIN et `golang.org/x/crypto/argon2` pour l'Argon2id de l'index des lettres d'invitation. Aucune autre bibliothèque cryptographique.
-- **Dépendances** : SDK Google officiels (KMS, Firestore, Secret Manager, Cloud Storage) ; `go.etcd.io/raft/v3`, épinglée, pour la grappe du protocole de PIN ; `net/http` brut pour Twilio Verify, Twilio Messaging, SendGrid, Stripe Identity et Pingen. Toute nouvelle dépendance se justifie dans la PR et entre dans la liste d'`ARCHITECTURE.md` §2.2 ; la CI refuse une dépendance réseau hors liste.
-- **Adresses des fournisseurs en dur** dans le code, jamais lues au démarrage. Ce qui est propre à un client (identifiants de compte, textes, gabarit de lettre, adresse de la passerelle) est une variable attestée ; les clés d'API sont dans Secret Manager. **Rien de propre à un client dans ce dépôt** : ni identifiant, ni nom de projet, de bucket ou de compte, ni texte de marque. Les noms de ressources sont écrits en `<projet-sesame>`, `<bucket-audit>`, `<compte-deces>` ; les valeurs concrètes sont celles du déploiement de Fatoom, non publiées.
-- **Budget** : au plus 6 000 lignes de Go hors tests et hors bibliothèques épinglées (plafond dur), contrôlé en CI. Une PR qui le dépasse doit retirer autant qu'elle ajoute.
+- **Cryptographie de la bibliothèque standard** (`crypto/ecdh`, `crypto/aes`, `crypto/ed25519`, `crypto/hkdf`, `crypto/mlkem`, et `crypto/ecdsa`, `crypto/rsa`, `crypto/x509` pour vérifier l'attestation et les signatures du registre). Deux exceptions cryptographiques, épinglées : `github.com/cloudflare/circl` pour l'OPRF du protocole de PIN et `golang.org/x/crypto/argon2` pour l'Argon2id de l'index des lettres d'invitation. Aucune autre bibliothèque cryptographique.
+- **Dépendances** : SDK Google officiels (KMS, Firestore, Secret Manager, Cloud Storage, Cloud Logging) ; `go.etcd.io/raft/v3`, épinglée, pour la grappe du protocole de PIN ; `net/http` brut pour Twilio Verify, Twilio Messaging, SendGrid, Stripe Identity et Pingen. Toute nouvelle dépendance se justifie dans la PR et entre dans les listes d'`ARCHITECTURE.md` §2.4 (bibliothèques) et §2.2 (réseau) ; la CI refuse une dépendance réseau hors liste.
+- **Adresses des fournisseurs en dur** dans le code, jamais lues au démarrage. Ce qui est propre à un client va dans des variables attestées (identifiants de compte, adresse de la passerelle) et, pour les textes et les gabarits des lettres, dans un document lu au démarrage et attesté par son empreinte, elle-même variable attestée (`ARCHITECTURE.md` §2.3) ; les clés d'API et ce document sont dans Secret Manager. **Rien de propre à un client dans ce dépôt** : ni identifiant, ni nom de projet, de bucket ou de compte, ni texte de marque. Les noms de ressources sont écrits en `<projet-sesame>`, `<bucket-audit>`, `<bucket-inscrits>`, `<bucket-ecritures>`, `<compte-charge>`, `<compte-deces>`, `<compte-exploitation>`, `<cle-codes-deces>`, `<secret-textes>`, `<registre-images>`, `<numero-projet-sesame>` ; les valeurs concrètes sont celles du déploiement de Fatoom et ne s'écrivent nulle part dans ce dépôt. Cette règle porte sur le dépôt seul : la page de transparence du client (pour Fatoom : fatoom.fr/sesame) publie les valeurs des arguments des scripts publics, `<numero-projet-sesame>`, `<registre-images>` et `<bucket-audit>`, dont les deux derniers contiennent le nom du projet, pour que chacun puisse exécuter ces scripts (`README.md`, étape 4) ; les autres valeurs ne sont publiées nulle part.
+- **Budget** : de l'ordre de 5 000 à 6 000 lignes de Go visées, plafond dur de 6 000 lignes hors tests et hors bibliothèques épinglées (`ARCHITECTURE.md` §2.2), contrôlé en CI. Une PR qui le dépasse doit retirer autant qu'elle ajoute.
 - **Journaux** : jamais de clé, de code, de numéro, d'email, de nom, de libellé ni de corps de requête (`ARCHITECTURE.md` §7). Les identifiants sont masqués (`uidMasque`).
-- **Lanceur factice** (`SESAME_FAKE_LAUNCHER`) et doubles de KMS, Twilio, SendGrid, Stripe, Pingen, Firestore : uniquement dans le paquet de test ; le build échoue si la variable est lue ailleurs.
-- Pas de rétrocompatibilité tant qu'aucune version n'est en production : un format se remplace, il ne se versionne pas. Cette règle sera levée à la première mise en service.
+- **Lanceur factice** (`SESAME_FAKE_LAUNCHER`) et doubles de KMS, Twilio, SendGrid, Stripe, Pingen, Firestore, Cloud Logging : uniquement dans le paquet de test ; le build échoue si la variable est lue ailleurs.
+- Pas de rétrocompatibilité tant qu'aucune version n'est en production : un format se remplace, il ne se versionne pas.
 
 ## Formats et vecteurs
 
@@ -39,11 +39,11 @@ On ne modifie jamais un vecteur à la main.
 ## Ce qu'une PR contient
 
 - Un titre et une description en français : ce qui change, pourquoi, quelle section d'`ARCHITECTURE.md` ou d'`API.md` est concernée.
-- Les tests : chaque décision de Sésame (charte périmée, rôle insuffisant, signalement trop récent, enveloppe à AAD étranger, défi rejoué, annulation d'un autre signalement, …) a son test unitaire ; la lettre est comparée octet pour octet ; les fournisseurs sont rejoués par des doubles HTTP locaux.
+- Les tests : chaque décision de Sésame (charte périmée, rôle insuffisant, signalement trop récent, enveloppe à AAD étranger, défi rejoué, annulation d'un autre signalement, …) a son test unitaire ; la lettre est comparée octet pour octet ; les fournisseurs sont rejoués par des doubles : Twilio et SendGrid en mémoire, Stripe et Pingen en doubles HTTP locaux (`ARCHITECTURE.md` §2.4).
 - Les documents mis à jour si le changement les rend faux, et un fichier `docs/decisions/` si une décision est prise ou revue (une décision revue est un **nouveau** fichier, jamais une réécriture).
 - La CI verte : build reproductible (double construction), budget, vecteurs, schéma de `versions.json`, cohérence KMS ⇔ `versions.json`, dépendances, image sans shell, borne du registre (`RELEASE.md` §8).
 
-Une PR qui touche l'attestation, le canal, KMS, le registre, le protocole de PIN, les protocoles ou `versions.json` est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Tant qu'il n'y a qu'un administrateur, une telle PR cite une décision écrite (`docs/decisions/`) et reste publique au moins 7 jours avant sa fusion ; dès qu'une seconde personne de confiance existe, elle approuve aussi.
+Une PR qui touche l'attestation, le canal, KMS, le registre, le protocole de PIN, les protocoles ou `versions.json` est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Tant qu'il n'y a qu'un administrateur, une telle PR cite une décision écrite (`docs/decisions/`) et reste publique au moins 7 jours avant sa fusion ; dès qu'une seconde personne de confiance existe, elle approuve aussi. L'équipe des propriétaires (`CODEOWNERS`) n'a aujourd'hui qu'un membre : l'auteur d'une telle PR en est aussi l'approbateur, et la décision écrite et les 7 jours de publicité tiennent lieu de second regard.
 
 ## Vérifier et signaler
 

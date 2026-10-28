@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0007 · Un dépôt public séparé du client
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur)
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md))
 
 ## Contexte et menace
 
@@ -22,4 +22,4 @@ Le code public est aussi lisible par un attaquant : la sécurité ne repose sur 
 
 ## Documents concernés
 
-`README.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md` §2.3.
+`README.md`, `CONTRIBUTING.md`, `ARCHITECTURE.md` §2.4.

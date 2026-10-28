@@ -1,8 +1,8 @@
-<!-- Source : Fatoom-Heritage-Numerique/Fatoom docs/technique/sesame/ -->
+<!-- Source : spécification de l'opérateur (dépôt Fatoom-Heritage-Numerique/Fatoom), décisions prises sur Sésame -->
 
 # 0011 · Go, binaire statique, image distroless, scripts gcloud ; ordre de construction
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · Résout la question Q-29 du client · **revue depuis** : budget porté à 6 000 lignes de Go hors tests (grappe Raft du protocole de PIN), `github.com/cloudflare/circl` admise pour l'OPRF
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · Résout une question ouverte du client · **revue depuis** ([0015](0015-budget-de-code-6000-lignes.md), [0016](0016-bibliotheques-oprf-argon2-raft.md))
 
 ## Contexte et menace
 
@@ -26,4 +26,4 @@ La reproductibilité est vérifiée par double construction en CI (`RELEASE.md` 
 
 ## Documents concernés
 
-`ARCHITECTURE.md` §2.1, §2.3 ; `RELEASE.md` §1 ; `CONTRIBUTING.md` ; `README.md` (« État du projet »).
+`ARCHITECTURE.md` §2.2, §2.4 ; `RELEASE.md` §1 ; `CONTRIBUTING.md` ; `README.md` (« État du projet »).
