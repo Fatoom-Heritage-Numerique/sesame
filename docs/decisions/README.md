@@ -44,4 +44,5 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0034](0034-lettre-de-secours-pour-un-seul-canal.md) | Lettre de secours pour un proche joint par un seul canal | 2026-10-28 |
 | [0035](0035-ce-qu-expose-une-faille-de-l-enclave.md) | Ce qu'expose une faille de l'enclave, écrit sans promesse de plus | 2026-10-28 |
 | [0036](0036-code-d-invitation-scelle-au-registre.md) | Code d'invitation des lettres scellé au registre par Sésame | 2026-10-28 |
-| [0037](0037-essais-des-codes-comptes-au-registre.md) | Essais des codes d'un proche comptés au registre | 2026-10-28 |
+| [0037](0037-essais-des-codes-comptes-au-registre.md) | Essais des codes d'un proche comptés au registre | 2026-10-28 · revue depuis 0038 |
+| [0038](0038-blocage-de-15-minutes-apres-le-5e-code-faux.md) | Blocage de 15 minutes pleines après le 5ᵉ code faux | 2026-10-28 |

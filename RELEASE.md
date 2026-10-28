@@ -91,7 +91,7 @@ Le client affiche aussi la liste et son historique sur sa page de transparence (
 4. **Démarrer et basculer** : la nouvelle version démarre sur trois VM neuves, une par zone, à côté des anciennes ; puis les trois préfixes de la table d'URL du répartiteur basculent vers elles, en une seule opération journalisée (`ARCHITECTURE.md` §5).
 5. **Amorcer la grappe** : juste après le basculement, l'exploitant amorce la grappe neuve du protocole de PIN (`grappe/amorcer`, `ARCHITECTURE.md` §9.3, `API.md` §4.3).
 6. **Forcer la mise à jour** : la version minimale de l'app est relevée à la première version qui contient la ligne. Une app plus ancienne demande sa mise à jour à sa prochaine ouverture. Aucune période de recouvrement n'est prévue pour les apps non mises à jour : la boutique propose toujours la mise à jour.
-7. **Arrêter l'ancienne version** aussitôt la nouvelle en service : sa grappe du protocole de PIN est effacée, et chaque titulaire redépose dans la nouvelle (`ARCHITECTURE.md`, « Protocole de PIN »).
+7. **Arrêter l'ancienne version** dès que les trois préfixes ont basculé : sa grappe du protocole de PIN est effacée, et chaque titulaire redépose dans la nouvelle (`ARCHITECTURE.md`, « Protocole de PIN »). Sa ligne passe ensuite `retiree`, avec `retireLe`, puis son empreinte sort de la condition KMS, qui reste égale aux lignes `en_service` (§7).
 
 Règles :
 
