@@ -2,7 +2,7 @@
 
 # 0009 · Une clé de release sur clé matérielle au départ, nombre de signatures gravé dans les clients
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur après explication du rôle de la signature) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md)), qui la remplace
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur après explication du rôle de la signature) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md))
 
 ## Contexte et menace
 

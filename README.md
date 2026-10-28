@@ -61,7 +61,7 @@ Une précision, sans détour : AMD SEV chiffre la mémoire mais ne protège pas 
 
 Promettre « nous ne lisons pas vos fichiers » ne suffit pas. Avec Sésame, chacun peut contrôler ce qui tourne.
 
-- **Un code public.** Le code de Sésame est publié en intégralité sur GitHub. Chacun peut le lire, l'auditer et le reconstruire.
+- **Un code public.** Le code de Sésame sera publié en intégralité dans ce dépôt, à l'étape 3 de sa construction (« État du projet »). Chacun pourra le lire, l'auditer et le reconstruire.
 - **Une empreinte unique.** Chaque version produit une empreinte (SHA-256). La moindre modification du code la change complètement.
 - **Des clés verrouillées sur cette empreinte.** Le coffre de clés de Google (Cloud KMS) ne descelle qu'au programme dont l'empreinte est autorisée, et un contrôle automatique de ce dépôt vérifie que cette autorisation correspond aux versions publiées.
 - **Une preuve à chaque échange.** Avant d'envoyer quoi que ce soit, l'app et fatoom.fr/acces demandent à l'enclave son attestation, un jeton signé par Google, et vérifient l'empreinte qu'il porte.
@@ -131,7 +131,7 @@ Format exact et procédure : `RELEASE.md`.
 
 ## Les limites, sans détour
 
-- **Le matériel et Google.** Sésame repose sur AMD SEV, sur Confidential Space et sur le service d'attestation de Google. Une faille exposerait les clés présentes en mémoire au moment de la faille, jamais ce que vous gardez pour vous. AMD SEV ne protégeant pas l'intégrité de la mémoire, Google, ou qui contrôlerait ses hyperviseurs, pourrait la manipuler pour en extraire ces clés. C'est le compromis des services les plus exigeants : sans enclave, Fatoom pourrait tout lire.
+- **Le matériel et Google.** Sésame repose sur AMD SEV, sur Confidential Space et sur le service d'attestation de Google. Une faille de l'enclave seule exposerait les clés de transmission des sessions ouvertes à ce moment. Combinée aux données de Fatoom (la copie chiffrée de la clé de votre coffre), elle permettrait de chercher hors ligne votre code PIN à 6 chiffres et d'ouvrir votre coffre entier, ce que vous gardez pour vous compris. AMD SEV ne protégeant pas l'intégrité de la mémoire, Google, ou qui contrôlerait ses hyperviseurs, pourrait la manipuler pour en extraire ces clés. C'est le compromis des services les plus exigeants : sans enclave, Fatoom pourrait tout lire.
 - **L'opérateur administre les clés.** Fatoom administre le projet Google Cloud de Sésame, avec un seul administrateur aujourd'hui. Il pourrait autoriser une autre image dans le coffre de clés : elle n'aurait besoin d'aucun client pour desceller les clés de transmission existantes. Ce n'est pas impossible ; c'est **visible**. L'opération laisse une trace dans les journaux d'administration de Google, exportés vers un bucket public que personne ne peut vider avant 10 ans sans supprimer Sésame entier, et le script public la signale.
 - **Les comptes de publication.** Il n'y a pas de délai d'annonce entre la publication d'une version et sa mise en service. Qui tiendrait à la fois les accès Google Cloud de Sésame et un compte qui publie l'app, le site ou ce dépôt pourrait faire accepter une image malveillante. Ces comptes se connectent par passkey, sans SMS.
 - **Le portail est servi par Fatoom.** Le portail des proches est un JavaScript servi par Fatoom, qui y compile aussi la liste des versions. Un Fatoom compromis qui servirait un portail modifié pourrait lire ce qu'un proche y ouvre. L'app, publiée par les boutiques, n'est pas concernée.

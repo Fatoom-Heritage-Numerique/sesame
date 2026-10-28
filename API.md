@@ -100,7 +100,7 @@ Toute autre réponse (statut ou forme hors contrat, erreur du répartiteur, coup
 | Portail d'un proche | code d'accès ou d'invitation, puis dernier code (SMS ou email) ou vérification d'identité, puis `sessionId`. Une session est **liée au canal** qui l'a ouverte (`instanceId`, `cliPub`) : présentée depuis un autre canal, elle est refusée (`canal_invalide`) |
 | Serveur du client | jeton OIDC Google d'un compte de service (pour Fatoom : `<compte-deces>`), dans le champ `jetonFatoom` du corps chiffré, jamais en en-tête (l'en-tête traverse le répartiteur en clair). Accepté seulement si la signature Google est valide, `exp` non passé, `iss` = `https://accounts.google.com`, `aud` = adresse publique de Sésame en variable attestée (`SESAME_AUDIENCE` ; pour Fatoom : `https://sesame.fatoom.fr`), `email` = compte de service en variable attestée et `email_verified` vrai ; sinon `jeton_invalide` |
 | Exploitant de Sésame (`grappe/membres`, `grappe/amorcer`) | jeton OIDC Google du compte d'exploitation de Sésame (`<compte-exploitation>`), dans le champ `jetonExploitation` du corps chiffré, vérifié comme `jetonFatoom` : signature Google valide, `exp` non passé, `iss` = `https://accounts.google.com`, `aud` = `SESAME_AUDIENCE`, `email` = compte d'exploitation en variable attestée et `email_verified` vrai ; sinon `jeton_invalide` |
-| VM de Sésame | canal mutuellement attesté entre VM : même `image_digest`, `hwmodel` admis (§4) |
+| VM de Sésame | canal mutuellement attesté entre VM : jeton de paire vérifié par les contrôles entre VM (§3) |
 
 L'`idToken` est accepté seulement si sa signature est valide pour les clés publiques de l'émetteur, `exp` non passé, `iss` et `aud` ceux de l'émetteur en variable attestée (pour Fatoom : `iss` = `https://securetoken.google.com/<identifiant du projet Firebase>`, `aud` = cet identifiant) et `sub` égal à l'`uid` du corps ; sinon `jeton_invalide`.
 
@@ -263,7 +263,7 @@ Sans preuve de la `cleVie` que porte le marqueur, une ligne absente n'est jamais
 "fatoom-sesame-vie|1|" ‖ uid ‖ JSON canonique {"v":1, "uid", "defi"}
 ```
 
-**Traitement** : écrit `vivantLe` ; annule un signalement d'**inactivité** en cours (`annulePar: preuve_de_vie`, notification `signalementAnnule`) ; après une transmission par inactivité, la première preuve de vie clôt le signalement (`closLe`, `closPar: retour`, `ARCHITECTURE.md`), bloque les ouvertures suivantes, ferme les sessions ouvertes des proches de cet `uid` (§2.19, notification `sessionTerminee`) et notifie `lifeAfterTransmission` ; une inactivité qui suit ouvre un nouveau signalement (§2.8). Une preuve de vie n'a **aucun effet** sur un signalement de décès, ni avant ni après son échéance. Sur une ligne rejetée par le contrôle de fraîcheur, la preuve est répondue mais pas inscrite.
+**Traitement** : écrit `vivantLe` ; annule un signalement d'**inactivité** en cours (`annulePar: preuve_de_vie`, notification `signalementAnnule`) ; après une transmission par inactivité, la première preuve de vie clôt le signalement (`closLe`, `closPar: retour`, `ARCHITECTURE.md`), bloque les ouvertures suivantes, ferme les sessions ouvertes des proches de cet `uid` (§2.19, notification `sessionTerminee`) et notifie `vieApresTransmission` ; une inactivité qui suit ouvre un nouveau signalement (§2.8). Une preuve de vie n'a **aucun effet** sur un signalement de décès, ni avant ni après son échéance. Sur une ligne rejetée par le contrôle de fraîcheur, la preuve est répondue mais pas inscrite.
 
 **Réponse `200`** :
 
@@ -515,7 +515,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Corps** : `{"sessionId": "<id>", "otp": "<code reçu>"}`, `otp` en chiffres seulement, tel qu'il a été envoyé.
 
-**Traitement** : vérification par Twilio Verify pour un code envoyé par SMS ; pour un code envoyé par email, comparaison en temps constant avec le code de l'état de la session, refusé après ses 10 minutes (`otp_refuse`) ; succès : code effacé de l'état, ouverture inscrite au registre, jeton de session émis, alerte de connexion au client (`openingNotified`, §5.5). Pour le contact de confiance du vivant du titulaire, Sésame alerte aussi lui-même le titulaire, une fois par session.
+**Traitement** : vérification par Twilio Verify pour un code envoyé par SMS ; pour un code envoyé par email, comparaison en temps constant avec le code de l'état de la session, refusé après ses 10 minutes (`otp_refuse`) ; succès : code effacé de l'état, ouverture inscrite au registre, jeton de session émis, alerte de connexion au client (`ouvertureNotifiee`, §5.5). Pour le contact de confiance du vivant du titulaire, Sésame alerte aussi lui-même le titulaire, une fois par session.
 
 **Réponse `200`** :
 
@@ -555,7 +555,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Corps** : `{"sessionId": "<id>"}`
 
-**Traitement** : Sésame relit la session Stripe. `verified` et prénom, nom et date de naissance conformes aux champs d'identité de la charte gardés dans l'état de la session (§2.14 ; comparaison tolérante) : `essaisIdentite` remis à zéro, `identiteVerifieeLe` inscrit dans `lettres/{contactId}` (parcours « courrier »), puis comme au §2.15 (ouverture inscrite, jeton, `openingNotified`). Sinon : `essaisIdentite + 1` dans le document d'identité du proche (`titulaires/{uid}/identites/{contactId}`, `ARCHITECTURE.md`), `letterIdentityFailed` au client, blocage de 24 h au 3ᵉ échec (`bloqueJusquau`). Dès le verdict (`verified` ou `requires_input`), Sésame demande à Stripe la suppression de la pièce et du selfie (R-COMPTE-20 ; nouvel essai et échec : `ARCHITECTURE.md`).
+**Traitement** : Sésame relit la session Stripe. `verified` et prénom, nom et date de naissance conformes aux champs d'identité de la charte gardés dans l'état de la session (§2.14 ; comparaison tolérante) : `essaisIdentite` remis à zéro, `identiteVerifieeLe` inscrit dans `lettres/{contactId}` (parcours « courrier »), puis comme au §2.15 (ouverture inscrite, jeton, `ouvertureNotifiee`). Sinon : `essaisIdentite + 1` dans le document d'identité du proche (`titulaires/{uid}/identites/{contactId}`, `ARCHITECTURE.md`), `identiteEchouee` au client, blocage de 24 h au 3ᵉ échec (`bloqueJusquau`). Dès le verdict (`verified` ou `requires_input`), Sésame demande à Stripe la suppression de la pièce et du selfie (R-COMPTE-20 ; nouvel essai et échec : `ARCHITECTURE.md`).
 
 **Réponse `200`** : comme au §2.15.
 
@@ -634,7 +634,7 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
 
 **Corps** : `{"sessionId": "<id>"}`
 
-**Traitement** : retire le rôle `gardien` sans invalider la charte. Sésame inscrit au registre le refus pour la génération courante de la charte (`rolesRefuses.{contactId}`, `ARCHITECTURE.md`) : cette charte vaut ensuite rôle `proche`, sans ouverture du vivant du titulaire, et son code ouvre à la transmission comme celui de tout proche (§2.14). Il notifie `roleRefused`, puis ferme la session (`sessionTerminee`) ; la VM qui reçoit ferme aussi les autres sessions de ce proche qu'elle tient, et `session/ouvrir-cles` refuse sur toute VM une session de base `vivant` de ce proche ouverte avant le refus (§2.19). L'app met ensuite la fiche du proche à jour ; le titulaire peut le réinviter ou choisir un autre contact de confiance, par une nouvelle génération de la charte (§2.6), qui remplace la charte refusée.
+**Traitement** : retire le rôle `gardien` sans invalider la charte. Sésame inscrit au registre le refus pour la génération courante de la charte (`rolesRefuses.{contactId}`, `ARCHITECTURE.md`) : cette charte vaut ensuite rôle `proche`, sans ouverture du vivant du titulaire, et son code ouvre à la transmission comme celui de tout proche (§2.14). Il notifie `roleRefuse`, puis ferme la session (`sessionTerminee`) ; la VM qui reçoit ferme aussi les autres sessions de ce proche qu'elle tient, et `session/ouvrir-cles` refuse sur toute VM une session de base `vivant` de ce proche ouverte avant le refus (§2.19). L'app met ensuite la fiche du proche à jour ; le titulaire peut le réinviter ou choisir un autre contact de confiance, par une nouvelle génération de la charte (§2.6), qui remplace la charte refusée.
 
 **Réponse `200`** : `{"refuse": true}`
 
@@ -642,7 +642,30 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
 
 ## 3. Jetons d'attestation
 
-Les contrôles d'un jeton d'attestation (émetteur, `image_digest` dans la liste compilée, version `en_service`, `hwmodel` admis, `eat_nonce`) sont décrits dans `ARCHITECTURE.md`. Ils s'appliquent à l'identique au client qui appelle Sésame, à la passerelle qui reçoit un appel de Sésame (§5.1) et à une VM qui rejoint la grappe (§4).
+Les contrôles d'un jeton d'attestation par un client (émetteur, `image_digest` dans la liste compilée, version `en_service`, `hwmodel` admis, `eat_nonce`) sont décrits dans `ARCHITECTURE.md`. Ils s'appliquent à l'identique au client qui appelle Sésame et à la passerelle qui reçoit un appel de Sésame (§5.1).
+
+**Entre VM de la grappe**, une VM vérifie le jeton d'un pair sans la liste des versions, qui n'intervient pas entre VM : une image ne peut pas contenir la liste qui porte sa propre empreinte. Le pair est accepté seulement si toutes les conditions suivantes sont vraies :
+
+| Claim | Valeur exigée |
+|---|---|
+| signature, `iss`, `aud`, `exp` et `iat`, `swname`, `submods.confidential_space.support_attributes`, `dbgstat`, `secboot` | comme pour un client (`ARCHITECTURE.md`) |
+| `submods.container.image_digest` | égal à celui du jeton de la VM qui vérifie : image identique |
+| `submods.container.env_override` | égal, dictionnaire entier, à celui du jeton de la VM qui vérifie : mêmes variables attestées, donc même `SESAME_TEXTES` |
+| `submods.gce.project_number`, `submods.container.image_reference` | égaux à ceux du jeton de la VM qui vérifie : leurs valeurs, propres à l'exploitant, ne sont pas dans l'image |
+| `hwmodel` | une des valeurs de la constante `hwmodels` de l'image, égale aux `hwmodels` de la ligne de cette version dans `versions.json` et changée seulement par une nouvelle version |
+| `eat_nonce` | exactement les trois valeurs du jeton de paire, ci-dessous |
+
+**Jeton de paire.** À l'ouverture de chaque connexion entre deux VM (canal mutuellement attesté, §4), chaque VM tire un `noncePaire` de 32 octets (primitive d'aléa) et l'envoie à l'autre ; chacune obtient alors de son lanceur un jeton propre à cette paire et à cette connexion, dont `eat_nonce` vaut :
+
+```
+eat_nonce = [ base64url(noncePaire),         # tiré par la VM qui demande l'attestation de son pair, et renvoyé dans le jeton
+              base64url(SHA-256(nodeId)),   # identifiant de nœud de la VM qui présente le jeton, 16 octets (§4.1)
+              base64url(SHA-256(cle)) ]     # clé publique de son certificat TLS entre VM, SubjectPublicKeyInfo DER
+```
+
+- base64url sans remplissage ; l'ordre des trois valeurs est libre.
+- La VM qui vérifie compare la première valeur au `noncePaire` qu'elle a tiré pour cette connexion, la deuxième à l'identifiant de nœud annoncé par le pair, la troisième à la clé du certificat TLS que le pair présente sur cette connexion. Un jeton recopié d'une autre paire ou d'une connexion précédente est refusé.
+- L'échange des jetons (`POST /interne/attestation`) et les certificats TLS entre VM, dont la clé ne vaut que par ce jeton, sont décrits dans `ARCHITECTURE.md`.
 
 ## 4. Routes entre VM
 
@@ -653,10 +676,10 @@ Servies seulement sur le canal mutuellement attesté entre VM de Sésame, jamais
 | | |
 |---|---|
 | Appelant | une VM de Sésame qui démarre sans état |
-| Authentification | attestation mutuelle : même `image_digest`, `hwmodel` admis |
+| Authentification | attestation mutuelle : contrôles entre VM (§3) |
 | Limite | 2 / min par `nodeId` |
 
-**Corps** : `{"jwt": "<jeton d'attestation de la VM>", "nodeId": "<id>"}`. `nodeId` est l'identifiant de nœud neuf : 16 octets de la primitive d'aléa, en base64url sans remplissage. Le jeton porte `image_digest`, `hwmodel` et la zone ; il lie l'identifiant de nœud neuf par `eat_nonce`.
+**Corps** : `{"jwt": "<jeton d'attestation de la VM>", "nodeId": "<id>"}`. `nodeId` est l'identifiant de nœud neuf : 16 octets de la primitive d'aléa, en base64url sans remplissage. `jwt` est le jeton de paire que la VM a présenté à l'ouverture de cette connexion (§3), vérifié par la VM qui reçoit la demande : il porte `image_digest`, `hwmodel` et la zone, et lie l'identifiant de nœud neuf par `eat_nonce`.
 
 **Traitement** : la VM est admise sans intervention si elle a le même `image_digest` et un `hwmodel` admis, si elle prend la zone d'un votant injoignable depuis au moins 2 minutes, ou la place inscrite pour son nom (`submods.gce.instance_name` de son jeton) par `grappe/membres` (§4.2), et si aucune autre modification de membres n'est en cours. Elle est ajoutée comme apprenante, promue, puis l'ancien membre est retiré. Sinon elle est refusée et la demande journalisée (`grappe_admission_refusee`, alerte à l'exploitant, `ARCHITECTURE.md`). Un ancien identifiant de nœud est refusé. Une VM sans grappe répond `refusee`.
 
@@ -697,10 +720,10 @@ Commandé par l'exploitant après le remplacement des trois VM (nouvelle version
 
 ```json
 {"v": 1, "imageDigest": "sha256:<hex, 64 caractères>",
- "membres": [{"nodeId": "<id>", "zone": "<zone>", "cle": "<base64, clé du canal entre VM>"}, …]}
+ "membres": [{"nodeId": "<id>", "zone": "<zone>", "cle": "<base64, SubjectPublicKeyInfo DER de la clé du certificat TLS entre VM>"}, …]}
 ```
 
-`nodeId` est l'identifiant de nœud neuf du membre (§4.1), `zone` sa zone (`submods.gce.zone` de son jeton), `cle` la clé publique de son canal entre VM, liée à son attestation par `eat_nonce`. `grappeId` = hex(SHA-256(ce JSON canonique)).
+`nodeId` est l'identifiant de nœud neuf du membre (§4.1), `zone` sa zone (`submods.gce.zone` de son jeton), `cle` la clé publique de son certificat TLS entre VM, liée à son jeton de paire par `eat_nonce` (§3). `grappeId` = hex(SHA-256(ce JSON canonique)).
 
 #### `grappe/amorcer`
 
@@ -714,7 +737,7 @@ Route du canal du §1.2 : `POST /n/{a|b|c}/canal`, `{"route": "grappe/amorcer", 
 
 **Corps** : `{"jetonExploitation": "<OIDC>"}`
 
-**Traitement** : servie seulement par une VM qui n'est dans aucune grappe et n'a réservé aucune configuration. Elle joint les deux autres VM à leur adresse DNS interne zonale sur le canal entre VM et vérifie leur attestation (§3 : même `image_digest`, `hwmodel` admis) ; elle exige exactement trois VM, une par zone, aucune dans une grappe. Elle compose la configuration initiale, la fait réserver par les deux autres (`grappe/preparer`), puis ordonne leur démarrage (`grappe/demarrer`) et démarre la dernière. Les trois démarrent Raft en état `new`, les trois membres votants, avec la même configuration initiale. La grappe neuve est publiée dans la borne de chaque VM (`grappe`, `ARCHITECTURE.md`) ; l'amorçage est journalisé (`grappe_amorcee`, avec l'`email` du jeton).
+**Traitement** : servie seulement par une VM qui n'est dans aucune grappe et n'a réservé aucune configuration. Elle joint les deux autres VM à leur adresse DNS interne zonale sur le canal entre VM et vérifie leur jeton de paire (contrôles entre VM du §3 : même `image_digest`, `hwmodel` admis) ; elle exige exactement trois VM, une par zone, aucune dans une grappe. Elle compose la configuration initiale, la fait réserver par les deux autres (`grappe/preparer`), puis ordonne leur démarrage (`grappe/demarrer`) et démarre la dernière. Les trois démarrent Raft en état `new`, les trois membres votants, avec la même configuration initiale. La grappe neuve est publiée dans la borne de chaque VM (`grappe`, `ARCHITECTURE.md`) ; l'amorçage est journalisé (`grappe_amorcee`, avec l'`email` du jeton).
 
 **Réponse `200`**, une fois une première entrée validée par la majorité de la grappe neuve : `{"grappeId": "<hex, 64 caractères>", "votants": 3}`
 
@@ -725,7 +748,7 @@ Route du canal du §1.2 : `POST /n/{a|b|c}/canal`, `{"route": "grappe/amorcer", 
 | | |
 |---|---|
 | Appelant | la VM qui a reçu `grappe/amorcer`, sur le canal entre VM |
-| Authentification | attestation mutuelle : même `image_digest`, `hwmodel` admis |
+| Authentification | attestation mutuelle : contrôles entre VM (§3) |
 | Limite | 2 / min par `nodeId` |
 
 **Corps** : `{"configuration": {…}}` (configuration initiale ci-dessus)
@@ -741,7 +764,7 @@ Route du canal du §1.2 : `POST /n/{a|b|c}/canal`, `{"route": "grappe/amorcer", 
 | | |
 |---|---|
 | Appelant | la VM qui a fait réserver la configuration, sur le canal entre VM |
-| Authentification | attestation mutuelle : même `image_digest`, `hwmodel` admis |
+| Authentification | attestation mutuelle : contrôles entre VM (§3) |
 | Limite | 2 / min par `nodeId` |
 
 **Corps** : `{"grappeId": "<hex, 64 caractères>"}`
@@ -758,19 +781,20 @@ Le client expose une passerelle HTTPS que seule une enclave attestée peut appel
 
 ### 5.1 Règles communes
 
-Chaque appel porte cinq en-têtes :
+Chaque appel porte six en-têtes :
 
 | En-tête | Contenu |
 |---|---|
 | `X-Sesame-Attestation` | le JWT d'attestation courant de l'instance |
 | `X-Sesame-Session-Pub` | `sessionPub` de l'instance (base64), pour vérifier `eat_nonce` |
+| `X-Sesame-Kem-Pub` | `kemPub` de l'instance (base64, 1184 octets), pour vérifier `eat_nonce` : le jeton en porte les deux empreintes (§3) |
 | `X-Sesame-Date` | horodatage ISO 8601 UTC de la requête (§1.7) |
 | `X-Sesame-Request-Id` | UUID v4 unique par requête, en minuscules |
 | `X-Sesame-Signature` | base64 de la signature ECDSA P-256 / SHA-256, au format DER que rend KMS, par la clé KMS `session-sign` sur `UTF-8(méthode ‖ "|" ‖ chemin-et-query ‖ "|" ‖ X-Sesame-Date ‖ "|" ‖ X-Sesame-Request-Id ‖ "|" ‖ hex(SHA-256(corps)))` (corps vide ⇒ SHA-256 de zéro octet) |
 
 La passerelle :
 
-- vérifie le jeton d'attestation avec **les mêmes règles qu'un client** (§3) et `eat_nonce` contre `X-Sesame-Session-Pub` ;
+- vérifie le jeton d'attestation avec **les mêmes règles qu'un client** (§3) et `eat_nonce` contre `X-Sesame-Session-Pub` et `X-Sesame-Kem-Pub` ;
 - vérifie la signature ; la clé publique `session-sign` est lue par `kid` dans `clesSession` de la liste des versions compilée (§1.6) ;
 - refuse un horodatage à plus de 5 min ;
 - répond `200 {}`, sans nouveau traitement, à une notification (§5.5) dont le `X-Sesame-Request-Id` est déjà traité ; ce contrôle passe avant le refus de rejeu ;
@@ -821,15 +845,15 @@ Le client ne peut que retenir une charte, jamais la modifier (elle est authentif
 
 | Route | Quand | Corps |
 |---|---|---|
-| `openingNotified` | **alerte de connexion**, une seule fois par session, à la délivrance du jeton (`session/verifier`, `session/identite/verifier`, ou `session/ouvrir` pour une identité déjà vérifiée), pour **tout** proche | `{uid, contactId, role, ouvertLe, lieu, navigateur}` : qui, quand, lieu approximatif et navigateur, déduits par Sésame de l'IP et de l'agent du navigateur et jamais conservés au registre. Elle ne porte pas les contenus ouverts |
+| `ouvertureNotifiee` | **alerte de connexion**, une seule fois par session, à la délivrance du jeton (`session/verifier`, `session/identite/verifier`, ou `session/ouvrir` pour une identité déjà vérifiée), pour **tout** proche | `{uid, contactId, role, ouvertLe, lieu, navigateur}` : qui, quand, lieu approximatif et navigateur, déduits par Sésame de l'IP et de l'agent du navigateur et jamais conservés au registre. Elle ne porte pas les contenus ouverts |
 | `sessionTerminee` | fin d'une session de proche, une seule fois par session, que son dernier code ou son identité ait été vérifié ou non : `session/fermer`, `session/refuser-role`, nouvelle génération de la charte (§2.6), retour du titulaire (§2.4), expiration après 1 h sans appel, fermeture du canal (§1.2) ; une session perdue au redémarrage de sa VM est notifiée par la tâche horaire de Sésame, d'après l'ouverture inscrite au registre (`ARCHITECTURE.md`), ce qui exclut une session jamais vérifiée, dont rien n'est inscrit | `{uid, contactId, ouvertLe?, fermeeLe, contenus: [{type, id}]}` : les contenus dont la clé a été ouverte, lus dans `contenus[]` de l'ouverture au registre ; `ouvertLe` absent et `contenus` vide pour une session jamais vérifiée |
 | `signalementAnnule` | annulation explicite, ou preuve de vie reçue pendant un signalement d'inactivité | `{uid, signalementId, annulePar: "annulation" \| "preuve_de_vie", annuleLe}` |
-| `roleRefused` | refus du rôle par le contact de confiance | `{uid, contactId}` |
-| `lifeAfterTransmission` | première preuve de vie après une transmission par **inactivité** | `{uid, signalementId, vivantLe}` |
-| `letterSent` | lettre commandée | `{uid, contactId, pingenDocumentId}`, sans le code |
-| `letterStatus` | changement d'état chez le prestataire d'impression | `{uid, contactId, pingenDocumentId, statut: "commandee" \| "imprimee" \| "en_distribution" \| "distribuee" \| "erreur"}` |
-| `letterFailed` | trois erreurs d'impression ou de distribution | `{uid, contactId}` |
-| `letterIdentityFailed` | échec de la vérification d'identité d'un proche, prévenu par lettre ou après une bascule (§2.17) | `{uid, contactId, essaisIdentite}` |
+| `roleRefuse` | refus du rôle par le contact de confiance | `{uid, contactId}` |
+| `vieApresTransmission` | première preuve de vie après une transmission par **inactivité** | `{uid, signalementId, vivantLe}` |
+| `lettreEnvoyee` | lettre commandée | `{uid, contactId, pingenDocumentId}`, sans le code |
+| `statutLettre` | changement d'état chez le prestataire d'impression | `{uid, contactId, pingenDocumentId, statut: "commandee" \| "imprimee" \| "en_distribution" \| "distribuee" \| "erreur"}` |
+| `lettreEchouee` | trois erreurs d'impression ou de distribution | `{uid, contactId}` |
+| `identiteEchouee` | échec de la vérification d'identité d'un proche, prévenu par lettre ou après une bascule (§2.17) | `{uid, contactId, essaisIdentite}` |
 
 Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signalement ne change jamais, et la passerelle refuse une notification de ce nom.
 

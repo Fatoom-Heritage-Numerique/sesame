@@ -10,7 +10,7 @@ Un refus du rôle par le contact de confiance, depuis une session du portail, fe
 
 ## Décision
 
-- Le refus retire le rôle `gardien` sans invalider la charte : Sésame l'inscrit pour la génération courante (`rolesRefuses`), ferme la session et prévient le client (`roleRefused`).
+- Le refus retire le rôle `gardien` sans invalider la charte : Sésame l'inscrit pour la génération courante (`rolesRefuses`), ferme la session et prévient le client (`roleRefuse`).
 - La charte de cette génération vaut ensuite rôle `proche` : aucune ouverture du vivant du titulaire, et son code ouvre à la transmission comme celui de tout proche.
 - Une génération plus récente publiée par le titulaire (réinvitation, autre contact de confiance) remplace la charte refusée. `-1` ne signifie plus qu'une suppression du proche, définitive.
 
