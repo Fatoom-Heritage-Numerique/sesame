@@ -17,7 +17,7 @@ Vous avez trouvé une faille ? Écrivez-nous avant de la rendre publique, nous v
 | Accusé de réception | sous **72 h** |
 | Premier diagnostic : reproduit, non reproduit, hors périmètre | sous **7 jours** |
 | Point d'avancement | toutes les 2 semaines tant que le sujet est ouvert |
-| Correctif | selon `RELEASE.md` : une version corrective est mise en service dès que les versions des clients qui la contiennent sont disponibles (mise à jour forcée) ; une version vulnérable peut être **retirée immédiatement**, les transmissions patientent |
+| Correctif | selon `RELEASE.md` : une version vulnérable peut être **retirée immédiatement** ; Sésame ne sert alors plus rien, ni ouverture ni transmission, et aucune annulation n'est inscrite ; la version corrective est mise en service dès que les versions des clients qui la contiennent sont disponibles (mise à jour forcée), en pratique comme une reprise publiée (`RELEASE.md` §5) ; un signalement de décès arrivé à échéance pendant l'arrêt est alors transmis (`THREAT_MODEL.md`, limite 8) |
 | Publication | une fois le correctif en service, nous publions la faille, sa portée et votre nom si vous le souhaitez, dans `docs/decisions/` ou dans les notes de la version |
 
 ## Périmètre
