@@ -112,7 +112,7 @@ L'enclave fournit une attestation : un jeton signé par Google, qui porte l'empr
 # chaque claim exigé (ARCHITECTURE.md, « Attestation ») et que l'empreinte attestée est en_service
 ```
 
-Ces scripts sont livrés avec le code ; leur contrat est décrit par ce `README`. Ce dépôt ne cite aucun nom de projet, de dépôt d'images ni de bucket : ils les reçoivent en arguments (`<numero-projet-sesame>`, `<registre-images>`, `<bucket-audit>`), dont les valeurs sont publiées sur fatoom.fr/sesame.
+Ces scripts sont livrés avec le code ; leur contrat est décrit par ce `README`. Ce dépôt ne cite aucun nom de projet, de dépôt d'images ni de bucket : les scripts les reçoivent en arguments (`<numero-projet-sesame>`, `<registre-images>`, `<bucket-audit>`). Leurs valeurs, dont les deux dernières contiennent le nom du projet de Sésame, sont publiées sur fatoom.fr/sesame, la page de Fatoom, pour que chacun puisse exécuter ces scripts : la règle vaut pour ce dépôt, pas pour cette page.
 
 ### Et après : les journaux publics
 

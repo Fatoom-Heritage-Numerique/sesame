@@ -18,7 +18,7 @@ Pour un proche qui a une adresse postale, la lettre de secours part quand chacun
 
 ## Conséquences et limites
 
-Une lettre de plus peut partir pour un proche à un seul canal. Le code reste le même que celui du canal échoué.
+Une lettre de plus peut partir pour un proche à un seul canal. Elle porte un nouveau code d'invitation tiré par Sésame, comme toute lettre, et le proche vérifie son identité sur le portail (`API.md` §2.10).
 
 ## Documents concernés
 

@@ -24,7 +24,7 @@ git tag -v vX.Y.Z                      # tag signé par une clé SSH (§3)
 ./build/reproduire.sh vX.Y.Z           # construit, puis affiche sha256:<empreinte>
 ```
 
-Le script n'a besoin que de `docker` (ou `podman`) et de `git`. Le dépôt publie, pour chaque version, le journal de la construction reproductible officielle, à comparer au vôtre. `build/reproduire.sh` et ce journal entrent dans le dépôt à l'étape du contrat exécutable (`README.md`, « État du projet »).
+Le script n'a besoin que de `docker` (ou `podman`) et de `git`. Le dépôt publie, pour chaque version, le journal de la construction reproductible officielle, à comparer au vôtre. `build/reproduire.sh` entre dans le dépôt à l'étape du contrat exécutable ; le journal officiel, avec la première version (`README.md`, « État du projet », étapes 2 et 6).
 
 ### 1.2 Double construction en CI
 
@@ -106,7 +106,7 @@ Règles :
 1. ligne passée `retiree`, avec `retireLe` ;
 2. empreinte retirée de la condition KMS **immédiatement** : la version ne descelle plus rien ;
 3. version minimale de l'app relevée ;
-4. VM de la version retirée arrêtées dès que la nouvelle est en service (effacement de sa grappe, redépôt).
+4. VM de la version retirée arrêtées dès que la nouvelle est en service (effacement de sa grappe, redépôt) ; pour un retrait pour faille, arrêtées aussitôt, sans attendre la nouvelle, car retirer l'empreinte de KMS n'arrête ni le protocole de PIN, tenu en mémoire, ni le canal : Sésame ne sert alors plus rien jusqu'à la version corrective, dont la grappe neuve s'amorce comme au §4, étape 5 (`THREAT_MODEL.md` §2, limite 8).
 
 Google ne garantit aucun délai de propagation : une révocation n'est tenue pour effective qu'après au moins 7 minutes et une vérification.
 
