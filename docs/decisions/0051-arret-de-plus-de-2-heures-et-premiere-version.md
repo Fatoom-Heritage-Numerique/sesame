@@ -2,7 +2,7 @@
 
 # 0051 · Après un arrêt de plus de 2 heures, et à la toute première version, une reprise publiée sans mécanisme nouveau
 
-**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau) · précise [0022](0022-reprise-publiee-avec-ou-sans-sauvegarde.md), [0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md) et [0049](0049-retrait-d-urgence-hors-faille-ecrit.md)
+**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau) · précise [0022](0022-reprise-publiee-avec-ou-sans-sauvegarde.md), [0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md) et [0049](0049-retrait-d-urgence-hors-faille-ecrit.md) · **revue depuis** ([0052](0052-reprise-apres-une-panne-sans-attendre-30-jours.md))
 
 ## Contexte et menace
 

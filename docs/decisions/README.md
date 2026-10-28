@@ -49,7 +49,7 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0039](0039-ouvertures-sans-detail-des-contenus.md) | Ouvertures sans le détail des contenus ouverts | 2026-10-28 |
 | [0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md) | Les bornes déposées en échec ne comptent pas dans le contrôle anti-retour | 2026-10-28 · revue depuis 0051 |
 | [0041](0041-code-d-invitation-verifie-par-son-scelle.md) | Code d'invitation vérifié par son scellé, sans empreinte au registre | 2026-10-28 |
-| [0042](0042-ecart-de-30-jours-sauf-faille.md) | Deux versions à moins de 30 jours d'écart seulement pour une faille | 2026-10-28 · revue depuis 0049 |
+| [0042](0042-ecart-de-30-jours-sauf-faille.md) | Deux versions à moins de 30 jours d'écart seulement pour une faille | 2026-10-28 · revue depuis 0049, 0052 |
 | [0043](0043-nouveau-pin-apres-recuperation-et-annulation.md) | Après le code de récupération, le nouveau PIN attend la grappe ; l'annulation d'un décès, non | 2026-10-28 · revue depuis 0047 |
 | [0044](0044-requetes-a-la-passerelle-sans-kid.md) | Requêtes à la passerelle vérifiées contre chaque clé de `clesSession` | 2026-10-28 |
 | [0045](0045-version-de-signature-fixee-par-l-image.md) | Version de signature fixée par l'image, une clause de la condition KMS par version en service | 2026-10-28 |
@@ -58,4 +58,5 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0048](0048-tout-code-refuse-decompte.md) | Tout code refusé est décompté, code juste compris | 2026-10-28 |
 | [0049](0049-retrait-d-urgence-hors-faille-ecrit.md) | Retrait d'urgence hors faille : l'arrêt jusqu'à la version suivante est écrit, sans procédure nouvelle | 2026-10-28 · revue depuis 0051 |
 | [0050](0050-remplacement-d-un-membre-sans-quatrieme-votant.md) | Remplacement d'un membre de la grappe : l'absent est retiré avant la promotion de la remplaçante | 2026-10-28 |
-| [0051](0051-arret-de-plus-de-2-heures-et-premiere-version.md) | Après un arrêt de plus de 2 heures, et à la toute première version, une reprise publiée sans mécanisme nouveau | 2026-10-28 |
+| [0051](0051-arret-de-plus-de-2-heures-et-premiere-version.md) | Après un arrêt de plus de 2 heures, et à la toute première version, une reprise publiée sans mécanisme nouveau | 2026-10-28 · revue depuis 0052 |
+| [0052](0052-reprise-apres-une-panne-sans-attendre-30-jours.md) | Une reprise publiée après une panne de plus de 2 heures n'attend pas l'échéance des 30 jours | 2026-10-28 |
