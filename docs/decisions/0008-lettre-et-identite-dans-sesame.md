@@ -2,7 +2,7 @@
 
 # 0008 · Lettre au proche sans téléphone ni email et vérification d'identité menées par Sésame
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur : « tout sur Sésame, en réduisant au maximum la taille du code ») · Résout une question ouverte du client · **revue depuis** ([0027](0027-lettre-et-identite-precisees.md))
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur : « tout sur Sésame, en réduisant au maximum la taille du code ») · Résout une question ouverte du client · **revue depuis** ([0027](0027-lettre-et-identite-precisees.md), [0036](0036-code-d-invitation-scelle-au-registre.md))
 
 ## Contexte et menace
 

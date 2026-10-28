@@ -403,7 +403,7 @@ La même requête renvoyée après son succès reçoit `generation_non_croissant
 
 **Corps** : `{"jetonFatoom": "<OIDC>", "uid": "<uid>", "contactId": "<id>"}`
 
-**Traitement** : Sésame lit la charte du proche à la passerelle (§5.4) et vérifie que la transmission est ouverte (signalement à terme, non annulé, non clos), que la charte est de la génération du registre avec la `ktsGeneration` de la ligne (mêmes contrôles qu'au §2.14, étape 2) et qu'elle a une adresse ; il tire alors un code d'invitation, inscrit `invitations/{lookup}` et commande la lettre ; le proche vérifiera son identité sur le portail. Le client ne peut que déclencher une lettre vers l'adresse scellée par le titulaire, jamais la rediriger.
+**Traitement** : Sésame lit la charte du proche à la passerelle (§5.4) et vérifie que la transmission est ouverte (signalement à terme, non annulé, non clos), que la charte est de la génération du registre avec la `ktsGeneration` de la ligne (mêmes contrôles qu'au §2.14, étape 2) et qu'elle a une adresse ; il tire alors un **nouveau** code d'invitation, le scelle sous sa clé KMS des codes d'invitation (`codeInvitationScelle`, `ARCHITECTURE.md`), inscrit `invitations/{lookup}` et `lettres/{contactId}`, puis commande la lettre ; le proche vérifiera son identité sur le portail. Le code n'est descellé que pour réimprimer cette lettre (nouvel envoi après une erreur, renvois de J+15 et J+45, reprise d'un envoi interrompu), jamais rendu au client. Le client ne peut que déclencher une lettre vers l'adresse scellée par le titulaire, jamais la rediriger.
 
 **Réponse `200`** : `{"commandee": true | false}`. `false` quand la transmission n'est pas ouverte, que la charte n'est pas de la génération du registre ou n'a pas d'adresse, ou qu'une lettre est déjà commandée pour cette transmission (une lettre d'une transmission précédente, close par le retour du titulaire, ne compte pas) ; le motif est journalisé par Sésame, jamais renvoyé : le client ne doit rien apprendre de la charte. Une répétition après une lettre commandée reçoit donc `false`.
 
@@ -482,7 +482,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 |---|---|
 | Appelant | portail, saisie du code d'accès (ou du code d'invitation reçu par lettre) |
 | Authentification | le code |
-| Limite | 20 / 15 min par IP ; 5 essais / 15 min par IP ; 3 sessions simultanées par `contactId` ; 3 renvois du dernier code par session (§2.15) |
+| Limite | 20 / 15 min par IP ; 5 essais / 15 min par IP, et par proche quand le code désigne un proche (au registre) ; 3 sessions simultanées par `contactId` ; 3 renvois du dernier code par session (§2.15) |
 
 **Corps** : `{"code": "<code saisi>", "lookup": "<hex>"}`, ou `{"sessionId": "<id>"}` seul pour « Renvoyer le code » (§2.15). `code` est envoyé tel que saisi (§1.7). `lookup` est l'index du code (`indexAcces`, hexadécimal en minuscules), étiré par Argon2id et calculé par le navigateur ; Sésame ne calcule un Argon2id que pour l'index d'un code d'invitation, une fois par lettre (§2.10).
 
@@ -492,6 +492,8 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 2. Sinon : `GET /bundle?lookup=` à la passerelle (§5.2), descellement de la KTS, ouverture de la charte ; vérifie `codeVerifier`, `charte.generation == registre.chartes[contactId]` (absente du registre ⇒ seule la génération 1 est acceptée, `ARCHITECTURE.md`), `ktsGeneration`, `isUnlocked`. Rôle `gardien` : accepté, sauf si le rôle a été refusé pour cette génération (`rolesRefuses`, §2.21) : la charte vaut alors rôle `proche`. Rôle `proche` : exige un signalement à terme, non annulé (inactivité : non clos par une preuve de vie reçue après le terme ; décès : définitif).
 3. Pour le parcours de l'étape 2, envoi du dernier code : par SMS au téléphone de la charte, par Twilio Verify ; sans téléphone, par email à l'adresse de la charte, par Sésame lui-même, qui tire un code de 6 chiffres (primitive d'aléa), valable 10 minutes, et l'envoie par l'API Mail Send de SendGrid, avec un texte attesté et l'adresse d'expédition attestée de ses alertes (`ARCHITECTURE.md`).
 4. Dans les deux parcours, création de la session, liée au canal. Son **état** reste en mémoire de la VM jusqu'à la fin de la session : la KTS déchiffrée et sa `ktsGeneration`, les champs d'identité de la charte (`prenom`, `nom`, `dateNaissance`), son rôle, sa génération vérifiée (§2.19) et, pour un dernier code par email, ce code. `session/identite/verifier`, `session/identite/bascule` et `session/ouvrir-cles` s'en servent, sans relire la charte. Une session dont l'état est perdu (redémarrage de sa VM) n'existe plus : `session_expiree`.
+
+**Codes faux** : dans les deux parcours, un code qui désigne un proche (invitation trouvée, ou charte servie par la passerelle) mais que refuse son `codeVerifier` est un code faux de ce proche : Sésame lit d'abord son document d'essais (`titulaires/{uid}/essais/{contactId}`, `ARCHITECTURE.md`), refuse sans vérifier après 5 codes faux en 15 min (`trop_d_essais`), et inscrit chaque code faux, signé, avant de répondre `code_refuse`.
 
 **Réponse `200`** :
 
@@ -503,7 +505,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 - `identite` : parcours « courrier » ; le portail enchaîne sur §2.16 (`masque: null`).
 - `aucun` : invitation dont l'identité est déjà vérifiée (`identiteVerifieeLe` de `lettres/{contactId}`) : le proche entre avec son code seul, sans nouvelle vérification ni dernier code (`masque: null`). La réponse porte en plus les champs de §2.15 (`jeton`, `scope`, `base`, `role`, `expireLe`, `prenom`, `titulaireAffiche`) ; l'ouverture est inscrite et notifiée comme au §2.15.
 
-**Erreurs** : `code_refuse` (403), **identique quel que soit le motif** (code inconnu, `codeVerifier` faux, invitation expirée ou qui n'est plus celle de la dernière lettre du proche, charte révoquée, code non remis, proche avant l'échéance, signalement annulé, preuve de vie après une transmission par inactivité, `bundle` refusé par la passerelle, ligne rejetée), avec `details.essaisRestants` ; le motif est journalisé par Sésame. `trop_d_essais` (429 ; 5 codes faux en 15 min, `details.reessayerLe`) ; `reessayer_plus_tard` (503 ; contrôle anti-retour du registre en échec, sans détail ni raison, sans décompter les essais) ; `trop_d_appels` (429 ; y compris une 4ᵉ session simultanée pour le même proche) ; `passerelle_indisponible` (503) ; `fournisseur_indisponible` (503). Pour un renvoi du dernier code : erreurs de « Renvoyer le code » (§2.15).
+**Erreurs** : `code_refuse` (403), **identique quel que soit le motif** (code inconnu, `codeVerifier` faux, invitation expirée ou qui n'est plus celle de la dernière lettre du proche, charte révoquée, code non remis, proche avant l'échéance, signalement annulé, preuve de vie après une transmission par inactivité, `bundle` refusé par la passerelle, ligne ou document d'essais rejeté), avec `details.essaisRestants` (le plus petit des essais restants de l'IP et, quand le code désigne un proche, de ce proche) ; le motif est journalisé par Sésame. `trop_d_essais` (429 ; 5 codes faux en 15 min d'une IP ou pour un même proche, `details.reessayerLe`) ; `registre_indisponible` (503 ; code faux d'un proche que le registre n'a pas inscrit : aucune réponse de code faux sans inscription) ; `reessayer_plus_tard` (503 ; contrôle anti-retour du registre en échec, sans détail ni raison, sans décompter les essais) ; `trop_d_appels` (429 ; y compris une 4ᵉ session simultanée pour le même proche) ; `passerelle_indisponible` (503) ; `fournisseur_indisponible` (503). Pour un renvoi du dernier code : erreurs de « Renvoyer le code » (§2.15).
 
 ### 2.15 `session/verifier`
 
@@ -511,11 +513,11 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 |---|---|
 | Appelant | portail, saisie du dernier code |
 | Authentification | `sessionId`, sur le canal qui l'a ouverte |
-| Limite | 5 essais / 15 min par proche ; 20 appels / 15 min par session |
+| Limite | 5 essais / 15 min par proche, comptés au registre ; 20 appels / 15 min par session |
 
 **Corps** : `{"sessionId": "<id>", "otp": "<code reçu>"}`, `otp` en chiffres seulement, tel qu'il a été envoyé.
 
-**Traitement** : vérification par Twilio Verify pour un code envoyé par SMS ; pour un code envoyé par email, comparaison en temps constant avec le code de l'état de la session, refusé après ses 10 minutes (`otp_refuse`) ; succès : code effacé de l'état, ouverture inscrite au registre, jeton de session émis, alerte de connexion au client (`ouvertureNotifiee`, §5.5). Pour le contact de confiance du vivant du titulaire, Sésame alerte aussi lui-même le titulaire, une fois par session.
+**Traitement** : Sésame lit d'abord le document d'essais du proche (`titulaires/{uid}/essais/{contactId}`, `ARCHITECTURE.md`) : après 5 derniers codes faux en 15 min, `trop_d_essais`, sans vérifier. Puis vérification par Twilio Verify pour un code envoyé par SMS ; pour un code envoyé par email, comparaison en temps constant avec le code de l'état de la session, refusé après ses 10 minutes (`otp_refuse`) ; chaque code faux est inscrit au registre, signé, avant la réponse `otp_refuse` ; un document d'essais rejeté fait refuser l'essai sans vérifier le code (`otp_refuse`) ; succès : code effacé de l'état, ouverture inscrite au registre, jeton de session émis, alerte de connexion au client (`ouvertureNotifiee`, §5.5). Pour le contact de confiance du vivant du titulaire, Sésame alerte aussi lui-même le titulaire, une fois par session.
 
 **Réponse `200`** :
 
@@ -525,7 +527,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 `scope`, `base` et `role` sont ceux du jeton (§1.6) ; `expireLe` est son `exp`. `base` vaut `vivant` pour le contact de confiance avant toute transmission, `deces` pour une transmission après décès, `inactivite` pour une transmission par inactivité ; elle reste `inactivite` jusqu'à la fin des accès quand un décès est vérifié ensuite (étape 7 de « Transmission après décès », `ARCHITECTURE.md`). `prenom` et `titulaireAffiche` sont lus dans la charte, pour l'affichage du portail (« Bonjour Léa »).
 
-**Erreurs** : `otp_refuse` (403, `details.essaisRestants`) ; `trop_d_essais` (429, `details.reessayerLe`) ; `reessayer_plus_tard` (503 ; contrôle anti-retour, sans décompte) ; `session_expiree` (410) ; `canal_invalide` (400, en clair) ; `fournisseur_indisponible` (503).
+**Erreurs** : `otp_refuse` (403, `details.essaisRestants`) ; `trop_d_essais` (429, `details.reessayerLe`) ; `registre_indisponible` (503 ; code faux que le registre n'a pas inscrit) ; `reessayer_plus_tard` (503 ; contrôle anti-retour, sans décompte) ; `session_expiree` (410) ; `canal_invalide` (400, en clair) ; `fournisseur_indisponible` (503).
 
 **Renvoyer le code** (R-PORTAIL-01) : le portail rappelle `session/ouvrir` (§2.14) avec `{"sessionId": "<id>"}` seul, sur le canal qui a ouvert la session. Sésame renvoie le dernier code de cette même session, par le même canal (`sms` par Twilio Verify, `email` par SendGrid : le même code tant qu'il est valable, un nouveau ensuite), sans nouvelle session et sans décompter les sessions simultanées ni les essais du code. Réponse `200` : `{"sessionId", "canal", "masque"}`, comme au §2.14. 3 renvois par session ; au 4ᵉ, `trop_d_essais` (429, `details.reessayerLe` : expiration de la session), et le proche saisit le dernier code reçu ou rouvre une session par son code d'accès. Erreurs : `trop_d_essais` (429) ; `message_refuse` (400 ; session `identite` ou `aucun`, ou dont le dernier code est déjà vérifié) ; `session_expiree` (410) ; `canal_invalide` (400, en clair) ; `fournisseur_indisponible` (503).
 
@@ -889,11 +891,11 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 | `pas_leader` | 409 | entre VM : la VM jointe n'est plus leader, le relais ou le décompte se refait au nouveau leader (`ARCHITECTURE.md`) |
 | `session_expiree` | 410 | session sans activité depuis 1 h, fermée (dont génération de la charte changée, rotation de la KTS, rôle refusé ou retour du titulaire) ou inconnue (dont état perdu au redémarrage de sa VM) |
 | `identite_bloquee` | 423 | 3 échecs d'identité cumulés depuis le dernier succès ou la fin du blocage : blocage de 24 h (`details.reessayerLe`) |
-| `trop_d_essais` | 429 | 5 essais de code ou de dernier code en 15 min, 4ᵉ renvoi du dernier code dans une session, ou délai d'essai du PIN en cours (`details.reessayerLe`) |
+| `trop_d_essais` | 429 | 5 essais de code en 15 min (par IP ou par proche) ou de dernier code (par proche), 4ᵉ renvoi du dernier code dans une session, ou délai d'essai du PIN en cours (`details.reessayerLe`) |
 | `trop_d_appels` | 429 | limite d'une route dépassée (`details.reessayerLe`) ; en clair pour `GET /attestation` |
 | `pin_indisponible_temporaire` | 503 | pas de majorité, registre illisible, transaction refusée, mémoire pleine |
 | `reessayer_plus_tard` | 503 | le contrôle anti-retour global refuse d'ouvrir, de transmettre ou de changer de grappe (`ARCHITECTURE.md`) ; aucun détail, aucun essai décompté |
-| `registre_indisponible` | 503 | registre ou bucket des marqueurs illisible |
+| `registre_indisponible` | 503 | registre ou bucket des marqueurs illisible ; code faux d'un proche que le registre n'a pas inscrit |
 | `passerelle_indisponible` | 503 | la passerelle ne répond pas ou répond hors contrat |
 | `fournisseur_indisponible` | 503 | Twilio, SendGrid, Stripe ou le prestataire d'impression en échec |
 | `enveloppe_refusee` | — | par enveloppe, dans `refusees` : aad étranger, tag invalide, contenu non ouvrable |
@@ -902,7 +904,7 @@ Sauf les trois premiers et `trop_d_appels` sur `GET /attestation`, le statut est
 
 ## 7. Limites
 
-Spécifiées : 5 essais / 15 min pour le code d'accès (par IP : contre qui change d'adresse IP, le frein est l'Argon2id du `lookup`, à calculer pour chaque code essayé, `ARCHITECTURE.md`) et le dernier code (par proche) ; 3 échecs d'identité cumulés depuis le dernier succès ou la fin du blocage, puis blocage de 24 h (par proche) ; défi à usage unique valable 5 min ; 10 essais par PIN, avec le délai croissant du §2.13 ; 1 h d'inactivité pour une session de portail ; `n` de 1 à 2³² − 1 par canal.
+Spécifiées : 5 essais / 15 min pour le code d'accès (par IP : contre qui change d'adresse IP, le frein est l'Argon2id du `lookup`, à calculer pour chaque code essayé, `ARCHITECTURE.md` ; et par proche quand le code désigne un proche) et le dernier code (par proche) ; 3 échecs d'identité cumulés depuis le dernier succès ou la fin du blocage, puis blocage de 24 h (par proche) ; défi à usage unique valable 5 min ; 10 essais par PIN, avec le délai croissant du §2.13 ; 1 h d'inactivité pour une session de portail ; `n` de 1 à 2³² − 1 par canal.
 
 Décidée par le porteur du produit : `etat`, 100 / jour par `uid` (§2.5).
 
@@ -911,7 +913,8 @@ Toutes les autres valeurs sont des valeurs initiales.
 Décompte :
 
 - une limite par `uid` ne compte que les appels authentifiés (signature, jeton ou preuve valides) ; un appel refusé à l'authentification ne compte que dans les limites par IP et par canal : qui connaît un `uid` ne peut pas épuiser les appels du titulaire ;
-- les limites par `uid`, par proche (`contactId` : sessions simultanées de `session/ouvrir`, essais de `session/verifier`) et pour le compte de service appelant (`deces/signaler`, `titulaire/supprimer`, `lettre/secours`) sont décomptées par le leader de la grappe pour les trois VM ensemble, en mémoire, sans réplication : la VM qui reçoit l'appel lui demande le décompte sur le canal entre VM, et lui signale la fin de chaque session pour le décompte des sessions simultanées ; un changement de leader les remet à zéro ; sans leader joignable (pause de la grappe, VM sans grappe), chaque VM décompte elle-même ; qui provoque des élections (l'administrateur, qui tient le réseau) peut donc dépasser ces limites, celles d'`etat` et des essais du dernier code comprises ;
+- les essais faux des codes d'un proche (code d'accès ou d'invitation qui le désigne, dernier code, vérification d'identité) sont comptés **au registre**, par proche (`essais/{contactId}` et `identites/{contactId}`, `ARCHITECTURE.md`), par une écriture signée à chaque essai faux, avant la réponse : ni un redémarrage des VM ni un changement de leader ne les remettent à zéro ;
+- les autres limites par `uid`, par proche (`contactId` : sessions simultanées de `session/ouvrir`) et pour le compte de service appelant (`deces/signaler`, `titulaire/supprimer`, `lettre/secours`) sont décomptées par le leader de la grappe pour les trois VM ensemble, en mémoire, sans réplication : la VM qui reçoit l'appel lui demande le décompte sur le canal entre VM, et lui signale la fin de chaque session pour le décompte des sessions simultanées ; un changement de leader les remet à zéro ; sans leader joignable (pause de la grappe, VM sans grappe), chaque VM décompte elle-même ; qui provoque des élections (l'administrateur, qui tient le réseau) peut donc dépasser ces limites, celle d'`etat` comprise ;
 - les limites par IP, par canal et par session sont décomptées par la VM qui reçoit l'appel ;
 - la limite de `grappe/membres` est décomptée par le leader.
 

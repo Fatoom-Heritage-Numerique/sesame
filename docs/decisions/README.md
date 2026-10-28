@@ -15,7 +15,7 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0005](0005-manifeste-signe-publie-7-jours-avant.md) | Manifeste signé sur clé matérielle, publié 7 jours avant, retrait immédiat, sans voie rapide | 2026-10-12 · revue depuis 0014 |
 | [0006](0006-verification-en-direct-et-par-cache.md) | Vérification de Sésame en direct pour enrôler et changer une charte, par manifeste en cache pour destiner | 2026-10-12 · revue depuis 0014, 0017, 0020, 0023 |
 | [0007](0007-depot-public-separe.md) | Un dépôt public séparé du client | 2026-10-12 · revue depuis 0014 |
-| [0008](0008-lettre-et-identite-dans-sesame.md) | Lettre au proche sans téléphone ni email et vérification d'identité menées par Sésame | 2026-10-12 · revue depuis 0027 |
+| [0008](0008-lettre-et-identite-dans-sesame.md) | Lettre au proche sans téléphone ni email et vérification d'identité menées par Sésame | 2026-10-12 · revue depuis 0027, 0036 |
 | [0009](0009-cle-de-release-sur-cle-materielle.md) | Une clé de release sur clé matérielle au départ, nombre de signatures gravé dans les clients | 2026-10-12 · revue depuis 0014 |
 | [0010](0010-fournisseurs-nommes-dans-le-code.md) | Fournisseurs nommés dans le code, réglages du client en variables attestées, clés d'API dans Secret Manager | 2026-10-12 · revue depuis 0014, 0023, 0028, 0029 |
 | [0011](0011-go-binaire-statique-distroless.md) | Go, binaire statique, image distroless, scripts gcloud ; ordre de construction | 2026-10-12 · revue depuis 0015, 0016 |
@@ -43,3 +43,5 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0033](0033-textes-du-client-attestes-par-leur-empreinte.md) | Textes du client réglés au lancement, attestés par leur empreinte | 2026-10-27 |
 | [0034](0034-lettre-de-secours-pour-un-seul-canal.md) | Lettre de secours pour un proche joint par un seul canal | 2026-10-28 |
 | [0035](0035-ce-qu-expose-une-faille-de-l-enclave.md) | Ce qu'expose une faille de l'enclave, écrit sans promesse de plus | 2026-10-28 |
+| [0036](0036-code-d-invitation-scelle-au-registre.md) | Code d'invitation des lettres scellé au registre par Sésame | 2026-10-28 |
+| [0037](0037-essais-des-codes-comptes-au-registre.md) | Essais des codes d'un proche comptés au registre | 2026-10-28 |
