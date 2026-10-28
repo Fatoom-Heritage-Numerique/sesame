@@ -34,10 +34,12 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0024](0024-signe-de-vie-transmission-par-inactivite.md) | Signe de vie : transmission par inactivité | 2026-10-22 |
 | [0025](0025-noms-francais-des-champs.md) | Noms français des champs des formats publiés | 2026-10-27 · revue depuis 0032 |
 | [0026](0026-cles-session-sign-dans-la-liste-des-versions.md) | Clés publiques de `session-sign` dans la liste des versions | 2026-10-27 |
-| [0027](0027-lettre-et-identite-precisees.md) | Lettre et identité : compte Pingen distinct, trois champs, bascule, lettre de secours, suppression chez Stripe | 2026-10-23 |
+| [0027](0027-lettre-et-identite-precisees.md) | Lettre et identité : compte Pingen distinct, trois champs, bascule, lettre de secours, suppression chez Stripe | 2026-10-23 · revue depuis 0034 |
 | [0028](0028-reglages-du-client-env-override-entier.md) | Réglages du client : dictionnaire `env_override` exigé en entier, textes longs dans l'image | 2026-10-26 · revue depuis 0033 |
 | [0029](0029-dernier-code-par-email-envoye-par-sesame.md) | Dernier code par email tiré et envoyé par Sésame lui-même ; Twilio Verify pour le SMS seulement | 2026-10-27 · revue depuis 0033 |
 | [0030](0030-preuve-des-signalements-insee.md) | Preuve des signalements de la source `insee` | 2026-10-27 |
 | [0031](0031-refus-du-role-sans-invalider-la-charte.md) | Refus du rôle depuis le portail sans invalider la charte | 2026-10-27 |
 | [0032](0032-chemin-du-depot-d-images-hors-de-la-liste.md) | Chemin du dépôt d'images hors de la liste des versions | 2026-10-27 |
 | [0033](0033-textes-du-client-attestes-par-leur-empreinte.md) | Textes du client réglés au lancement, attestés par leur empreinte | 2026-10-27 |
+| [0034](0034-lettre-de-secours-pour-un-seul-canal.md) | Lettre de secours pour un proche joint par un seul canal | 2026-10-28 |
+| [0035](0035-ce-qu-expose-une-faille-de-l-enclave.md) | Ce qu'expose une faille de l'enclave, écrit sans promesse de plus | 2026-10-28 |

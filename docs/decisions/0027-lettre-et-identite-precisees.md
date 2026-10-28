@@ -2,7 +2,7 @@
 
 # 0027 · Lettre et identité : compte Pingen distinct, trois champs, bascule, lettre de secours, suppression chez Stripe
 
-**Date** : 2026-10-23 · **Statut** : actée (validée par l'opérateur) · revoit [0008](0008-lettre-et-identite-dans-sesame.md)
+**Date** : 2026-10-23 · **Statut** : actée (validée par l'opérateur) · revoit [0008](0008-lettre-et-identite-dans-sesame.md) · **revue depuis** [0034](0034-lettre-de-secours-pour-un-seul-canal.md)
 
 ## Contexte et menace
 

@@ -397,7 +397,7 @@ La même requête renvoyée après son succès reçoit `generation_non_croissant
 
 | | |
 |---|---|
-| Appelant | serveur du client, quand l'email **et** le téléphone d'un proche ont échoué techniquement |
+| Appelant | serveur du client, quand chacun des canaux d'un proche a échoué techniquement : son email **et** son téléphone, ou le seul des deux qu'il a |
 | Authentification | `jetonFatoom` |
 | Limite | 100 / min pour le compte de service appelant |
 
@@ -835,7 +835,7 @@ Les chartes des proches à prévenir par lettre (`courrier == true`). La passere
 
 ### 5.4 `GET /bundle?uid=<uid>&contactId=<id>`
 
-Un proche par son identifiant : la lettre de secours vise un proche qui n'est pas « courrier », et le parcours « courrier » retrouve le proche par `invitations/{lookup}` (`uid`, `contactId`). Sésame ne garde aucune charte durablement : une charte ouverte ne reste en mémoire que dans l'état d'une session (§2.14) ou le temps d'une lettre. **Réponse** : comme au §5.2 ; `404` sans motif sinon.
+Un proche par son identifiant : la lettre de secours vise un proche qui n'est pas « courrier » (un email, un téléphone ou les deux), et le parcours « courrier » retrouve le proche par `invitations/{lookup}` (`uid`, `contactId`). Sésame ne garde aucune charte durablement : une charte ouverte ne reste en mémoire que dans l'état d'une session (§2.14) ou le temps d'une lettre. **Réponse** : comme au §5.2 ; `404` sans motif sinon.
 
 Le client ne peut que retenir une charte, jamais la modifier (elle est authentifiée sous la KTS) : un déni de service est visible, une substitution est impossible.
 
