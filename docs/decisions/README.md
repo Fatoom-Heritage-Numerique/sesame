@@ -24,12 +24,12 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0014](0014-liste-des-versions-compilee.md) | Liste des versions compilée dans les clients, mise à jour forcée | 2026-10-25 · revue depuis 0025, 0026, 0032 |
 | [0015](0015-budget-de-code-6000-lignes.md) | Budget de code porté à 6 000 lignes de Go | 2026-10-26 |
 | [0016](0016-bibliotheques-oprf-argon2-raft.md) | Bibliothèques admises : `circl` pour l'OPRF, `x/crypto/argon2`, `go.etcd.io/raft/v3` | 2026-10-24 et 2026-10-27 |
-| [0017](0017-protocole-de-pin-grappe-de-trois-vm.md) | Protocole de PIN en mémoire, sur une grappe de trois VM à majorité, et règle des 30 jours | 2026-10-24 · revue depuis 0018, 0042, 0043 |
+| [0017](0017-protocole-de-pin-grappe-de-trois-vm.md) | Protocole de PIN en mémoire, sur une grappe de trois VM à majorité, et règle des 30 jours | 2026-10-24 · revue depuis 0018, 0042, 0043, 0050 |
 | [0018](0018-amorcage-commande-d-une-grappe-neuve.md) | Amorçage d'une grappe neuve commandé par l'exploitant | 2026-10-27 |
 | [0019](0019-canal-hybride-x25519-ml-kem.md) | Canal chiffré hybride X25519 et ML-KEM-768 vers l'enclave | 2026-10-23 |
 | [0020](0020-annulation-explicite-et-transmission-definitive.md) | Annulation explicite d'un signalement de décès, transmission définitive après l'échéance | 2026-10-22 et 2026-10-26 |
 | [0021](0021-registre-signe-et-borne-publique.md) | Registre en ajout seul signé par `registre-sign`, borne publique du registre | 2026-10-26 · revue depuis 0040, 0045 |
-| [0022](0022-reprise-publiee-avec-ou-sans-sauvegarde.md) | Export horaire, toute restauration par une reprise publiée, ré-enrôlement d'un coffre sans ligne | 2026-10-27 · revue depuis 0040 |
+| [0022](0022-reprise-publiee-avec-ou-sans-sauvegarde.md) | Export horaire, toute restauration par une reprise publiée, ré-enrôlement d'un coffre sans ligne | 2026-10-27 · revue depuis 0040, 0051 |
 | [0023](0023-alertes-envoyees-par-sesame-et-fiche-d-alerte.md) | Alertes envoyées par Sésame lui-même, fiche d'alerte scellée par Sésame | 2026-10-24 |
 | [0024](0024-signe-de-vie-transmission-par-inactivite.md) | Signe de vie : transmission par inactivité | 2026-10-22 |
 | [0025](0025-noms-francais-des-champs.md) | Noms français des champs des formats publiés | 2026-10-27 · revue depuis 0032 |
@@ -47,7 +47,7 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0037](0037-essais-des-codes-comptes-au-registre.md) | Essais des codes d'un proche comptés au registre | 2026-10-28 · revue depuis 0038, 0048 |
 | [0038](0038-blocage-de-15-minutes-apres-le-5e-code-faux.md) | Blocage de 15 minutes pleines après le 5ᵉ code faux | 2026-10-28 · revue depuis 0048 |
 | [0039](0039-ouvertures-sans-detail-des-contenus.md) | Ouvertures sans le détail des contenus ouverts | 2026-10-28 |
-| [0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md) | Les bornes déposées en échec ne comptent pas dans le contrôle anti-retour | 2026-10-28 |
+| [0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md) | Les bornes déposées en échec ne comptent pas dans le contrôle anti-retour | 2026-10-28 · revue depuis 0051 |
 | [0041](0041-code-d-invitation-verifie-par-son-scelle.md) | Code d'invitation vérifié par son scellé, sans empreinte au registre | 2026-10-28 |
 | [0042](0042-ecart-de-30-jours-sauf-faille.md) | Deux versions à moins de 30 jours d'écart seulement pour une faille | 2026-10-28 · revue depuis 0049 |
 | [0043](0043-nouveau-pin-apres-recuperation-et-annulation.md) | Après le code de récupération, le nouveau PIN attend la grappe ; l'annulation d'un décès, non | 2026-10-28 · revue depuis 0047 |
@@ -56,4 +56,6 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0046](0046-nouvel-envoi-d-une-lettre-au-passage-suivant.md) | Nouvel envoi d'une lettre au passage de la tâche qui relève l'erreur | 2026-10-28 |
 | [0047](0047-recuperation-dans-les-30-jours-d-un-changement-de-grappe.md) | Dans les 30 jours d'un changement de grappe, le code de récupération ne rouvre pas le coffre sur un nouvel appareil ; l'annulation d'un décès reste possible | 2026-10-28 |
 | [0048](0048-tout-code-refuse-decompte.md) | Tout code refusé est décompté, code juste compris | 2026-10-28 |
-| [0049](0049-retrait-d-urgence-hors-faille-ecrit.md) | Retrait d'urgence hors faille : l'arrêt jusqu'à la version suivante est écrit, sans procédure nouvelle | 2026-10-28 |
+| [0049](0049-retrait-d-urgence-hors-faille-ecrit.md) | Retrait d'urgence hors faille : l'arrêt jusqu'à la version suivante est écrit, sans procédure nouvelle | 2026-10-28 · revue depuis 0051 |
+| [0050](0050-remplacement-d-un-membre-sans-quatrieme-votant.md) | Remplacement d'un membre de la grappe : l'absent est retiré avant la promotion de la remplaçante | 2026-10-28 |
+| [0051](0051-arret-de-plus-de-2-heures-et-premiere-version.md) | Après un arrêt de plus de 2 heures, et à la toute première version, une reprise publiée sans mécanisme nouveau | 2026-10-28 |

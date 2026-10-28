@@ -2,7 +2,7 @@
 
 # 0049 · Retrait d'urgence hors faille : l'arrêt jusqu'à la version suivante est écrit, sans procédure nouvelle
 
-**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau) · précise [0042](0042-ecart-de-30-jours-sauf-faille.md)
+**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau) · précise [0042](0042-ecart-de-30-jours-sauf-faille.md) · **revue depuis** ([0051](0051-arret-de-plus-de-2-heures-et-premiere-version.md))
 
 ## Contexte et menace
 

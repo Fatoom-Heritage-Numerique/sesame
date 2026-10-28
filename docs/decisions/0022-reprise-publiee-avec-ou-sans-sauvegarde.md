@@ -2,7 +2,7 @@
 
 # 0022 · Export horaire, toute restauration par une reprise publiée, ré-enrôlement d'un coffre sans ligne
 
-**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0003](0003-registre-minimal-tenu-par-sesame.md) · **revue depuis** ([0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md))
+**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0003](0003-registre-minimal-tenu-par-sesame.md) · **revue depuis** ([0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md), [0051](0051-arret-de-plus-de-2-heures-et-premiere-version.md))
 
 ## Contexte et menace
 

@@ -2,7 +2,7 @@
 
 # 0040 · Les bornes déposées en échec ne comptent pas dans le contrôle anti-retour
 
-**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option la plus simple qui tient la garantie annoncée) · précise [0021](0021-registre-signe-et-borne-publique.md) et [0022](0022-reprise-publiee-avec-ou-sans-sauvegarde.md)
+**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option la plus simple qui tient la garantie annoncée) · précise [0021](0021-registre-signe-et-borne-publique.md) et [0022](0022-reprise-publiee-avec-ou-sans-sauvegarde.md) · **revue depuis** ([0051](0051-arret-de-plus-de-2-heures-et-premiere-version.md))
 
 ## Contexte et menace
 
