@@ -61,7 +61,7 @@ Une précision, sans détour : AMD SEV chiffre la mémoire mais ne protège pas 
 
 Promettre « nous ne lisons pas vos fichiers » ne suffit pas. Avec Sésame, chacun peut contrôler ce qui tourne.
 
-- **Un code public.** Le code de Sésame sera publié en intégralité dans ce dépôt, à l'étape 3 de sa construction (« État du projet »). Chacun pourra le lire, l'auditer et le reconstruire.
+- **Un code public.** Le code de Sésame entre en intégralité dans ce dépôt à l'étape 3 de sa construction (« État du projet ») : chacun peut alors le lire, l'auditer et le reconstruire.
 - **Une empreinte unique.** Chaque version produit une empreinte (SHA-256). La moindre modification du code la change complètement.
 - **Des clés verrouillées sur cette empreinte.** Le coffre de clés de Google (Cloud KMS) ne descelle qu'au programme dont l'empreinte est autorisée, et un contrôle automatique de ce dépôt vérifie que cette autorisation correspond aux versions publiées.
 - **Une preuve à chaque échange.** Avant d'envoyer quoi que ce soit, l'app et fatoom.fr/acces demandent à l'enclave son attestation, un jeton signé par Google, et vérifient l'empreinte qu'il porte.
@@ -146,7 +146,7 @@ Sésame est **en construction**. Ce dépôt ne contient encore que sa documentat
 Ordre de construction :
 
 1. **Documentation** : ce dépôt tel que vous le lisez (en cours).
-2. **Contrat exécutable** : OpenAPI, vecteurs de test partagés avec les clients, `sesame-fake` (un double local de Sésame pour développer l'app, le portail et la passerelle sans enclave), `Dockerfile` et `build/reproduire.sh`.
+2. **Contrat exécutable** : OpenAPI, vecteurs de test partagés avec les clients, `sesame-fake` (un double local de Sésame pour développer l'app, le portail et la passerelle sans enclave, qui tourne en trois exemplaires pour la grappe du protocole de PIN), `Dockerfile` et `build/reproduire.sh`.
 3. **Cœur** : attestation, canal chiffré, KMS, registre, protocoles, grappe du protocole de PIN.
 4. **Fournisseurs** : SMS et email, alertes, vérification d'identité, lettre.
 5. **Infrastructure** : scripts `gcloud` du projet, du trousseau, du pool d'identités, des machines, du bucket d'audit ; `build/verifier-attestation.sh` et `build/verifier-journaux.sh`.

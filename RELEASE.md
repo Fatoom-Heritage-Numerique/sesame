@@ -24,7 +24,7 @@ git tag -v vX.Y.Z                      # tag signé par une clé SSH (§3)
 ./build/reproduire.sh vX.Y.Z           # construit, puis affiche sha256:<empreinte>
 ```
 
-Le script n'a besoin que de `docker` (ou `podman`) et de `git`. Le dépôt publie, pour chaque version, le journal de la construction reproductible officielle, à comparer au vôtre ; son emplacement est écrit ici avec `build/reproduire.sh`, livré à l'étape du contrat exécutable (`README.md`, « État du projet »).
+Le script n'a besoin que de `docker` (ou `podman`) et de `git`. Le dépôt publie, pour chaque version, le journal de la construction reproductible officielle, à comparer au vôtre. `build/reproduire.sh` et ce journal entrent dans le dépôt à l'étape du contrat exécutable (`README.md`, « État du projet »).
 
 ### 1.2 Double construction en CI
 
@@ -87,9 +87,11 @@ Le client affiche aussi la liste et son historique sur sa page de transparence (
 
 1. **Figer** : tag `vX.Y.Z` signé ; CI verte (§8) ; ligne `en_service` ajoutée à `versions.json`.
 2. **Publier les clients d'abord** : les versions de l'app, du site et des fonctions qui contiennent la nouvelle ligne sont publiées, et l'app est **disponible dans les deux boutiques**, avant toute mise en service. Jamais l'inverse.
-3. **Autoriser** : l'empreinte est ajoutée à la condition du fournisseur du pool d'identités (`ARCHITECTURE.md`, « Libération des clés »). La liste d'abord, l'IAM ensuite. La nouvelle version démarre.
-4. **Forcer la mise à jour** : la version minimale de l'app est relevée à la première version qui contient la ligne. Une app plus ancienne demande sa mise à jour à sa prochaine ouverture. Aucune période de recouvrement n'est prévue pour les apps non mises à jour : la boutique propose toujours la mise à jour.
-5. **Arrêter l'ancienne version** aussitôt la nouvelle en service : sa grappe du protocole de PIN est effacée, et chaque titulaire redépose dans la nouvelle (`ARCHITECTURE.md`, « Protocole de PIN »).
+3. **Autoriser** : l'empreinte est ajoutée à la condition du fournisseur du pool d'identités (`ARCHITECTURE.md`, « Libération des clés »). La liste d'abord, l'IAM ensuite.
+4. **Démarrer et basculer** : la nouvelle version démarre sur trois VM neuves, une par zone, à côté des anciennes ; puis les trois préfixes de la table d'URL du répartiteur basculent vers elles, en une seule opération journalisée (`ARCHITECTURE.md` §5).
+5. **Amorcer la grappe** : juste après le basculement, l'exploitant amorce la grappe neuve du protocole de PIN (`grappe/amorcer`, `ARCHITECTURE.md` §9.3, `API.md` §4.3).
+6. **Forcer la mise à jour** : la version minimale de l'app est relevée à la première version qui contient la ligne. Une app plus ancienne demande sa mise à jour à sa prochaine ouverture. Aucune période de recouvrement n'est prévue pour les apps non mises à jour : la boutique propose toujours la mise à jour.
+7. **Arrêter l'ancienne version** aussitôt la nouvelle en service : sa grappe du protocole de PIN est effacée, et chaque titulaire redépose dans la nouvelle (`ARCHITECTURE.md`, « Protocole de PIN »).
 
 Règles :
 
@@ -133,9 +135,11 @@ Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit l
 | Budget | plus de 6 000 lignes de Go hors tests et hors bibliothèques épinglées |
 | Vecteurs | les vecteurs de test diffèrent de ceux du client de référence |
 | `versions.json` | le fichier n'est pas conforme à son schéma |
+| `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) |
 | KMS ⇔ `versions.json` | les empreintes, la clause `dbgstat`, les valeurs de `hwmodel` ou le dictionnaire `env_override` de la condition ne correspondent pas (§7) |
 | Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` |
 | Image | un shell ; une variable de lanceur factice lue hors du paquet de test |
+| Scripts publics | `build/verifier-attestation.sh` ou `build/verifier-journaux.sh` accepte un argument manquant de sa signature (`README.md`) ; le premier accepte un jeton d'un autre projet ou d'un autre dépôt d'images, le second ne signale pas un appel aux clés d'un sujet fédéré d'un autre projet |
 | Borne du registre | borne non signée ou non déposée toutes les 10 minutes en création seule ; pas d'échec fermé sans borne ; une version activée de la clé de signature refusée |
 | Journaux (chaque jour) | `build/verifier-journaux.sh` signale un appel d'une identité inconnue, un surplus, une modification inattendue ou un trou ; le résultat est publié |
 

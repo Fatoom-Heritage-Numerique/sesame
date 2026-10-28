@@ -8,10 +8,10 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 
 | # | Décision | Date |
 |---|---|---|
-| [0001](0001-enclave-confidential-space.md) | Les clés des contenus destinés s'ouvrent dans une enclave au code public, pas chez le client | 2026-10-12 · revue depuis 0014 |
-| [0002](0002-kms-hsm-cle-de-transmission-par-titulaire.md) | Libération des clés par Cloud KMS HSM conditionné à l'attestation, une clé de transmission par titulaire | 2026-10-12 · revue depuis 0014 |
-| [0003](0003-registre-minimal-tenu-par-sesame.md) | Registre minimal tenu par Sésame : 7 jours, preuve de vie, générations de chartes | 2026-10-12 · revue depuis 0020, 0021, 0022, 0024 |
-| [0004](0004-second-facteur-envoye-et-verifie-par-sesame.md) | Le dernier code est envoyé et vérifié par Sésame, pas par le client | 2026-10-12 · revue depuis 0029 |
+| [0001](0001-enclave-confidential-space.md) | Les clés des contenus destinés s'ouvrent dans une enclave au code public | 2026-10-12 · revue depuis 0014 |
+| [0002](0002-kms-hsm-cle-de-transmission-par-titulaire.md) | Cloud KMS HSM conditionné à l'attestation, une clé de transmission par titulaire | 2026-10-12 · revue depuis 0014 |
+| [0003](0003-registre-minimal-tenu-par-sesame.md) | Un registre minimal tenu par Sésame : 7 jours, preuve de vie, générations | 2026-10-12 · revue depuis 0020, 0021, 0022, 0024 |
+| [0004](0004-second-facteur-envoye-et-verifie-par-sesame.md) | Le dernier code est envoyé et vérifié par Sésame | 2026-10-12 · revue depuis 0029 |
 | [0005](0005-manifeste-signe-publie-7-jours-avant.md) | Manifeste signé sur clé matérielle, publié 7 jours avant, retrait immédiat, sans voie rapide | 2026-10-12 · revue depuis 0014 |
 | [0006](0006-verification-en-direct-et-par-cache.md) | Vérification de Sésame en direct pour enrôler et changer une charte, par manifeste en cache pour destiner | 2026-10-12 · revue depuis 0014, 0017, 0020, 0023 |
 | [0007](0007-depot-public-separe.md) | Un dépôt public séparé du client | 2026-10-12 · revue depuis 0014 |
@@ -21,7 +21,7 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0011](0011-go-binaire-statique-distroless.md) | Go, binaire statique, image distroless, scripts gcloud ; ordre de construction | 2026-10-12 · revue depuis 0015, 0016 |
 | [0012](0012-canaux-d-envoi-non-croises.md) | Canaux d'envoi non croisés : un fournisseur piraté peut ouvrir après un décès vérifié | 2026-10-12 · revue depuis 0013 |
 | [0013](0013-canaux-d-envoi-croises.md) | Canaux d'envoi croisés : code d'accès par email, dernier code par SMS | 2026-10-22 |
-| [0014](0014-liste-des-versions-compilee.md) | Liste des versions compilée dans les clients, mise à jour forcée ; plus de manifeste signé, de clé de release ni de délai de 7 jours | 2026-10-25 · revue depuis 0025, 0026, 0032 |
+| [0014](0014-liste-des-versions-compilee.md) | Liste des versions compilée dans les clients, mise à jour forcée | 2026-10-25 · revue depuis 0025, 0026, 0032 |
 | [0015](0015-budget-de-code-6000-lignes.md) | Budget de code porté à 6 000 lignes de Go | 2026-10-26 |
 | [0016](0016-bibliotheques-oprf-argon2-raft.md) | Bibliothèques admises : `circl` pour l'OPRF, `x/crypto/argon2`, `go.etcd.io/raft/v3` | 2026-10-24 et 2026-10-27 |
 | [0017](0017-protocole-de-pin-grappe-de-trois-vm.md) | Protocole de PIN en mémoire, sur une grappe de trois VM à majorité, et règle des 30 jours | 2026-10-24 · revue depuis 0018 |

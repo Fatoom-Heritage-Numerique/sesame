@@ -212,7 +212,7 @@ Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux 
 **Traitement** :
 
 - **premier enrôlement** (ni ligne ni marqueur) : `idToken` seul ; le marqueur d'inscription, qui porte la `cleViePub` reçue, est créé avant la ligne ; `vivantLe = enroleLe` ;
-- **génération supérieure** : rotation, preuve exigée ;
+- **génération supérieure** : rotation, preuve exigée ; elle ferme les sessions ouvertes des proches de ce titulaire, comme une nouvelle génération de charte (§2.6) : la VM qui reçoit ferme celles qu'elle tient, `session/ouvrir-cles` refuse sur toute VM une session dont la `ktsGeneration` a changé (§2.19), et chaque session fermée notifie `sessionTerminee` (§5.5) ;
 - **génération égale** : rescellement seul (reprise d'une création interrompue) ; la preuve doit se vérifier avec la `cleViePub` inscrite, la `cleViePub` reçue doit lui être égale, ni les chartes ni l'enregistrement du PIN ne sont touchés ;
 - **génération inférieure** : refusée.
 
@@ -491,7 +491,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 1. Sésame cherche `invitations/{lookup}` au registre et vérifie le code par son `codeVerifier` ; trouvé : parcours « courrier ». Il exige que cette invitation soit celle de la dernière lettre du proche (`lettres/{contactId}.invitationLookup` = `lookup` : le code d'une transmission précédente, close par le retour du titulaire, n'ouvre plus, `ARCHITECTURE.md`). Il lit la charte de ce proche à la passerelle (`GET /bundle?uid=&contactId=`, §5.4), descelle la KTS et ouvre la charte, puis exige, comme pour le rôle `proche` ci-dessous, un signalement de cet `uid` à terme, non annulé et non clos ; la vérification d'identité suit (§2.16). À la création de la session, Sésame inscrit `invitationUtiliseeLe` dans `lettres/{contactId}` s'il est vide (première session ouverte par ce code) : les renvois de J+15 et J+45 s'arrêtent (`ARCHITECTURE.md`).
 2. Sinon : `GET /bundle?lookup=` à la passerelle (§5.2), descellement de la KTS, ouverture de la charte ; vérifie `codeVerifier`, `charte.generation == registre.chartes[contactId]` (absente du registre ⇒ seule la génération 1 est acceptée, `ARCHITECTURE.md`), `ktsGeneration`, `isUnlocked`. Rôle `gardien` : accepté, sauf si le rôle a été refusé pour cette génération (`rolesRefuses`, §2.21) : la charte vaut alors rôle `proche`. Rôle `proche` : exige un signalement à terme, non annulé (inactivité : non clos par une preuve de vie reçue après le terme ; décès : définitif).
 3. Pour le parcours de l'étape 2, envoi du dernier code : par SMS au téléphone de la charte, par Twilio Verify ; sans téléphone, par email à l'adresse de la charte, par Sésame lui-même, qui tire un code de 6 chiffres (primitive d'aléa), valable 10 minutes, et l'envoie par l'API Mail Send de SendGrid, avec un texte attesté et l'adresse d'expédition attestée de ses alertes (`ARCHITECTURE.md`).
-4. Dans les deux parcours, création de la session, liée au canal. Son **état** reste en mémoire de la VM jusqu'à la fin de la session : la KTS déchiffrée, les champs d'identité de la charte (`prenom`, `nom`, `dateNaissance`), son rôle, sa génération vérifiée (§2.19) et, pour un dernier code par email, ce code. `session/identite/verifier`, `session/identite/bascule` et `session/ouvrir-cles` s'en servent, sans relire la charte. Une session dont l'état est perdu (redémarrage de sa VM) n'existe plus : `session_expiree`.
+4. Dans les deux parcours, création de la session, liée au canal. Son **état** reste en mémoire de la VM jusqu'à la fin de la session : la KTS déchiffrée et sa `ktsGeneration`, les champs d'identité de la charte (`prenom`, `nom`, `dateNaissance`), son rôle, sa génération vérifiée (§2.19) et, pour un dernier code par email, ce code. `session/identite/verifier`, `session/identite/bascule` et `session/ouvrir-cles` s'en servent, sans relire la charte. Une session dont l'état est perdu (redémarrage de sa VM) n'existe plus : `session_expiree`.
 
 **Réponse `200`** :
 
@@ -594,7 +594,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 Les enveloppes viennent du client (contenus listés avec le jeton de session) ; Sésame ne les a jamais vues.
 
-**Traitement** : Sésame relit la ligne du titulaire. Si `chartes.{contactId}` n'est plus la génération vérifiée à l'ouverture de la session (§2.6), si le rôle `gardien` d'une session de base `vivant` a été refusé depuis son ouverture (§2.21), ou si un signalement d'inactivité de cet `uid` a été clos depuis l'ouverture (retour du titulaire, §2.4), la session est fermée (`sessionTerminee`) et la réponse est `session_expiree`. Sinon, pour chaque enveloppe, Sésame reconstruit l'aad (`uid`, `type`, `id`, proche authentifié, génération du registre) et l'ouvre sous la KTS de l'état de la session (§2.14) ; une enveloppe destinée à un autre proche est refusée ; le type `volontes` s'ouvre comme les autres types. La KTS reste dans l'état de la session jusqu'à sa fin, et s'efface avec lui (§2.20, §5.5). Les contenus ouverts s'ajoutent, à chaque appel, à `contenus[]` de l'ouverture au registre (`ARCHITECTURE.md`).
+**Traitement** : Sésame relit la ligne du titulaire. Si `chartes.{contactId}` n'est plus la génération vérifiée à l'ouverture de la session (§2.6), si la `ktsGeneration` de la ligne n'est plus celle de la KTS de la session (rotation, §2.3), si le rôle `gardien` d'une session de base `vivant` a été refusé depuis son ouverture (§2.21), ou si un signalement d'inactivité de cet `uid` a été clos depuis l'ouverture (retour du titulaire, §2.4), la session est fermée (`sessionTerminee`) et la réponse est `session_expiree`. Sinon, pour chaque enveloppe, Sésame reconstruit l'aad (`uid`, `type`, `id`, proche authentifié, génération du registre) et l'ouvre sous la KTS de l'état de la session (§2.14) ; une enveloppe destinée à un autre proche est refusée ; le type `volontes` s'ouvre comme les autres types. La KTS reste dans l'état de la session jusqu'à sa fin, et s'efface avec lui (§2.20, §5.5). Les contenus ouverts s'ajoutent, à chaque appel, à `contenus[]` de l'ouverture au registre (`ARCHITECTURE.md`).
 
 **Réponse `200`** (sous le canal : les clés ne sont lisibles que par le navigateur) :
 
@@ -606,7 +606,7 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
 
 `type` accompagne `id` : deux contenus de types différents peuvent avoir le même identifiant. Une enveloppe refusée n'empêche pas les autres. Le jeton renouvelé matérialise l'inactivité : chaque appel réussi prolonge la session ; sans appel pendant 1 h, elle expire.
 
-**Erreurs** : `enveloppe_refusee` (par élément, dans `refusees`) ; `message_refuse` (400 ; plus de 500 enveloppes, forme invalide) ; `reessayer_plus_tard` (503 ; contrôle anti-retour) ; `session_expiree` (410 ; y compris génération de la charte changée, rôle refusé ou retour du titulaire depuis l'ouverture, et état perdu au redémarrage de la VM) ; `canal_invalide` (400, en clair).
+**Erreurs** : `enveloppe_refusee` (par élément, dans `refusees`) ; `message_refuse` (400 ; plus de 500 enveloppes, forme invalide) ; `reessayer_plus_tard` (503 ; contrôle anti-retour) ; `session_expiree` (410 ; y compris génération de la charte changée, rotation de la KTS, rôle refusé ou retour du titulaire depuis l'ouverture, et état perdu au redémarrage de la VM) ; `canal_invalide` (400, en clair).
 
 ### 2.20 `session/fermer`
 
@@ -681,7 +681,7 @@ Servies seulement sur le canal mutuellement attesté entre VM de Sésame, jamais
 
 **Corps** : `{"jwt": "<jeton d'attestation de la VM>", "nodeId": "<id>"}`. `nodeId` est l'identifiant de nœud neuf : 16 octets de la primitive d'aléa, en base64url sans remplissage. `jwt` est le jeton de paire que la VM a présenté à l'ouverture de cette connexion (§3), vérifié par la VM qui reçoit la demande : il porte `image_digest`, `hwmodel` et la zone, et lie l'identifiant de nœud neuf par `eat_nonce`.
 
-**Traitement** : la VM est admise sans intervention si elle a le même `image_digest` et un `hwmodel` admis, si elle prend la zone d'un votant injoignable depuis au moins 2 minutes, ou la place inscrite pour son nom (`submods.gce.instance_name` de son jeton) par `grappe/membres` (§4.2), et si aucune autre modification de membres n'est en cours. Elle est ajoutée comme apprenante, promue, puis l'ancien membre est retiré. Sinon elle est refusée et la demande journalisée (`grappe_admission_refusee`, alerte à l'exploitant, `ARCHITECTURE.md`). Un ancien identifiant de nœud est refusé. Une VM sans grappe répond `refusee`.
+**Traitement** : la VM est admise sans intervention si elle a le même `image_digest` et un `hwmodel` admis, si elle prend la zone d'un votant injoignable depuis au moins 2 minutes, ou la place inscrite pour son nom (`submods.gce.instance_name` de son jeton) par `grappe/membres` (§4.2), et si aucune autre modification de membres n'est en cours. Elle est ajoutée comme apprenante, promue, puis l'ancien membre est retiré. Sinon elle est refusée et la demande journalisée (`grappe_admission_refusee`, alerte à l'exploitant, `ARCHITECTURE.md`). Un ancien identifiant de nœud est refusé. Une VM sans grappe répond `refusee` et journalise de même `grappe_admission_refusee`.
 
 **Réponse `200`** : `{"admise": true, "role": "apprenant"}`
 
@@ -822,7 +822,7 @@ Retrouve un proche par l'index de son code d'accès.
 
 ### 5.3 `GET /bundle?uid=<uid>&courrier=1`
 
-Les chartes des proches à prévenir par lettre (`courrier == true`).
+Les chartes des proches à prévenir par lettre (`courrier == true`). La passerelle ne lit pas les chartes : elle renvoie celles des proches du titulaire dont l'email et le téléphone en clair sont vides et qui ont une adresse (`aAdresse`, `ARCHITECTURE.md`). Sésame ouvre chaque charte et ne poste une lettre que si elle porte `courrier: true` ; une autre charte est ignorée, le motif journalisé (`ARCHITECTURE.md`).
 
 **Réponse `200`** :
 
@@ -846,7 +846,7 @@ Le client ne peut que retenir une charte, jamais la modifier (elle est authentif
 | Route | Quand | Corps |
 |---|---|---|
 | `ouvertureNotifiee` | **alerte de connexion**, une seule fois par session, à la délivrance du jeton (`session/verifier`, `session/identite/verifier`, ou `session/ouvrir` pour une identité déjà vérifiée), pour **tout** proche | `{uid, contactId, role, ouvertLe, lieu, navigateur}` : qui, quand, lieu approximatif et navigateur, déduits par Sésame de l'IP et de l'agent du navigateur et jamais conservés au registre. Elle ne porte pas les contenus ouverts |
-| `sessionTerminee` | fin d'une session de proche, une seule fois par session, que son dernier code ou son identité ait été vérifié ou non : `session/fermer`, `session/refuser-role`, nouvelle génération de la charte (§2.6), retour du titulaire (§2.4), expiration après 1 h sans appel, fermeture du canal (§1.2) ; une session perdue au redémarrage de sa VM est notifiée par la tâche horaire de Sésame, d'après l'ouverture inscrite au registre (`ARCHITECTURE.md`), ce qui exclut une session jamais vérifiée, dont rien n'est inscrit | `{uid, contactId, ouvertLe?, fermeeLe, contenus: [{type, id}]}` : les contenus dont la clé a été ouverte, lus dans `contenus[]` de l'ouverture au registre ; `ouvertLe` absent et `contenus` vide pour une session jamais vérifiée |
+| `sessionTerminee` | fin d'une session de proche, une seule fois par session, que son dernier code ou son identité ait été vérifié ou non : `session/fermer`, `session/refuser-role`, nouvelle génération de la charte (§2.6), rotation de la KTS (§2.3), retour du titulaire (§2.4), expiration après 1 h sans appel, fermeture du canal (§1.2) ; une session perdue au redémarrage de sa VM est notifiée par la tâche horaire de Sésame, d'après l'ouverture inscrite au registre (`ARCHITECTURE.md`), ce qui exclut une session jamais vérifiée, dont rien n'est inscrit | `{uid, contactId, ouvertLe?, fermeeLe, contenus: [{type, id}]}` : les contenus dont la clé a été ouverte, lus dans `contenus[]` de l'ouverture au registre ; `ouvertLe` absent et `contenus` vide pour une session jamais vérifiée |
 | `signalementAnnule` | annulation explicite, ou preuve de vie reçue pendant un signalement d'inactivité | `{uid, signalementId, annulePar: "annulation" \| "preuve_de_vie", annuleLe}` |
 | `roleRefuse` | refus du rôle par le contact de confiance | `{uid, contactId}` |
 | `vieApresTransmission` | première preuve de vie après une transmission par **inactivité** | `{uid, signalementId, vivantLe}` |
@@ -869,6 +869,7 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 | `code_refuse` | 403 | code d'accès refusé, quel que soit le motif (`details.essaisRestants`) |
 | `otp_refuse` | 403 | dernier code faux (`details.essaisRestants`) |
 | `role_insuffisant` | 403 | action réservée au contact de confiance |
+| `pair_refuse` | 403 | entre VM : jeton de paire refusé par les contrôles entre VM (§3), requête avant la fin de l'échange des jetons, ou identifiant de nœud que l'attestation du pair ne lie pas ou qui a été retiré (`ARCHITECTURE.md`) |
 | `preuve_requise` | 403 | ré-enrôlement sans preuve `cleVie` valide |
 | `identite_non_confirmee` | 403 | identité non conforme à la charte ; message neutre |
 | `bascule_impossible` | 403 | charte sans nom ou sans date de naissance, ou session de base `vivant` (aucune transmission arrivée à terme) ; message neutre |
@@ -885,7 +886,8 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 | `refusee` | 409 | VM hors des conditions d'entrée dans la grappe, ou VM jointe sans grappe |
 | `amorcage_refuse` | 409 | amorçage d'une grappe neuve hors de ses conditions (§4.3) |
 | `membres_refuses` | 409 | modification de membres commandée hors de ses conditions (§4.2) |
-| `session_expiree` | 410 | session sans activité depuis 1 h, fermée (dont génération de la charte changée, rôle refusé ou retour du titulaire) ou inconnue (dont état perdu au redémarrage de sa VM) |
+| `pas_leader` | 409 | entre VM : la VM jointe n'est plus leader, le relais ou le décompte se refait au nouveau leader (`ARCHITECTURE.md`) |
+| `session_expiree` | 410 | session sans activité depuis 1 h, fermée (dont génération de la charte changée, rotation de la KTS, rôle refusé ou retour du titulaire) ou inconnue (dont état perdu au redémarrage de sa VM) |
 | `identite_bloquee` | 423 | 3 échecs d'identité cumulés depuis le dernier succès ou la fin du blocage : blocage de 24 h (`details.reessayerLe`) |
 | `trop_d_essais` | 429 | 5 essais de code ou de dernier code en 15 min, 4ᵉ renvoi du dernier code dans une session, ou délai d'essai du PIN en cours (`details.reessayerLe`) |
 | `trop_d_appels` | 429 | limite d'une route dépassée (`details.reessayerLe`) ; en clair pour `GET /attestation` |
