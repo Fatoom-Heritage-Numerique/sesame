@@ -2,7 +2,7 @@
 
 # 0026 · Clés publiques de `session-sign` dans la liste des versions
 
-**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0014](0014-liste-des-versions-compilee.md)
+**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0014](0014-liste-des-versions-compilee.md) · **revue depuis** ([0044](0044-requetes-a-la-passerelle-sans-kid.md), [0045](0045-version-de-signature-fixee-par-l-image.md))
 
 ## Contexte et menace
 

@@ -263,7 +263,7 @@ Sans preuve de la `cleVie` que porte le marqueur, une ligne absente n'est jamais
 "fatoom-sesame-vie|1|" ‖ uid ‖ JSON canonique {"v":1, "uid", "defi"}
 ```
 
-**Traitement** : écrit `vivantLe` ; annule un signalement d'**inactivité** en cours (`annulePar: preuve_de_vie`, notification `signalementAnnule`) ; après une transmission par inactivité, la première preuve de vie clôt le signalement (`closLe`, `closPar: retour`, `ARCHITECTURE.md`), bloque les ouvertures suivantes, ferme les sessions ouvertes des proches de cet `uid` (§2.19, notification `sessionTerminee`) et notifie `vieApresTransmission` ; une inactivité qui suit ouvre un nouveau signalement (§2.8). Une preuve de vie n'a **aucun effet** sur un signalement de décès, ni avant ni après son échéance. Sur une ligne rejetée par le contrôle de fraîcheur, la preuve est répondue mais pas inscrite.
+**Traitement** : écrit `vivantLe` ; annule un signalement d'**inactivité** en cours (`annulePar: preuve_de_vie`, notification `signalementAnnule`) ; après une transmission par inactivité, la première preuve de vie clôt le signalement (`closLe`, `closPar: retour`, `ARCHITECTURE.md`), bloque les ouvertures suivantes, ferme les sessions ouvertes des proches de cet `uid` (§2.19, notification `sessionTerminee`) et notifie `vieApresTransmission` ; une inactivité qui suit ouvre un nouveau signalement (§2.8). Une preuve de vie n'a **aucun effet** sur un signalement de décès, ni avant ni après son échéance. Sur une ligne rejetée par le contrôle de fraîcheur, la preuve est répondue mais pas inscrite : réponse `200` de la forme ci-dessous, lue dans la ligne rejetée telle qu'elle est (`vivantLe` inchangé), sans aucun effet.
 
 **Réponse `200`** :
 
@@ -606,7 +606,7 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
  "jeton": "<JWT ES256 renouvelé>", "expireLe": "<ISO>"}
 ```
 
-`type` accompagne `id` : deux contenus de types différents peuvent avoir le même identifiant. Une enveloppe refusée n'empêche pas les autres. Le jeton renouvelé matérialise l'inactivité : chaque appel réussi prolonge la session ; sans appel pendant 1 h, elle expire. Un appel avec `enveloppes: []` est admis : il ne vérifie que la session et renouvelle le jeton. Le portail l'envoie avant un appel au client qui suit une action du proche (liste des contenus, URL d'un fichier) quand son jeton a plus de 50 minutes, jamais sans action du proche : la session expire toujours après 1 h sans action. Un téléchargement commencé avec une URL signée valide va à son terme sans autre appel, l'URL n'étant vérifiée qu'au début de la requête.
+`type` accompagne `id` : deux contenus de types différents peuvent avoir le même identifiant. Une enveloppe refusée n'empêche pas les autres. Le jeton renouvelé matérialise l'inactivité : chaque appel réussi prolonge la session ; sans appel pendant 1 h, elle expire. Un appel avec `enveloppes: []` est admis : il ne vérifie que la session et renouvelle le jeton. Le portail l'envoie avant un appel au client qui suit une action du proche (liste des contenus, URL d'un fichier) quand son jeton a plus de 50 minutes, et une fois quand le client vient de refuser son jeton, avant de refaire l'appel ; jamais sans action du proche : la session expire toujours après 1 h sans action. Un téléchargement commencé avec une URL signée valide va à son terme sans autre appel, l'URL n'étant vérifiée qu'au début de la requête.
 
 **Erreurs** : `enveloppe_refusee` (par élément, dans `refusees`) ; `message_refuse` (400 ; plus de 500 enveloppes, forme invalide) ; `reessayer_plus_tard` (503 ; contrôle anti-retour) ; `session_expiree` (410 ; y compris génération de la charte changée, rotation de la KTS, rôle refusé ou retour du titulaire depuis l'ouverture, et état perdu au redémarrage de la VM) ; `canal_invalide` (400, en clair).
 
@@ -797,7 +797,7 @@ Chaque appel porte six en-têtes :
 La passerelle :
 
 - vérifie le jeton d'attestation avec **les mêmes règles qu'un client** (§3) et `eat_nonce` contre `X-Sesame-Session-Pub` et `X-Sesame-Kem-Pub` ;
-- vérifie la signature ; la clé publique `session-sign` est lue par `kid` dans `clesSession` de la liste des versions compilée (§1.6) ;
+- vérifie la signature contre chaque clé publique `session-sign` de `clesSession` de la liste des versions compilée (§1.6) : la requête ne porte pas de `kid`, et la signature est acceptée si l'une de ces clés la vérifie ; aucune ne la vérifie ⇒ `401` ;
 - refuse un horodatage à plus de 5 min ;
 - répond `200 {}`, sans nouveau traitement, à une notification (§5.5) dont le `X-Sesame-Request-Id` est déjà traité ; ce contrôle passe avant le refus de rejeu ;
 - refuse un `X-Sesame-Request-Id` de `GET /bundle` déjà vu dans les 10 min ;
@@ -884,7 +884,7 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 | `pin_bloque` | 409 | plafond de 10 essais atteint, y compris par le 10ᵉ essai, décompté sans évaluation |
 | `pin_indisponible` | 409 | aucun enregistrement du PIN, compte inconnu, ligne absente, rejetée ou `supprime` |
 | `identite_en_attente` | 409 | Stripe n'a pas encore rendu son verdict |
-| `titulaire_indisponible` | 409 | ligne absente, `supprime` ou rejetée (hors routes du PIN) ; sur `vie` et `etat`, `details.reprise: true` quand la ligne manque pendant une reprise publiée (§2.4) |
+| `titulaire_indisponible` | 409 | ligne absente ou `supprime`, ou ligne rejetée selon la route (hors routes du PIN ; `vie` et `deces/annuler` acceptent une ligne rejetée) ; sur `vie` et `etat`, `details.reprise: true` quand la ligne manque pendant une reprise publiée (§2.4) |
 | `refusee` | 409 | VM hors des conditions d'entrée dans la grappe, ou VM jointe sans grappe |
 | `amorcage_refuse` | 409 | amorçage d'une grappe neuve hors de ses conditions (§4.3) |
 | `membres_refuses` | 409 | modification de membres commandée hors de ses conditions (§4.2) |

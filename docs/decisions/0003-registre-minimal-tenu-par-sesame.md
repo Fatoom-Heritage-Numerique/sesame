@@ -2,7 +2,7 @@
 
 # 0003 · Un registre minimal tenu par Sésame : 7 jours, preuve de vie, générations
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0020](0020-annulation-explicite-et-transmission-definitive.md), [0021](0021-registre-signe-et-borne-publique.md), [0022](0022-reprise-publiee-avec-ou-sans-sauvegarde.md), [0024](0024-signe-de-vie-transmission-par-inactivite.md))
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0020](0020-annulation-explicite-et-transmission-definitive.md), [0021](0021-registre-signe-et-borne-publique.md), [0022](0022-reprise-publiee-avec-ou-sans-sauvegarde.md), [0024](0024-signe-de-vie-transmission-par-inactivite.md), [0039](0039-ouvertures-sans-detail-des-contenus.md))
 
 ## Contexte et menace
 

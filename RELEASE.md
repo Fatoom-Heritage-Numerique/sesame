@@ -118,9 +118,8 @@ Google ne garantit aucun délai de propagation : une révocation n'est tenue pou
 
 La condition du fournisseur du pool d'identités est le seul point d'autorisation de toutes les clés de Sésame. Elle doit correspondre exactement à `versions.json` :
 
-- l'ensemble des empreintes autorisées est **identique** à l'ensemble des lignes `en_service` ;
+- l'ensemble des couples (empreinte, dictionnaire `env_override`) de la condition, une clause par version, est **identique** à l'ensemble des couples (`imageDigest`, `envDigest`) des lignes `en_service` ;
 - la clause `dbgstat` est présente ;
-- le dictionnaire `env_override` de la condition correspond à l'`envDigest` publié ;
 - les valeurs de `hwmodel` correspondent à `hwmodels`.
 
 Un contrôle CI lit la condition avec `gcloud` et échoue au moindre écart. Une empreinte autorisée dans KMS mais absente de `versions.json` signifie qu'une image non publiée pourrait desceller des clés (`THREAT_MODEL.md` §2, limite 2).
@@ -136,7 +135,7 @@ Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit l
 | Vecteurs | les vecteurs de test diffèrent de ceux du client de référence |
 | `versions.json` | le fichier n'est pas conforme à son schéma |
 | `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) |
-| KMS ⇔ `versions.json` | les empreintes, la clause `dbgstat`, les valeurs de `hwmodel` ou le dictionnaire `env_override` de la condition ne correspondent pas (§7) |
+| KMS ⇔ `versions.json` | les couples (empreinte, dictionnaire `env_override`) de la condition, la clause `dbgstat` ou les valeurs de `hwmodel` ne correspondent pas (§7) |
 | Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` |
 | Image | un shell ; une variable de lanceur factice lue hors du paquet de test |
 | Scripts publics | `build/verifier-attestation.sh` ou `build/verifier-journaux.sh` accepte un argument manquant de sa signature (`README.md`) ; le premier accepte un jeton d'un autre projet ou d'un autre dépôt d'images, le second ne signale pas un appel aux clés d'un sujet fédéré d'un autre projet |

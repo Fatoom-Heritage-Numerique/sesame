@@ -2,7 +2,7 @@
 
 # 0036 · Code d'invitation des lettres scellé au registre par Sésame
 
-**Date** : 2026-10-28 · **Statut** : actée (validée par l'opérateur) · revoit [0008](0008-lettre-et-identite-dans-sesame.md)
+**Date** : 2026-10-28 · **Statut** : actée (validée par l'opérateur) · revoit [0008](0008-lettre-et-identite-dans-sesame.md) · **revue depuis** ([0041](0041-code-d-invitation-verifie-par-son-scelle.md))
 
 ## Contexte et menace
 

@@ -2,7 +2,7 @@
 
 # 0028 · Réglages du client : dictionnaire `env_override` exigé en entier, textes longs dans l'image
 
-**Date** : 2026-10-26 · **Statut** : actée (décision de l'opérateur) · revoit [0010](0010-fournisseurs-nommes-dans-le-code.md) · **revue depuis** ([0033](0033-textes-du-client-attestes-par-leur-empreinte.md))
+**Date** : 2026-10-26 · **Statut** : actée (décision de l'opérateur) · revoit [0010](0010-fournisseurs-nommes-dans-le-code.md) · **revue depuis** ([0033](0033-textes-du-client-attestes-par-leur-empreinte.md), [0045](0045-version-de-signature-fixee-par-l-image.md))
 
 ## Contexte et menace
 
