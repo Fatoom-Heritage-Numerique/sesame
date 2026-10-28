@@ -46,3 +46,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0036](0036-code-d-invitation-scelle-au-registre.md) | Code d'invitation des lettres scellé au registre par Sésame | 2026-10-28 |
 | [0037](0037-essais-des-codes-comptes-au-registre.md) | Essais des codes d'un proche comptés au registre | 2026-10-28 · revue depuis 0038 |
 | [0038](0038-blocage-de-15-minutes-apres-le-5e-code-faux.md) | Blocage de 15 minutes pleines après le 5ᵉ code faux | 2026-10-28 |
+| [0039](0039-ouvertures-sans-detail-des-contenus.md) | Ouvertures sans le détail des contenus ouverts | 2026-10-28 |
