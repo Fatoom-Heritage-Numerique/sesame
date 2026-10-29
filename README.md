@@ -124,7 +124,7 @@ Une étape de plus pour qui veut contrôler l'opérateur lui-même : `build/veri
 
 - La liste est **compilée** dans l'app, le portail des proches et la passerelle de Fatoom. Ils ne téléchargent rien et refusent toute version absente de la liste ou retirée.
 - Une nouvelle version n'est mise en service qu'une fois l'app qui la contient disponible dans les deux boutiques. La version minimale de l'app est alors relevée : une app plus ancienne demande sa mise à jour.
-- Une version peut être retirée immédiatement : elle ne descelle plus rien.
+- Une version peut être retirée à tout moment : elle ne descelle plus rien dès que son jeton fédéré expire, au plus 7 minutes de propagation plus une heure (`ARCHITECTURE.md` §4).
 - Le coffre de clés (Cloud KMS) ne descelle qu'aux empreintes `en_service` ; un contrôle automatique du dépôt vérifie que les deux listes sont identiques.
 
 Format exact et procédure : `RELEASE.md`.
