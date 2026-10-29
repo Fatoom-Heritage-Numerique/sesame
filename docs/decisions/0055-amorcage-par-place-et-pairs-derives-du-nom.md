@@ -2,7 +2,7 @@
 
 # 0055 · Amorçage d'une grappe sur trois places, quelle que soit la zone ; pairs dérivés du nom de la VM
 
-**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau)
+**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau) · revoit [0018](0018-amorcage-commande-d-une-grappe-neuve.md)
 
 ## Contexte et menace
 

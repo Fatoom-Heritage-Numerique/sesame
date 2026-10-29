@@ -25,7 +25,7 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0015](0015-budget-de-code-6000-lignes.md) | Budget de code porté à 6 000 lignes de Go | 2026-10-26 |
 | [0016](0016-bibliotheques-oprf-argon2-raft.md) | Bibliothèques admises : `circl` pour l'OPRF, `x/crypto/argon2`, `go.etcd.io/raft/v3` | 2026-10-24 et 2026-10-27 |
 | [0017](0017-protocole-de-pin-grappe-de-trois-vm.md) | Protocole de PIN en mémoire, sur une grappe de trois VM à majorité, et règle des 30 jours | 2026-10-24 · revue depuis 0018, 0042, 0043, 0050 |
-| [0018](0018-amorcage-commande-d-une-grappe-neuve.md) | Amorçage d'une grappe neuve commandé par l'exploitant | 2026-10-27 |
+| [0018](0018-amorcage-commande-d-une-grappe-neuve.md) | Amorçage d'une grappe neuve commandé par l'exploitant | 2026-10-27 · revue depuis 0055 |
 | [0019](0019-canal-hybride-x25519-ml-kem.md) | Canal chiffré hybride X25519 et ML-KEM-768 vers l'enclave | 2026-10-23 |
 | [0020](0020-annulation-explicite-et-transmission-definitive.md) | Annulation explicite d'un signalement de décès, transmission définitive après l'échéance | 2026-10-22 et 2026-10-26 |
 | [0021](0021-registre-signe-et-borne-publique.md) | Registre en ajout seul signé par `registre-sign`, borne publique du registre | 2026-10-26 · revue depuis 0040, 0045 |
@@ -63,3 +63,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0053](0053-recopie-au-registre-avant-la-reponse-du-pin.md) | L'état du PIN est recopié au registre avant la réponse ; sans KMS, ni dépôt ni évaluation | 2026-10-28 · revue depuis 0054 |
 | [0054](0054-essai-decompte-sans-recopie-signale.md) | Un essai décompté dont la recopie échoue est signalé ; un retrait d'urgence ne décompte aucun essai | 2026-10-28 |
 | [0055](0055-amorcage-par-place-et-pairs-derives-du-nom.md) | Amorçage d'une grappe sur trois places, quelle que soit la zone ; pairs dérivés du nom de la VM | 2026-10-28 |
+| [0056](0056-ordre-des-controles-et-precisions-de-la-grappe.md) | Ligne lue avant la signature `cleVie` ; `grappePin` non défait ; rythme des admissions et des alertes | 2026-10-29 |

@@ -181,7 +181,7 @@ Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux 
 
 **Réponse `200`** : `{"defi": "<base64, 32 octets>", "expireLe": "<ISO>", "grappeId": "<hex, 64 caractères>" | null}`
 
-`grappeId` identifie la grappe du protocole de PIN en service : l'app en a besoin pour signer un dépôt (§2.12), y compris à la création du coffre, où aucune évaluation ne précède. Une VM sans grappe (`ARCHITECTURE.md`) répond `grappeId: null` : aucun dépôt n'est possible par elle, et l'app reprend à `GET /attestation`, sur un nouveau canal, comme après `pin_indisponible_temporaire`.
+`grappeId` identifie la grappe du protocole de PIN en service : l'app en a besoin pour signer un dépôt (§2.12), y compris à la création du coffre, où aucune évaluation ne précède. Une VM sans grappe (`ARCHITECTURE.md`) répond `grappeId: null` : aucun dépôt n'est possible par elle, et l'app reprend à `GET /attestation`, sur un nouveau canal, comme après `pin_indisponible_temporaire`, seulement quand ce défi sert à un dépôt du PIN ; avant `vie`, `deces/annuler` ou `enroler`, que toute VM sert sans grappe, l'app ne tient pas compte de `grappeId` et poursuit sur ce canal.
 
 **Erreurs** : seulement les erreurs communes.
 
@@ -254,7 +254,7 @@ Sans preuve de la `cleVie` que porte le marqueur, une ligne absente n'est jamais
 | | |
 |---|---|
 | Appelant | app, à chaque déverrouillage (au plus une fois par 24 h, ou à chaque ouverture pendant une relance) |
-| Authentification | signature `cleVie` sur un défi |
+| Authentification | signature `cleVie` sur un défi, vérifiée avec la `cleViePub` de la ligne, lue avant elle (§6) |
 | Limite | 10 / jour par `uid` |
 
 **Corps** : `{"uid": "<uid>", "defi": "<base64>", "signature": "<base64>"}`, signature sur :
@@ -312,7 +312,7 @@ Le repère est tenu par l'app : `ouvertures` est l'`ouvertLe` de la dernière ou
 | | |
 |---|---|
 | Appelant | app, **avant** toute écriture d'une charte chez le client : régénération du code, révocation, changement de rôle ou de coordonnées, suppression du proche, republication après un refus du rôle, nouveau code de chaque proche pendant une `Migration` (`ARCHITECTURE.md`) |
-| Authentification | signature `cleVie`, sans défi : la génération strictement croissante refuse le rejeu |
+| Authentification | signature `cleVie`, sans défi : la génération strictement croissante refuse le rejeu ; vérifiée avec la `cleViePub` de la ligne, lue avant elle (§6) |
 | Limite | 30 / min par `uid` |
 
 **Corps** : `{"uid": "<uid>", "contactId": "<id>", "generation": 2, "signature": "<base64>"}`, `generation` entier ≥ 1 ou `-1`, signature sur :
@@ -334,7 +334,7 @@ La même requête renvoyée après son succès reçoit `generation_non_croissant
 | | |
 |---|---|
 | Appelant | app : fin de la création du coffre et fin d'une `Migration`, la fiche ayant disparu avec la ligne (non bloquant, retenté à chaque déverrouillage jusqu'au succès) ; changement du téléphone ou de l'email du titulaire |
-| Authentification | signature `cleVie` |
+| Authentification | signature `cleVie`, vérifiée avec la `cleViePub` de la ligne, lue avant elle (§6) |
 | Limite | 10 / jour par `uid` |
 
 **Corps** : `{"uid": "<uid>", "generation": 1, "telephone": "<E.164>" | null, "email": "<adresse>", "signature": "<base64>"}`. `generation` est un entier ≥ 1 ; `email`, l'adresse du compte, en NFC (§1.7). La signature porte sur `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation ‖ JSON canonique de la fiche`, la fiche étant `{"email":"<adresse>","generation":1,"telephone":"<E.164>"|null,"uid":"<uid>","v":1}` : clés triées, UTF-8, sans espace ni retour à la ligne. La génération empêche de rejouer une ancienne fiche. Les vecteurs sont générés par script (A-27).
@@ -373,7 +373,7 @@ La même requête renvoyée après son succès reçoit `generation_non_croissant
 | | |
 |---|---|
 | Appelant | app, geste « Je suis en vie, annuler la transmission », depuis n'importe quel appareil où le coffre est ouvert |
-| Authentification | signature `cleVie` sur un défi |
+| Authentification | signature `cleVie` sur un défi, vérifiée avec la `cleViePub` de la ligne, lue avant elle (§6) |
 | Limite | 10 / jour par `uid` |
 
 **Corps** : `{"uid": "<uid>", "signalementId": "<id>", "defi": "<base64>", "signature": "<base64>"}`, signature sur :
@@ -905,7 +905,7 @@ Sauf les trois premiers et `trop_d_appels` sur `GET /attestation`, le statut est
 
 Un appel à KMS (`Decrypt`, `AsymmetricSign`) ou un échange STS refusé ou sans réponse (panne, propagation de l'IAM, retrait d'urgence) reçoit `registre_indisponible`, et `pin_indisponible_temporaire` sur les routes du PIN ; rien n'est inscrit.
 
-**Ordre des contrôles hors `enroler`** (dont l'ordre est fixé au §2.3) : quand plusieurs erreurs s'appliquent, la réponse porte celle de la première étape qui échoue, dans cet ordre : (1) canal et forme du corps (`canal_invalide`, `message_refuse`) ; (2) authentification : `idToken`, jeton OIDC, jeton de session, signature (`jeton_invalide`, `session_expiree`, `message_refuse`) ; (3) limite d'appels (`trop_d_appels`) ; (4) défi (`defi_invalide`) ; (5) lecture de la ligne du registre et de son contrôle de fraîcheur (`registre_indisponible` ou `pin_indisponible_temporaire` ; ligne absente, rejetée ou `supprime` : le code de la route) ; (6) contrôle anti-retour, quand la route l'exige (`reessayer_plus_tard`) ; (7) les autres erreurs de la route, dans l'ordre de sa liste « Erreurs » ; (8) majorité de la grappe, mémoire et recopie au registre (`pin_indisponible_temporaire`) ; sans leader joignable, les étapes qui lisent l'état de la grappe ne se font pas, et la réponse est `pin_indisponible_temporaire`. Exemple : un `redepot` au plafond dans une grappe récente reçoit `pin_bloque`, listé avant `grappe_recente`.
+**Ordre des contrôles hors `enroler`** (dont l'ordre est fixé au §2.3) : quand plusieurs erreurs s'appliquent, la réponse porte celle de la première étape qui échoue, dans cet ordre : (1) canal et forme du corps (`canal_invalide`, `message_refuse`) ; (2) authentification par `idToken`, jeton OIDC ou jeton de session (`jeton_invalide`, `session_expiree`) ; (3) limite d'appels (`trop_d_appels`), sauf la limite par `uid` d'une route signée par `cleVie`, décomptée à l'étape (6) ; (4) défi (`defi_invalide`) ; (5) lecture de la ligne du registre et de son contrôle de fraîcheur (`registre_indisponible` ou `pin_indisponible_temporaire` ; ligne absente, rejetée ou `supprime` : le code de la route) ; (6) pour une route signée par `cleVie`, comme pour `enroler` : signature, vérifiée avec la `cleViePub` de la ligne lue (`message_refuse`), puis limite par `uid` (`trop_d_appels`) ; (7) contrôle anti-retour, quand la route l'exige (`reessayer_plus_tard`) ; (8) les autres erreurs de la route, dans l'ordre de sa liste « Erreurs » ; (9) majorité de la grappe, mémoire et recopie au registre (`pin_indisponible_temporaire`) ; sans leader joignable, les étapes qui lisent l'état de la grappe ne se font pas, et la réponse est `pin_indisponible_temporaire`. Exemple : un `redepot` au plafond dans une grappe récente reçoit `pin_bloque`, listé avant `grappe_recente`.
 
 ## 7. Limites
 
@@ -917,7 +917,7 @@ Toutes les autres valeurs sont des valeurs initiales.
 
 Décompte :
 
-- une limite par `uid` ne compte que les appels authentifiés (signature, jeton ou preuve valides) ; un appel refusé à l'authentification ne compte que dans les limites par IP et par canal : qui connaît un `uid` ne peut pas épuiser les appels du titulaire ;
+- une limite par `uid` ne compte que les appels authentifiés (signature, jeton ou preuve valides ; pour une route signée par `cleVie`, après la lecture de la ligne et la vérification de la signature, §6) ; un appel refusé à l'authentification ne compte que dans les limites par IP et par canal : qui connaît un `uid` ne peut pas épuiser les appels du titulaire ;
 - les essais faux des codes d'un proche (code d'accès ou d'invitation qui le désigne, dernier code, vérification d'identité) sont comptés **au registre**, par proche (`essais/{contactId}` et `identites/{contactId}`, `ARCHITECTURE.md`), par une écriture signée à chaque essai faux, avant la réponse, qui inscrit aussi la fin du blocage posé par le 5ᵉ code faux (`codeBloqueJusquau`, `dernierCodeBloqueJusquau`) : ni un redémarrage des VM ni un changement de leader ne les remettent à zéro ;
 - les autres limites par `uid`, par proche (`contactId` : sessions simultanées de `session/ouvrir`) et pour le compte de service appelant (`deces/signaler`, `titulaire/supprimer`, `lettre/secours`) sont décomptées par le leader de la grappe pour les trois VM ensemble, en mémoire, sans réplication : la VM qui reçoit l'appel lui demande le décompte sur le canal entre VM, et lui signale la fin de chaque session pour le décompte des sessions simultanées ; le leader retient l'`instanceId` de la VM qui a demandé chaque session comptée, et sa tâche horaire retire du compte, vérifiées ou non, les sessions d'une instance dont le `vuLe` a plus de 2 minutes, comme pour `sessionTerminee` (`ARCHITECTURE.md`) : une VM perdue ne bloque pas un proche plus d'une heure ; un changement de leader les remet à zéro ; sans leader joignable (pause de la grappe, VM sans grappe), chaque VM décompte elle-même ; qui provoque des élections (l'administrateur, qui tient le réseau) peut donc dépasser ces limites, celle d'`etat` comprise ;
 - les limites par IP, par canal et par session sont décomptées par la VM qui reçoit l'appel ;
