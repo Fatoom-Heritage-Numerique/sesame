@@ -57,10 +57,11 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0047](0047-recuperation-dans-les-30-jours-d-un-changement-de-grappe.md) | Dans les 30 jours d'un changement de grappe, le code de récupération ne rouvre pas le coffre sur un nouvel appareil ; l'annulation d'un décès reste possible | 2026-10-28 |
 | [0048](0048-tout-code-refuse-decompte.md) | Tout code refusé est décompté, code juste compris | 2026-10-28 |
 | [0049](0049-retrait-d-urgence-hors-faille-ecrit.md) | Retrait d'urgence hors faille : l'arrêt jusqu'à la version suivante est écrit, sans procédure nouvelle | 2026-10-28 · revue depuis 0051 |
-| [0050](0050-remplacement-d-un-membre-sans-quatrieme-votant.md) | Remplacement d'un membre de la grappe : l'absent est retiré avant la promotion de la remplaçante | 2026-10-28 |
+| [0050](0050-remplacement-d-un-membre-sans-quatrieme-votant.md) | Remplacement d'un membre de la grappe : l'absent est retiré avant la promotion de la remplaçante | 2026-10-28 · revue depuis 0057 |
 | [0051](0051-arret-de-plus-de-2-heures-et-premiere-version.md) | Après un arrêt de plus de 2 heures, et à la toute première version, une reprise publiée sans mécanisme nouveau | 2026-10-28 · revue depuis 0052 |
 | [0052](0052-reprise-apres-une-panne-sans-attendre-30-jours.md) | Une reprise publiée après une panne de plus de 2 heures n'attend pas l'échéance des 30 jours | 2026-10-28 |
 | [0053](0053-recopie-au-registre-avant-la-reponse-du-pin.md) | L'état du PIN est recopié au registre avant la réponse ; sans KMS, ni dépôt ni évaluation | 2026-10-28 · revue depuis 0054 |
 | [0054](0054-essai-decompte-sans-recopie-signale.md) | Un essai décompté dont la recopie échoue est signalé ; un retrait d'urgence ne décompte aucun essai | 2026-10-28 |
-| [0055](0055-amorcage-par-place-et-pairs-derives-du-nom.md) | Amorçage d'une grappe sur trois places, quelle que soit la zone ; pairs dérivés du nom de la VM | 2026-10-28 |
+| [0055](0055-amorcage-par-place-et-pairs-derives-du-nom.md) | Amorçage d'une grappe sur trois places, quelle que soit la zone ; pairs dérivés du nom de la VM | 2026-10-28 · revue depuis 0057 |
 | [0056](0056-ordre-des-controles-et-precisions-de-la-grappe.md) | Ligne lue avant la signature `cleVie` ; `grappePin` non défait ; rythme des admissions et des alertes | 2026-10-29 |
+| [0057](0057-place-inscrite-et-instance-qui-refuse-de-servir.md) | Place de chaque membre inscrite dans l'état répliqué ; instance qui refuse de servir ; contrôles avant `grappePin` | 2026-10-29 |

@@ -2,7 +2,7 @@
 
 # 0050 · Remplacement d'un membre de la grappe : l'absent est retiré avant la promotion de la remplaçante
 
-**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, d'après les pratiques établies de Raft) · précise [0017](0017-protocole-de-pin-grappe-de-trois-vm.md)
+**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, d'après les pratiques établies de Raft) · précise [0017](0017-protocole-de-pin-grappe-de-trois-vm.md) · **revue depuis** ([0057](0057-place-inscrite-et-instance-qui-refuse-de-servir.md))
 
 ## Contexte et menace
 

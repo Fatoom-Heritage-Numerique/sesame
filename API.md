@@ -454,7 +454,7 @@ Signature sur :
 - `ouverture` : seulement juste après une évaluation sur **le même canal**, pour le même `elementAveugle` ; garde `cleOprf`, remet 10 essais, sans évaluation ;
 - `redepot` (même PIN) : nouvelle `cleOprf`, garde le compteur d'essais ; sur un enregistrement absent (effacement, nouvelle grappe), il le crée avec 10 essais, comme un premier dépôt.
 
-Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours après l'entrée dans la grappe inscrite. Mémoire de la grappe à 90 % : les nouveaux dépôts sont refusés, c'est-à-dire tout dépôt qui ajoute un enregistrement absent de la grappe (premier dépôt, `redepot`, `nouveau_pin` sans enregistrement) ; `ouverture` et un `nouveau_pin` qui remplace un enregistrement présent restent admis. Une répétition demande un nouveau défi : un `nouveau_pin` ou un `redepot` répété tire encore une nouvelle `cleOprf`, et seule la dernière évaluation reçue vaut.
+Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours après l'entrée dans la grappe inscrite. Mémoire de la grappe à 90 % : les nouveaux dépôts sont refusés, c'est-à-dire tout dépôt qui ajoute un enregistrement absent de la grappe (premier dépôt, `redepot` ou `nouveau_pin` sans enregistrement) ; `ouverture`, et un `redepot` ou un `nouveau_pin` qui remplace un enregistrement présent, restent admis. Une répétition demande un nouveau défi : un `nouveau_pin` ou un `redepot` répété tire encore une nouvelle `cleOprf`, et seule la dernière évaluation reçue vaut.
 
 **Réponse `200`** : `{"evaluation": "<base64, 32 octets>" | null, "grappeId": "<hex, 64 caractères>"}` (`null` pour `ouverture`)
 
@@ -684,7 +684,7 @@ Servies seulement sur le canal mutuellement attesté entre VM de Sésame, jamais
 
 **Corps** : `{"jwt": "<jeton d'attestation de la VM>", "nodeId": "<id>"}`. `nodeId` est l'identifiant de nœud neuf : 16 octets de la primitive d'aléa, en base64url sans remplissage. `jwt` est le jeton de paire que la VM a présenté à l'ouverture de cette connexion (§3), vérifié par la VM qui reçoit la demande : il porte `image_digest`, `hwmodel` et la zone, et lie l'identifiant de nœud neuf par `eat_nonce`.
 
-**Traitement** : la VM est admise sans intervention si elle a le même `image_digest` et un `hwmodel` admis, si elle prend la zone d'un votant injoignable depuis au moins 2 minutes, ou la place inscrite pour son nom (`submods.gce.instance_name` de son jeton) par `grappe/membres` (§4.2), et si aucune autre modification de membres n'est en cours. Elle est ajoutée comme apprenante ; son journal rattrapé, l'ancien membre est retiré, puis elle est promue : jamais plus de trois votants. Sinon elle est refusée et la demande journalisée (`grappe_admission_refusee`, alerte à l'exploitant, `ARCHITECTURE.md`). Un ancien identifiant de nœud est refusé. Une VM sans grappe répond `refusee` et journalise de même `grappe_admission_refusee`.
+**Traitement** : la VM est admise sans intervention si elle a le même `image_digest` et un `hwmodel` admis, si son nom (`submods.gce.instance_name` de son jeton), donc sa place, est celui d'un votant injoignable depuis au moins 2 minutes et sa zone celle que l'état répliqué inscrit pour ce nom (zone de l'amorçage, §4.3, ou inscrite par `grappe/membres`, §4.2), et si aucune autre modification de membres n'est en cours. Elle est ajoutée comme apprenante ; son journal rattrapé, l'ancien membre de ce nom est retiré, puis elle est promue : jamais plus de trois votants. Sinon elle est refusée et la demande journalisée (`grappe_admission_refusee`, alerte à l'exploitant, `ARCHITECTURE.md`). Un ancien identifiant de nœud est refusé. Une VM sans grappe répond `refusee` et journalise de même `grappe_admission_refusee`. La limite est décomptée par la VM qui reçoit la demande ; un `trop_d_appels` n'est pas un refus d'admission, ni journalisé ni alerté, et la VM sans grappe renouvelle sa demande 30 secondes plus tard.
 
 **Réponse `200`** : `{"admise": true, "role": "apprenant"}`
 
@@ -719,14 +719,14 @@ Route du canal du §1.2 : `POST /n/{a|b|c}/canal`, `{"route": "grappe/membres", 
 
 Commandé par l'exploitant après le remplacement des trois VM (nouvelle version, effacement total) ; procédure et raisons : `ARCHITECTURE.md`. Conçu au lot 1 bis avec le prototype Raft, écrit ici avant d'être servi.
 
-**Configuration initiale**, identique pour les trois VM, en JSON canonique, `membres` triés par `zone` puis par `nodeId`, exactement trois éléments :
+**Configuration initiale**, identique pour les trois VM, en JSON canonique, `membres` triés par `vm`, exactement trois éléments :
 
 ```json
 {"v": 1, "imageDigest": "sha256:<hex, 64 caractères>",
- "membres": [{"nodeId": "<id>", "zone": "<zone>", "cle": "<base64, SubjectPublicKeyInfo DER de la clé du certificat TLS entre VM>"}, …]}
+ "membres": [{"nodeId": "<id>", "vm": "<nom de la VM>", "zone": "<zone>", "cle": "<base64, SubjectPublicKeyInfo DER de la clé du certificat TLS entre VM>"}, …]}
 ```
 
-`nodeId` est l'identifiant de nœud neuf du membre (§4.1), `zone` sa zone (`submods.gce.zone` de son jeton), `cle` la clé publique de son certificat TLS entre VM, liée à son jeton de paire par `eat_nonce` (§3). `grappeId` = hex(SHA-256(ce JSON canonique)).
+`nodeId` est l'identifiant de nœud neuf du membre (§4.1), `vm` le nom de sa VM (`submods.gce.instance_name` de son jeton), qui fixe sa place et que l'état répliqué garde avec sa zone, `zone` sa zone (`submods.gce.zone` de son jeton), `cle` la clé publique de son certificat TLS entre VM, liée à son jeton de paire par `eat_nonce` (§3). `grappeId` = hex(SHA-256(ce JSON canonique)).
 
 #### `grappe/amorcer`
 
@@ -793,7 +793,7 @@ Chaque appel porte six en-têtes :
 | `X-Sesame-Kem-Pub` | `kemPub` de l'instance (base64, 1184 octets), pour vérifier `eat_nonce` : le jeton en porte les deux empreintes (§3) |
 | `X-Sesame-Date` | horodatage ISO 8601 UTC de la requête (§1.7) |
 | `X-Sesame-Request-Id` | UUID v4 unique par requête, en minuscules |
-| `X-Sesame-Signature` | base64 de la signature ECDSA P-256 / SHA-256, au format DER que rend KMS, par la clé KMS `session-sign` sur `UTF-8(méthode ‖ "|" ‖ chemin-et-query ‖ "|" ‖ X-Sesame-Date ‖ "|" ‖ X-Sesame-Request-Id ‖ "|" ‖ hex(SHA-256(corps)))` (corps vide ⇒ SHA-256 de zéro octet) |
+| `X-Sesame-Signature` | base64 de la signature ECDSA P-256 / SHA-256, `R ‖ S` sur 64 octets (comme toute signature de `session-sign`, convertie depuis la forme DER que rend KMS), par la clé KMS `session-sign` sur `UTF-8(méthode ‖ "|" ‖ chemin-et-query ‖ "|" ‖ X-Sesame-Date ‖ "|" ‖ X-Sesame-Request-Id ‖ "|" ‖ hex(SHA-256(corps)))` (corps vide ⇒ SHA-256 de zéro octet) |
 
 La passerelle :
 
@@ -866,7 +866,7 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 |---|---|---|
 | `canal_invalide` | 400, en clair | enveloppe mal formée ou trop grande, corps indéchiffrable, `n` hors bornes ou non croissant, `kemCt` ou `ivPrefixe` changé, canal fermé, secret nul, session présentée depuis un autre canal (§1.3) |
 | `instance_inconnue` | 410, en clair | `instanceId` inconnu (redémarrage) : le client reprend à `GET /attestation` |
-| `attestation_indisponible` | 503, en clair | jeton d'attestation pas encore obtenu du lanceur |
+| `attestation_indisponible` | 503, en clair | jeton d'attestation pas encore obtenu du lanceur, ou instance qui refuse de servir (`version_importee`), à toute route |
 | `message_refuse` | 400 | route inconnue, corps mal formé, champ manquant ou inconnu, valeur hors contrat, longueur fausse, chaîne hors NFC, corps trop grand, signature `cleVie` invalide |
 | `jeton_invalide` | 401 | `idToken` ou jeton OIDC refusé |
 | `code_refuse` | 403 | code d'accès refusé, quel que soit le motif (`details.essaisRestants`) |
