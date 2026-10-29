@@ -2,7 +2,7 @@
 
 # 0021 · Registre en ajout seul signé par `registre-sign`, borne publique du registre
 
-**Date** : 2026-10-26 · **Statut** : actée (validée par l'opérateur) · revoit [0003](0003-registre-minimal-tenu-par-sesame.md)
+**Date** : 2026-10-26 · **Statut** : actée (validée par l'opérateur) · revoit [0003](0003-registre-minimal-tenu-par-sesame.md) · **revue depuis** ([0040](0040-bornes-en-echec-hors-du-controle-anti-retour.md), [0045](0045-version-de-signature-fixee-par-l-image.md))
 
 ## Contexte et menace
 

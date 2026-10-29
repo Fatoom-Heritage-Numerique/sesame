@@ -61,7 +61,7 @@ Une précision, sans détour : AMD SEV chiffre la mémoire mais ne protège pas 
 
 Promettre « nous ne lisons pas vos fichiers » ne suffit pas. Avec Sésame, chacun peut contrôler ce qui tourne.
 
-- **Un code public.** Le code de Sésame entre en intégralité dans ce dépôt à l'étape 3 de sa construction (« État du projet ») : chacun peut alors le lire, l'auditer et le reconstruire.
+- **Un code public.** Le code de Sésame entre dans ce dépôt au fil de sa construction (« État du projet ») : celui de la grappe du protocole de PIN dès l'étape 2, dans `sesame-fake`, le reste à l'étape 3. Chacun peut alors le lire, l'auditer et le reconstruire.
 - **Une empreinte unique.** Chaque version produit une empreinte (SHA-256). La moindre modification du code la change complètement.
 - **Des clés verrouillées sur cette empreinte.** Le coffre de clés de Google (Cloud KMS) ne descelle qu'au programme dont l'empreinte est autorisée, et un contrôle automatique de ce dépôt vérifie que cette autorisation correspond aux versions publiées.
 - **Une preuve à chaque échange.** Avant d'envoyer quoi que ce soit, l'app et fatoom.fr/acces demandent à l'enclave son attestation, un jeton signé par Google, et vérifient l'empreinte qu'il porte.
@@ -124,7 +124,7 @@ Une étape de plus pour qui veut contrôler l'opérateur lui-même : `build/veri
 
 - La liste est **compilée** dans l'app, le portail des proches et la passerelle de Fatoom. Ils ne téléchargent rien et refusent toute version absente de la liste ou retirée.
 - Une nouvelle version n'est mise en service qu'une fois l'app qui la contient disponible dans les deux boutiques. La version minimale de l'app est alors relevée : une app plus ancienne demande sa mise à jour.
-- Une version peut être retirée immédiatement : elle ne descelle plus rien.
+- Une version peut être retirée à tout moment : elle ne descelle plus rien dès que son jeton fédéré expire, au plus 7 minutes de propagation plus une heure (`ARCHITECTURE.md` §4).
 - Le coffre de clés (Cloud KMS) ne descelle qu'aux empreintes `en_service` ; un contrôle automatique du dépôt vérifie que les deux listes sont identiques.
 
 Format exact et procédure : `RELEASE.md`.
@@ -135,7 +135,7 @@ Format exact et procédure : `RELEASE.md`.
 - **L'opérateur administre les clés.** Fatoom administre le projet Google Cloud de Sésame, avec un seul administrateur aujourd'hui. Il pourrait autoriser une autre image dans le coffre de clés : elle n'aurait besoin d'aucun client pour desceller les clés de transmission existantes. Ce n'est pas impossible ; c'est **visible**. L'opération laisse une trace dans les journaux d'administration de Google, exportés vers un bucket public que personne ne peut vider avant 10 ans sans supprimer Sésame entier, et le script public la signale.
 - **Les comptes de publication.** Il n'y a pas de délai d'annonce entre la publication d'une version et sa mise en service. Qui tiendrait à la fois les accès Google Cloud de Sésame et un compte qui publie l'app, le site ou ce dépôt pourrait faire accepter une image malveillante. Ces comptes se connectent par passkey, sans SMS.
 - **Le portail est servi par Fatoom.** Le portail des proches est un JavaScript servi par Fatoom, qui y compile aussi la liste des versions. Un Fatoom compromis qui servirait un portail modifié pourrait lire ce qu'un proche y ouvre. L'app, publiée par les boutiques, n'est pas concernée.
-- **La disponibilité.** Fatoom peut tout bloquer : empêcher une annulation ou une alerte de Sésame d'arriver, au prix de bloquer aussi les ouvertures des proches. Passé l'échéance, une transmission sur décès est définitive.
+- **La disponibilité.** Fatoom peut tout bloquer. Il peut empêcher une annulation d'arriver, au prix de bloquer aussi les ouvertures des proches, ou faire taire les alertes de Sésame, sans rien bloquer d'autre. Passé l'échéance, une transmission sur décès est définitive.
 
 Toutes les limites, adversaire par adversaire : `THREAT_MODEL.md` §2.
 
@@ -147,7 +147,7 @@ Ordre de construction :
 
 1. **Documentation** : ce dépôt tel que vous le lisez (en cours).
 2. **Contrat exécutable** : OpenAPI, vecteurs de test partagés avec les clients, `sesame-fake` (un double local de Sésame pour développer l'app, le portail et la passerelle sans enclave, qui tourne en trois exemplaires pour la grappe du protocole de PIN), `Dockerfile` et `build/reproduire.sh`.
-3. **Cœur** : attestation, canal chiffré, KMS, registre, protocoles, grappe du protocole de PIN.
+3. **Cœur** : attestation, canal chiffré, KMS, registre, protocoles, grappe du protocole de PIN dans l'enclave (son code, consensus compris, est écrit et testé dès l'étape 2, dans `sesame-fake`).
 4. **Fournisseurs** : SMS et email, alertes, vérification d'identité, lettre.
 5. **Infrastructure** : scripts `gcloud` du projet, du trousseau, du pool d'identités, des machines, du bucket d'audit ; `build/verifier-attestation.sh` et `build/verifier-journaux.sh`.
 6. **Version 1.0.0** inscrite à `versions.json`, compilée dans les clients, puis mise en service.

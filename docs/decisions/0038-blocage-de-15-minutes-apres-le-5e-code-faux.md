@@ -2,7 +2,7 @@
 
 # 0038 · Blocage de 15 minutes pleines après le 5ᵉ code faux
 
-**Date** : 2026-10-28 · **Statut** : actée (validée par l'opérateur) · revoit [0037](0037-essais-des-codes-comptes-au-registre.md)
+**Date** : 2026-10-28 · **Statut** : actée (validée par l'opérateur) · revoit [0037](0037-essais-des-codes-comptes-au-registre.md) · **revue depuis** ([0048](0048-tout-code-refuse-decompte.md))
 
 ## Contexte et menace
 

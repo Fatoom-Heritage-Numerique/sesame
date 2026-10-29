@@ -2,7 +2,7 @@
 
 # Publier une version de Sésame
 
-Une version de Sésame n'est acceptée que si elle figure dans `versions.json`, à la racine de ce dépôt, avec le statut `en_service`, **et** dans une version du client qui l'a compilée. Les clients ne téléchargent aucune liste et ne vérifient aucune signature : la liste fait partie de leur propre code. Il n'y a pas de délai d'annonce. La revue des boutiques et l'historique public de ce dépôt en tiennent lieu (`THREAT_MODEL.md` §2, limite 12). Une version se retire immédiatement.
+Une version de Sésame n'est acceptée que si elle figure dans `versions.json`, à la racine de ce dépôt, avec le statut `en_service`, **et** dans une version du client qui l'a compilée. Les clients ne téléchargent aucune liste et ne vérifient aucune signature : la liste fait partie de leur propre code. Il n'y a pas de délai d'annonce. La revue des boutiques et l'historique public de ce dépôt en tiennent lieu (`THREAT_MODEL.md` §2, limite 12). Une version se retire à tout moment : elle ne descelle plus rien dès que son jeton fédéré, gardé une heure au plus, expire (ci-dessous).
 
 ## 1. Build reproductible
 
@@ -95,7 +95,7 @@ Le client affiche aussi la liste et son historique sur sa page de transparence (
 
 Règles :
 
-- **Jamais deux versions de Sésame à moins de 30 jours d'écart**, sauf retrait d'urgence : un titulaire entré dans une grappe depuis moins de 30 jours ne peut pas en changer (`THREAT_MODEL.md` §2, limite 19).
+- **Jamais deux versions de Sésame à moins de 30 jours d'écart**, sauf retrait pour une faille ou reprise après une panne de toutes les instances de plus de 2 heures, sans retrait d'urgence (tout autre retrait d'urgence attend l'échéance pour la version suivante ; `ARCHITECTURE.md` §11.6, décision 0052) : un titulaire entré dans une grappe depuis moins de 30 jours ne peut pas en changer (`THREAT_MODEL.md` §2, limite 19).
 - **Téléphone trop ancien** : sur un appareil sous la version minimale du système exigée par la dernière app, l'app laisse ouvrir et consulter le coffre localement, sans aucun appel à Sésame, et le signe de vie y est suspendu. Les fonctions de Sésame se font depuis un appareil à jour.
 - Le client publie sa version minimale de l'app dans un fichier statique versionné (pour Fatoom : `fatoom.fr/.well-known/fatoom-version-minimale.json`, `ARCHITECTURE.md` §8.3), que `build/verifier-journaux.sh` lit avec son historique (§7).
 
@@ -104,9 +104,9 @@ Règles :
 À tout moment, sans délai :
 
 1. ligne passée `retiree`, avec `retireLe` ;
-2. empreinte retirée de la condition KMS **immédiatement** : la version ne descelle plus rien ;
+2. empreinte retirée de la condition KMS **immédiatement** : la version ne descelle plus rien dès que son jeton fédéré, gardé une heure au plus, expire (`ARCHITECTURE.md` §4) ;
 3. version minimale de l'app relevée ;
-4. VM de la version retirée arrêtées dès que la nouvelle est en service (effacement de sa grappe, redépôt) ; pour un retrait pour faille, arrêtées aussitôt, sans attendre la nouvelle, car retirer l'empreinte de KMS n'arrête ni le protocole de PIN, tenu en mémoire, ni le canal : Sésame ne sert alors plus rien jusqu'à la version corrective, dont la grappe neuve s'amorce comme au §4, étape 5 (`THREAT_MODEL.md` §2, limite 8).
+4. VM de la version retirée arrêtées dès que la nouvelle est en service (effacement de sa grappe, redépôt) ; pour un retrait pour faille, arrêtées aussitôt, sans attendre la nouvelle, car retirer l'empreinte de KMS n'arrête ni le protocole de PIN, tenu en mémoire, ni le canal : Sésame ne sert alors plus rien jusqu'à la version corrective. Celle-ci exige des clients publiés (§4, étape 2), donc plus de 2 heures sans borne : elle est en pratique toujours une reprise publiée, sans attendre l'échéance des 30 jours, et sa grappe neuve s'amorce comme au §4, étape 5 ; un signalement de décès arrivé à échéance pendant l'arrêt est transmis à la reprise sans avoir pu être annulé (`THREAT_MODEL.md` §2, limite 8 ; décision 0051). Hors faille, la nouvelle version attend l'échéance des 30 jours, et Sésame, sans KMS, ne signe ni ne descelle plus rien jusque-là : la version suivante est une reprise publiée (`ARCHITECTURE.md` §11.6, décision 0049).
 
 Google ne garantit aucun délai de propagation : une révocation n'est tenue pour effective qu'après au moins 7 minutes et une vérification.
 
@@ -118,9 +118,8 @@ Google ne garantit aucun délai de propagation : une révocation n'est tenue pou
 
 La condition du fournisseur du pool d'identités est le seul point d'autorisation de toutes les clés de Sésame. Elle doit correspondre exactement à `versions.json` :
 
-- l'ensemble des empreintes autorisées est **identique** à l'ensemble des lignes `en_service` ;
+- l'ensemble des couples (empreinte, dictionnaire `env_override`) de la condition, une clause par version, est **identique** à l'ensemble des couples (`imageDigest`, `envDigest`) des lignes `en_service` ;
 - la clause `dbgstat` est présente ;
-- le dictionnaire `env_override` de la condition correspond à l'`envDigest` publié ;
 - les valeurs de `hwmodel` correspondent à `hwmodels`.
 
 Un contrôle CI lit la condition avec `gcloud` et échoue au moindre écart. Une empreinte autorisée dans KMS mais absente de `versions.json` signifie qu'une image non publiée pourrait desceller des clés (`THREAT_MODEL.md` §2, limite 2).
@@ -136,7 +135,7 @@ Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit l
 | Vecteurs | les vecteurs de test diffèrent de ceux du client de référence |
 | `versions.json` | le fichier n'est pas conforme à son schéma |
 | `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) |
-| KMS ⇔ `versions.json` | les empreintes, la clause `dbgstat`, les valeurs de `hwmodel` ou le dictionnaire `env_override` de la condition ne correspondent pas (§7) |
+| KMS ⇔ `versions.json` | les couples (empreinte, dictionnaire `env_override`) de la condition, la clause `dbgstat` ou les valeurs de `hwmodel` ne correspondent pas (§7) |
 | Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` |
 | Image | un shell ; une variable de lanceur factice lue hors du paquet de test |
 | Scripts publics | `build/verifier-attestation.sh` ou `build/verifier-journaux.sh` accepte un argument manquant de sa signature (`README.md`) ; le premier accepte un jeton d'un autre projet ou d'un autre dépôt d'images, le second ne signale pas un appel aux clés d'un sujet fédéré d'un autre projet |

@@ -2,7 +2,7 @@
 
 # 0018 · Amorçage d'une grappe neuve commandé par l'exploitant
 
-**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0017](0017-protocole-de-pin-grappe-de-trois-vm.md)
+**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0017](0017-protocole-de-pin-grappe-de-trois-vm.md) · **revue depuis** ([0055](0055-amorcage-par-place-et-pairs-derives-du-nom.md))
 
 ## Contexte et menace
 

@@ -2,7 +2,7 @@
 
 # 0033 · Textes du client réglés au lancement, attestés par leur empreinte
 
-**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0028](0028-reglages-du-client-env-override-entier.md) et [0029](0029-dernier-code-par-email-envoye-par-sesame.md)
+**Date** : 2026-10-27 · **Statut** : actée (décision de l'opérateur) · revoit [0028](0028-reglages-du-client-env-override-entier.md) et [0029](0029-dernier-code-par-email-envoye-par-sesame.md) · **revue depuis** ([0058](0058-aucun-refus-au-demarrage-ne-fait-sortir-le-processus.md))
 
 ## Contexte et menace
 
