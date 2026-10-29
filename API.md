@@ -213,7 +213,7 @@ Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux 
 
 - **premier enrôlement** (ni ligne ni marqueur) : `idToken` seul ; le marqueur d'inscription, qui porte la `cleViePub` reçue, est créé avant la ligne ; `vivantLe = enroleLe` ;
 - **génération supérieure** : rotation, preuve exigée ; elle ferme les sessions ouvertes des proches de ce titulaire, comme une nouvelle génération de charte (§2.6) : la VM qui reçoit ferme celles qu'elle tient, `session/ouvrir-cles` refuse sur toute VM une session dont la `ktsGeneration` a changé (§2.19), et chaque session fermée notifie `sessionTerminee` (§5.5) ;
-- **génération égale** : rescellement seul (reprise d'une création interrompue) ; la preuve doit se vérifier avec la `cleViePub` inscrite, la `cleViePub` reçue doit lui être égale, ni les chartes ni l'enregistrement du PIN ne sont touchés ;
+- **génération égale** : rescellement seul (reprise d'une création, d'une rotation ou d'une `Migration` interrompue) ; la preuve doit se vérifier avec la `cleViePub` inscrite, la `cleViePub` reçue doit lui être égale, ni les chartes ni l'enregistrement du PIN ne sont touchés ; la KTS reçue remplace la KTS scellée, même si elle en diffère (rotation reprise sur un autre appareil, qui tire une nouvelle KTS à la génération inscrite), sans fermer aucune session : seul le porteur de la `cleVie` inscrite le peut, et tant que le client n'a pas publié les chartes de cette génération, aucune session ne s'y ouvre (`session/ouvrir-cles` compare la `ktsGeneration`, §2.19) ;
 - **génération inférieure** : refusée.
 
 Sésame scelle la KTS sous la clé KMS `kts-seal`, crée ou met à jour la ligne, puis efface `kts`. Une répétition à la même génération, avec une preuve sur un nouveau défi, est un rescellement : même effet.
@@ -287,7 +287,7 @@ Les limites d'appels (`trop_d_appels`) se placent comme sur une route signée pa
 |---|---|
 | Appelant | app, coffre verrouillé, une fois par jour et à chaque ouverture de l'app |
 | Authentification | `idToken` seul |
-| Effets | aucun |
+| Effets | aucune écriture ; une ligne rejetée à la lecture est publiée dans la borne et alertée comme à toute lecture (`ligne_rejetee`) |
 | Limite | 100 / jour par `uid`, 60 / min par IP |
 
 **Corps** :
@@ -454,14 +454,14 @@ Signature sur :
 **Traitement** : exige une ligne `actif` ; chaque changement est validé par la majorité de la grappe, puis recopié dans la ligne du registre (`pinDeposeLe`, `pinBloqueLe`, `pinEvaluations`), avant la réponse ; recopie impossible (registre illisible, transaction en conflit, KMS ou STS indisponible) ⇒ `pin_indisponible_temporaire`, sans évaluation : l'app réessaie avec un nouveau défi.
 
 - `nouveau_pin` (création du coffre, changement de PIN, nouveau PIN après une récupération) : nouvelle `cleOprf`, 10 essais ; seul motif admis au plafond ;
-- `ouverture` : seulement juste après une évaluation sur **le même canal**, pour le même `elementAveugle` ; garde `cleOprf`, remet 10 essais, sans évaluation ;
+- `ouverture` : seulement juste après une évaluation sur **le même canal**, pour le même `elementAveugle` ; garde `cleOprf`, remet 10 essais, sans évaluation ; il ne change aucun des trois champs recopiés : rien n'est écrit au registre, et la réponse suit la seule validation par la grappe ;
 - `redepot` (même PIN) : nouvelle `cleOprf`, garde le compteur d'essais ; sur un enregistrement absent (effacement, nouvelle grappe), il le crée avec 10 essais, comme un premier dépôt.
 
 Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours après l'entrée dans la grappe inscrite. Mémoire de la grappe à 90 % : les nouveaux dépôts sont refusés, c'est-à-dire tout dépôt qui ajoute un enregistrement absent de la grappe (premier dépôt, `redepot` ou `nouveau_pin` sans enregistrement) ; `ouverture`, et un `redepot` ou un `nouveau_pin` qui remplace un enregistrement présent, restent admis. Une répétition demande un nouveau défi : un `nouveau_pin` ou un `redepot` répété tire encore une nouvelle `cleOprf`, et seule la dernière évaluation reçue vaut.
 
 **Réponse `200`** : `{"evaluation": "<base64, 32 octets>" | null, "grappeId": "<hex, 64 caractères>"}` (`null` pour `ouverture`)
 
-**Erreurs** : `jeton_invalide` (401) ; `message_refuse` (400 ; signature absente ou d'une autre clé, `ouverture` sans évaluation notée sur ce canal ou pour un autre élément) ; `defi_invalide` (409 ; y compris un `grappeId` signé qui n'est plus celui de la grappe en service, par exemple tiré avant un amorçage : l'app redemande un défi, qui porte le `grappeId` courant, et signe de nouveau) ; `pin_bloque` (409 ; plafond atteint, motif autre que `nouveau_pin`) ; `grappe_recente` (409) ; `pin_indisponible` (409 ; ligne absente, rejetée ou `supprime`) ; `pin_indisponible_temporaire` (503 ; pas de majorité, registre illisible, transaction refusée, mémoire pleine) ; `reessayer_plus_tard` (503 ; contrôle anti-retour en échec avant un dépôt dans une autre grappe, sans détail).
+**Erreurs** : `jeton_invalide` (401) ; `message_refuse` (400 ; signature absente ou d'une autre clé, `ouverture` sans évaluation notée sur ce canal ou pour un autre élément) ; `defi_invalide` (409 ; y compris un `grappeId` signé qui n'est plus celui de la grappe en service, par exemple tiré avant un amorçage : l'app redemande un défi, qui porte le `grappeId` courant, et signe de nouveau) ; `pin_bloque` (409 ; plafond atteint, motif autre que `nouveau_pin`) ; `grappe_recente` (409) ; `pin_indisponible` (409 ; ligne absente, rejetée ou `supprime`) ; `pin_indisponible_temporaire` (503 ; pas de majorité, registre illisible, transaction refusée, mémoire pleine) ; `reessayer_plus_tard` (503 ; contrôle anti-retour en échec avant un dépôt dans une autre grappe ou avant le premier dépôt du titulaire, sans détail).
 
 ### 2.13 `pin/evaluer`
 
@@ -683,7 +683,7 @@ Servies seulement sur le canal mutuellement attesté entre VM de Sésame, jamais
 |---|---|
 | Appelant | une VM de Sésame qui démarre sans état |
 | Authentification | attestation mutuelle : contrôles entre VM (§3) |
-| Limite | 2 / min par `nodeId` |
+| Limite | 4 / min par `nodeId` |
 
 **Corps** : `{"jwt": "<jeton d'attestation de la VM>", "nodeId": "<id>"}`. `nodeId` est l'identifiant de nœud neuf : 16 octets de la primitive d'aléa, en base64url sans remplissage. `jwt` est le jeton de paire que la VM a présenté à l'ouverture de cette connexion (§3), vérifié par la VM qui reçoit la demande : il porte `image_digest`, `hwmodel` et la zone, et lie l'identifiant de nœud neuf par `eat_nonce`.
 
@@ -898,7 +898,7 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 | `trop_d_essais` | 429 | blocage de 15 min posé par le 5ᵉ code faux d'une fenêtre de 15 min, code d'accès (par IP ou par proche) ou dernier code (par proche), 4ᵉ renvoi du dernier code dans une session, ou délai d'essai du PIN en cours (`details.reessayerLe`) |
 | `trop_d_appels` | 429 | limite d'une route dépassée (`details.reessayerLe`) ; en clair pour `GET /attestation` |
 | `pin_indisponible_temporaire` | 503 | pas de majorité, registre illisible, recopie au registre impossible (§2.12, §2.13), transaction refusée, mémoire pleine |
-| `reessayer_plus_tard` | 503 | le contrôle anti-retour global refuse d'ouvrir, de transmettre ou de changer de grappe (`ARCHITECTURE.md`) ; aucun détail, aucun essai décompté |
+| `reessayer_plus_tard` | 503 | le contrôle anti-retour global refuse d'ouvrir, de transmettre, de changer de grappe ou d'en inscrire une première (`ARCHITECTURE.md`) ; aucun détail, aucun essai décompté |
 | `registre_indisponible` | 503 | registre ou bucket des marqueurs illisible ; code faux d'un proche, ou échec de sa vérification d'identité, que le registre n'a pas inscrit |
 | `passerelle_indisponible` | 503 | la passerelle ne répond pas ou répond hors contrat |
 | `fournisseur_indisponible` | 503 | Twilio, SendGrid, Stripe ou le prestataire d'impression en échec |
@@ -947,7 +947,7 @@ Décompte :
 | `session/ouvrir-cles` | 500 enveloppes par appel, 60 appels / h par session | valeur initiale, révisable avec les tests de charge du lot 1 bis |
 | `session/fermer` | 10 / h par canal | valeur initiale, révisable avec les tests de charge du lot 1 bis |
 | `session/refuser-role` | 5 / h par session | valeur initiale, révisable avec les tests de charge du lot 1 bis |
-| `grappe/rejoindre` | 2 / min par `nodeId` | valeur initiale, révisable avec les tests de charge du lot 1 bis |
+| `grappe/rejoindre` | 4 / min par `nodeId` (le double du renouvellement toutes les 30 s d'une VM sans grappe) | valeur initiale, révisable avec les tests de charge du lot 1 bis |
 | `grappe/membres` | 2 / h pour la grappe | valeur initiale, révisable avec les tests de charge du lot 1 bis |
 | `grappe/amorcer` | 2 / min par IP | valeur initiale, révisable avec les tests de charge du lot 1 bis |
 | `grappe/preparer`, `grappe/demarrer` | 2 / min par `nodeId`, chacune | valeur initiale, révisable avec les tests de charge du lot 1 bis |
