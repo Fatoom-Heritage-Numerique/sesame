@@ -2,7 +2,7 @@
 
 # 0057 · Place de chaque membre inscrite dans l'état répliqué ; instance qui refuse de servir ; contrôles avant `grappePin`
 
-**Date** : 2026-10-29 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau) · précise [0050](0050-remplacement-d-un-membre-sans-quatrieme-votant.md) et [0055](0055-amorcage-par-place-et-pairs-derives-du-nom.md)
+**Date** : 2026-10-29 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau) · précise [0050](0050-remplacement-d-un-membre-sans-quatrieme-votant.md) et [0055](0055-amorcage-par-place-et-pairs-derives-du-nom.md) · **revue depuis** ([0058](0058-aucun-refus-au-demarrage-ne-fait-sortir-le-processus.md))
 
 ## Contexte et menace
 

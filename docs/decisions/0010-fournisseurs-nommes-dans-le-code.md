@@ -2,7 +2,7 @@
 
 # 0010 · Fournisseurs nommés dans le code, réglages du client en variables attestées, clés d'API dans Secret Manager
 
-**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md), [0023](0023-alertes-envoyees-par-sesame-et-fiche-d-alerte.md), [0028](0028-reglages-du-client-env-override-entier.md), [0029](0029-dernier-code-par-email-envoye-par-sesame.md))
+**Date** : 2026-10-12 · **Statut** : actée (validée par l'opérateur) · **revue depuis** ([0014](0014-liste-des-versions-compilee.md), [0023](0023-alertes-envoyees-par-sesame-et-fiche-d-alerte.md), [0028](0028-reglages-du-client-env-override-entier.md), [0029](0029-dernier-code-par-email-envoye-par-sesame.md), [0058](0058-aucun-refus-au-demarrage-ne-fait-sortir-le-processus.md))
 
 ## Contexte et menace
 

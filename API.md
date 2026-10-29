@@ -58,7 +58,7 @@ Les limites de débit du §7 sont des valeurs initiales, révisables avec les te
 
 **`instanceId`** :
 
-- Forme : `<p>-<22 caractères>`, expression `^[abc]-[A-Za-z0-9_-]{22}$`. `<p>` est le préfixe de routage de la VM : le répartiteur envoie `/n/<p>/…` à cette VM, et `<p>` est le dernier caractère du nom de la VM, qui se termine par `-a`, `-b` ou `-c` ; une VM dont le nom ne se termine pas ainsi refuse de démarrer. Les 22 caractères sont 16 octets de la primitive d'aléa, en base64url sans remplissage.
+- Forme : `<p>-<22 caractères>`, expression `^[abc]-[A-Za-z0-9_-]{22}$`. `<p>` est le préfixe de routage de la VM : le répartiteur envoie `/n/<p>/…` à cette VM, et `<p>` est le dernier caractère du nom de la VM, qui se termine par `-a`, `-b` ou `-c` ; une VM dont le nom ne se termine pas ainsi refuse de servir (`attestation_indisponible`, §6). Les 22 caractères sont 16 octets de la primitive d'aléa, en base64url sans remplissage.
 - Tiré par l'instance à son démarrage, en mémoire seulement, jamais réutilisé : une VM redémarrée en tire un nouveau. Il est distinct de l'identifiant de nœud de la grappe (§4.1).
 - Émis : inscrit à `instances/{instanceId}` au démarrage (`ARCHITECTURE.md`), renvoyé par `GET /attestation`, porté par les bornes du registre et les journaux.
 - Vérifié par l'instance sur chaque requête du canal : un `instanceId` autre que le sien reçoit `410 instance_inconnue`. Le client en lit `<p>` pour choisir son chemin.
@@ -223,7 +223,8 @@ Sésame scelle la KTS sous la clé KMS `kts-seal`, crée ou met à jour la ligne
 - ni ligne ni marqueur : premier enrôlement, la preuve se vérifiant avec la `cleViePub` reçue ;
 - marqueur sans ligne (premier enrôlement interrompu entre le marqueur et la ligne) : la preuve se vérifie avec la `cleViePub` que porte le marqueur, qui doit être la `cleViePub` reçue ; la ligne est alors créée comme à un premier enrôlement ;
 - ligne de même `cleViePub` : rescellement à génération égale (ci-dessus) ;
-- `cleViePub` différente, ou preuve qui ne se vérifie pas : `preuve_requise` sur une ligne, `titulaire_indisponible` sur un marqueur sans ligne.
+- ligne d'une autre `cleViePub` : la preuve, de la `cleVie` du brouillon, ne se vérifie pas avec la `cleViePub` inscrite ⇒ `preuve_requise` (contrôle 6) ; une preuve qui se vérifie avec la `cleViePub` inscrite, jointe à une autre `cleViePub` reçue, reçoit `message_refuse` (contrôle 7) ;
+- marqueur sans ligne, `cleViePub` reçue différente de celle du marqueur ou preuve qui ne se vérifie pas : `titulaire_indisponible`.
 
 Sans preuve de la `cleVie` que porte le marqueur, une ligne absente n'est jamais recréée : le marqueur garde son rôle d'échec fermé (`ARCHITECTURE.md`).
 
@@ -517,7 +518,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Corps** : `{"sessionId": "<id>", "otp": "<code reçu>"}`, `otp` en chiffres seulement, tel qu'il a été envoyé.
 
-**Traitement** : Sésame lit d'abord le document d'essais du proche (`titulaires/{uid}/essais/{contactId}`, `ARCHITECTURE.md`) : pendant le blocage posé par le 5ᵉ dernier code faux d'une fenêtre de 15 min (`dernierCodeBloqueJusquau`, 15 min après ce 5ᵉ code faux), `trop_d_essais` (`details.reessayerLe` = `dernierCodeBloqueJusquau`), sans vérifier ; le 5ᵉ reçoit encore `otp_refuse`, avec `essaisRestants: 0`. Puis vérification par Twilio Verify pour un code envoyé par SMS ; pour un code envoyé par email, comparaison en temps constant avec le code de l'état de la session, refusé après ses 10 minutes (`otp_refuse`) ; chaque code faux est inscrit au registre, signé, avant la réponse `otp_refuse` ; un document d'essais rejeté fait refuser l'essai sans vérifier le code (`otp_refuse`) ; succès : code effacé de l'état, ouverture inscrite au registre, jeton de session émis, alerte de connexion au client (`ouvertureNotifiee`, §5.5). Pour le contact de confiance du vivant du titulaire, Sésame alerte aussi lui-même le titulaire, une fois par session.
+**Traitement** : Sésame lit d'abord le document d'essais du proche (`titulaires/{uid}/essais/{contactId}`, `ARCHITECTURE.md`) : pendant le blocage posé par le 5ᵉ dernier code faux d'une fenêtre de 15 min (`dernierCodeBloqueJusquau`, 15 min après ce 5ᵉ code faux), `trop_d_essais` (`details.reessayerLe` = `dernierCodeBloqueJusquau`), sans vérifier ; le 5ᵉ reçoit encore `otp_refuse`, avec `essaisRestants: 0`. Puis vérification par Twilio Verify pour un code envoyé par SMS ; pour un code envoyé par email, comparaison en temps constant avec le code de l'état de la session, refusé après ses 10 minutes (`otp_refuse`) ; chaque code faux est inscrit au registre, signé, avant la réponse `otp_refuse` ; un document d'essais rejeté fait refuser l'essai sans vérifier le code (`otp_refuse`) ; succès : ligne du titulaire relue, et rejetée, absente ou `supprime` ⇒ session fermée (`sessionTerminee`) et `session_expiree`, sans ouverture inscrite ni jeton ; sinon code effacé de l'état, ouverture inscrite au registre, jeton de session émis, alerte de connexion au client (`ouvertureNotifiee`, §5.5). Pour le contact de confiance du vivant du titulaire, Sésame alerte aussi lui-même le titulaire, une fois par session.
 
 **Réponse `200`** :
 
@@ -557,7 +558,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Corps** : `{"sessionId": "<id>"}`
 
-**Traitement** : Sésame relit la session Stripe. `verified` et prénom, nom et date de naissance conformes aux champs d'identité de la charte gardés dans l'état de la session (§2.14 ; comparaison tolérante) : `essaisIdentite` remis à zéro, `identiteVerifieeLe` inscrit dans `lettres/{contactId}` (parcours « courrier »), puis comme au §2.15 (ouverture inscrite, jeton, `ouvertureNotifiee`). Sinon : `essaisIdentite + 1` dans le document d'identité du proche (`titulaires/{uid}/identites/{contactId}`, `ARCHITECTURE.md`), `identiteEchouee` au client, blocage de 24 h au 3ᵉ échec (`bloqueJusquau`) ; un échec dont l'écriture échoue reçoit `registre_indisponible`, jamais `identite_non_confirmee`, comme un code faux. Dès le verdict (`verified` ou `requires_input`), Sésame demande à Stripe la suppression de la pièce et du selfie (R-COMPTE-20 ; nouvel essai et échec : `ARCHITECTURE.md`).
+**Traitement** : Sésame relit la session Stripe. `verified` et prénom, nom et date de naissance conformes aux champs d'identité de la charte gardés dans l'état de la session (§2.14 ; comparaison tolérante) : ligne du titulaire relue comme au §2.15 (rejetée, absente ou `supprime` ⇒ `session_expiree`, rien d'inscrit), puis `essaisIdentite` remis à zéro, `identiteVerifieeLe` inscrit dans `lettres/{contactId}` (parcours « courrier »), puis comme au §2.15 (ouverture inscrite, jeton, `ouvertureNotifiee`). Sinon : `essaisIdentite + 1` dans le document d'identité du proche (`titulaires/{uid}/identites/{contactId}`, `ARCHITECTURE.md`), `identiteEchouee` au client, blocage de 24 h au 3ᵉ échec (`bloqueJusquau`) ; un échec dont l'écriture échoue reçoit `registre_indisponible`, jamais `identite_non_confirmee`, comme un code faux. Dès le verdict (`verified` ou `requires_input`), Sésame demande à Stripe la suppression de la pièce et du selfie (R-COMPTE-20 ; nouvel essai et échec : `ARCHITECTURE.md`).
 
 **Réponse `200`** : comme au §2.15.
 
@@ -596,7 +597,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 Les enveloppes viennent du client (contenus listés avec le jeton de session) ; Sésame ne les a jamais vues.
 
-**Traitement** : Sésame relit la ligne du titulaire. Si `chartes.{contactId}` n'est plus la génération vérifiée à l'ouverture de la session (§2.6), si la `ktsGeneration` de la ligne n'est plus celle de la KTS de la session (rotation, §2.3), si le rôle `gardien` d'une session de base `vivant` a été refusé depuis son ouverture (§2.21), ou si un signalement d'inactivité de cet `uid` a été clos depuis l'ouverture (retour du titulaire, §2.4), la session est fermée (`sessionTerminee`) et la réponse est `session_expiree`. Sinon, pour chaque enveloppe, Sésame reconstruit l'aad (`uid`, `type`, `id`, proche authentifié, génération du registre) et l'ouvre sous la KTS de l'état de la session (§2.14) ; une enveloppe destinée à un autre proche est refusée ; le type `volontes` s'ouvre comme les autres types. La KTS reste dans l'état de la session jusqu'à sa fin, et s'efface avec lui (§2.20, §5.5). Sésame ne garde pas la liste des contenus ouverts : l'ouverture inscrite au registre ne dit que qui et quand (`ARCHITECTURE.md`).
+**Traitement** : Sésame relit la ligne du titulaire. Si `chartes.{contactId}` n'est plus la génération vérifiée à l'ouverture de la session (§2.6), si la `ktsGeneration` de la ligne n'est plus celle de la KTS de la session (rotation, §2.3), si le rôle `gardien` d'une session de base `vivant` a été refusé depuis son ouverture (§2.21), si un signalement d'inactivité de cet `uid` a été clos depuis l'ouverture (retour du titulaire, §2.4), ou si la ligne est rejetée, absente ou `supprime`, la session est fermée (`sessionTerminee`) et la réponse est `session_expiree`. Sinon, pour chaque enveloppe, Sésame reconstruit l'aad (`uid`, `type`, `id`, proche authentifié, génération du registre) et l'ouvre sous la KTS de l'état de la session (§2.14) ; une enveloppe destinée à un autre proche est refusée ; le type `volontes` s'ouvre comme les autres types. La KTS reste dans l'état de la session jusqu'à sa fin, et s'efface avec lui (§2.20, §5.5). Sésame ne garde pas la liste des contenus ouverts : l'ouverture inscrite au registre ne dit que qui et quand (`ARCHITECTURE.md`).
 
 **Réponse `200`** (sous le canal : les clés ne sont lisibles que par le navigateur) :
 
@@ -608,7 +609,7 @@ Les enveloppes viennent du client (contenus listés avec le jeton de session) ; 
 
 `type` accompagne `id` : deux contenus de types différents peuvent avoir le même identifiant. Une enveloppe refusée n'empêche pas les autres. Le jeton renouvelé matérialise l'inactivité : chaque appel réussi prolonge la session ; sans appel pendant 1 h, elle expire. Un appel avec `enveloppes: []` est admis : il ne vérifie que la session et renouvelle le jeton. Le portail l'envoie avant un appel au client qui suit une action du proche (liste des contenus, URL d'un fichier) quand son jeton a plus de 50 minutes, et une fois quand le client vient de refuser son jeton, avant de refaire l'appel ; jamais sans action du proche : la session expire toujours après 1 h sans action. Un téléchargement commencé avec une URL signée valide va à son terme sans autre appel, l'URL n'étant vérifiée qu'au début de la requête.
 
-**Erreurs** : `enveloppe_refusee` (par élément, dans `refusees`) ; `message_refuse` (400 ; plus de 500 enveloppes, forme invalide) ; `reessayer_plus_tard` (503 ; contrôle anti-retour) ; `session_expiree` (410 ; y compris génération de la charte changée, rotation de la KTS, rôle refusé ou retour du titulaire depuis l'ouverture ; état perdu au redémarrage de la VM : `instance_inconnue`, §1.3) ; `canal_invalide` (400, en clair).
+**Erreurs** : `enveloppe_refusee` (par élément, dans `refusees`) ; `message_refuse` (400 ; plus de 500 enveloppes, forme invalide) ; `reessayer_plus_tard` (503 ; contrôle anti-retour) ; `session_expiree` (410 ; y compris génération de la charte changée, rotation de la KTS, rôle refusé ou retour du titulaire depuis l'ouverture, ligne rejetée, absente ou `supprime` ; état perdu au redémarrage de la VM : `instance_inconnue`, §1.3) ; `canal_invalide` (400, en clair).
 
 ### 2.20 `session/fermer`
 
@@ -732,7 +733,7 @@ Commandé par l'exploitant après le remplacement des trois VM (nouvelle version
 
 | | |
 |---|---|
-| Appelant | l'exploitant, après avoir remplacé les trois VM, une par place (`-a`, `-b`, `-c`), dans les zones de l'option en service |
+| Appelant | l'exploitant, une fois trois VM sans grappe en place (trois VM neuves à côté des anciennes pour une nouvelle version, ou recréées après un effacement total), une par place (`-a`, `-b`, `-c`), dans les zones de l'option en service |
 | Authentification | `jetonExploitation` (§1.4), en plus du canal (§1.2) ; la route n'agit que sur trois VM sans grappe et ne donne ni état, ni essai, ni clé |
 | Limite | 2 / min par IP |
 
@@ -866,7 +867,7 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 |---|---|---|
 | `canal_invalide` | 400, en clair | enveloppe mal formée ou trop grande, corps indéchiffrable, `n` hors bornes ou non croissant, `kemCt` ou `ivPrefixe` changé, canal fermé, secret nul, session présentée depuis un autre canal (§1.3) |
 | `instance_inconnue` | 410, en clair | `instanceId` inconnu (redémarrage) : le client reprend à `GET /attestation` |
-| `attestation_indisponible` | 503, en clair | jeton d'attestation pas encore obtenu du lanceur, ou instance qui refuse de servir (`version_importee`), à toute route |
+| `attestation_indisponible` | 503, en clair | jeton d'attestation pas encore obtenu du lanceur, ou instance qui refuse de servir (`version_importee`, `configuration_refusee`), à toute route |
 | `message_refuse` | 400 | route inconnue, corps mal formé, champ manquant ou inconnu, valeur hors contrat, longueur fausse, chaîne hors NFC, corps trop grand, signature `cleVie` invalide |
 | `jeton_invalide` | 401 | `idToken` ou jeton OIDC refusé |
 | `code_refuse` | 403 | code d'accès refusé, quel que soit le motif (`details.essaisRestants`) |

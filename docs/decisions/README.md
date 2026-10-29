@@ -17,7 +17,7 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0007](0007-depot-public-separe.md) | Un dépôt public séparé du client | 2026-10-12 · revue depuis 0014 |
 | [0008](0008-lettre-et-identite-dans-sesame.md) | Lettre au proche sans téléphone ni email et vérification d'identité menées par Sésame | 2026-10-12 · revue depuis 0027, 0036 |
 | [0009](0009-cle-de-release-sur-cle-materielle.md) | Une clé de release sur clé matérielle au départ, nombre de signatures gravé dans les clients | 2026-10-12 · revue depuis 0014 |
-| [0010](0010-fournisseurs-nommes-dans-le-code.md) | Fournisseurs nommés dans le code, réglages du client en variables attestées, clés d'API dans Secret Manager | 2026-10-12 · revue depuis 0014, 0023, 0028, 0029 |
+| [0010](0010-fournisseurs-nommes-dans-le-code.md) | Fournisseurs nommés dans le code, réglages du client en variables attestées, clés d'API dans Secret Manager | 2026-10-12 · revue depuis 0014, 0023, 0028, 0029, 0058 |
 | [0011](0011-go-binaire-statique-distroless.md) | Go, binaire statique, image distroless, scripts gcloud ; ordre de construction | 2026-10-12 · revue depuis 0015, 0016 |
 | [0012](0012-canaux-d-envoi-non-croises.md) | Canaux d'envoi non croisés : un fournisseur piraté peut ouvrir après un décès vérifié | 2026-10-12 · revue depuis 0013 |
 | [0013](0013-canaux-d-envoi-croises.md) | Canaux d'envoi croisés : code d'accès par email, dernier code par SMS | 2026-10-22 |
@@ -40,7 +40,7 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0030](0030-preuve-des-signalements-insee.md) | Preuve des signalements de la source `insee` | 2026-10-27 |
 | [0031](0031-refus-du-role-sans-invalider-la-charte.md) | Refus du rôle depuis le portail sans invalider la charte | 2026-10-27 |
 | [0032](0032-chemin-du-depot-d-images-hors-de-la-liste.md) | Chemin du dépôt d'images hors de la liste des versions | 2026-10-27 |
-| [0033](0033-textes-du-client-attestes-par-leur-empreinte.md) | Textes du client réglés au lancement, attestés par leur empreinte | 2026-10-27 |
+| [0033](0033-textes-du-client-attestes-par-leur-empreinte.md) | Textes du client réglés au lancement, attestés par leur empreinte | 2026-10-27 · revue depuis 0058 |
 | [0034](0034-lettre-de-secours-pour-un-seul-canal.md) | Lettre de secours pour un proche joint par un seul canal | 2026-10-28 |
 | [0035](0035-ce-qu-expose-une-faille-de-l-enclave.md) | Ce qu'expose une faille de l'enclave, écrit sans promesse de plus | 2026-10-28 |
 | [0036](0036-code-d-invitation-scelle-au-registre.md) | Code d'invitation des lettres scellé au registre par Sésame | 2026-10-28 · revue depuis 0041 |
@@ -64,4 +64,5 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0054](0054-essai-decompte-sans-recopie-signale.md) | Un essai décompté dont la recopie échoue est signalé ; un retrait d'urgence ne décompte aucun essai | 2026-10-28 |
 | [0055](0055-amorcage-par-place-et-pairs-derives-du-nom.md) | Amorçage d'une grappe sur trois places, quelle que soit la zone ; pairs dérivés du nom de la VM | 2026-10-28 · revue depuis 0057 |
 | [0056](0056-ordre-des-controles-et-precisions-de-la-grappe.md) | Ligne lue avant la signature `cleVie` ; `grappePin` non défait ; rythme des admissions et des alertes | 2026-10-29 |
-| [0057](0057-place-inscrite-et-instance-qui-refuse-de-servir.md) | Place de chaque membre inscrite dans l'état répliqué ; instance qui refuse de servir ; contrôles avant `grappePin` | 2026-10-29 |
+| [0057](0057-place-inscrite-et-instance-qui-refuse-de-servir.md) | Place de chaque membre inscrite dans l'état répliqué ; instance qui refuse de servir ; contrôles avant `grappePin` | 2026-10-29 · revue depuis 0058 |
+| [0058](0058-aucun-refus-au-demarrage-ne-fait-sortir-le-processus.md) | Aucun refus au démarrage ne fait sortir le processus ; ligne relue avant une ouverture ; premier dépôt du PIN | 2026-10-29 |
