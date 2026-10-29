@@ -66,3 +66,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0056](0056-ordre-des-controles-et-precisions-de-la-grappe.md) | Ligne lue avant la signature `cleVie` ; `grappePin` non défait ; rythme des admissions et des alertes | 2026-10-29 |
 | [0057](0057-place-inscrite-et-instance-qui-refuse-de-servir.md) | Place de chaque membre inscrite dans l'état répliqué ; instance qui refuse de servir ; contrôles avant `grappePin` | 2026-10-29 · revue depuis 0058 |
 | [0058](0058-aucun-refus-au-demarrage-ne-fait-sortir-le-processus.md) | Aucun refus au démarrage ne fait sortir le processus ; ligne relue avant une ouverture ; premier dépôt du PIN | 2026-10-29 |
+| [0059](0059-lectures-locales-jeton-federe-et-fenetre-de-rotation.md) | État du PIN lu sur la copie locale ; jeton fédéré gardé jusqu'à son expiration ; fenêtre d'une rotation interrompue | 2026-10-29 |

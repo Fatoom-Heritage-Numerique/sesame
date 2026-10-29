@@ -248,6 +248,8 @@ Sans preuve de la `cleVie` que porte le marqueur, une ligne absente n'est jamais
    - ni ligne ni marqueur : une preuve présente doit se vérifier avec la `cleViePub` reçue, sinon `message_refuse`.
 7. Génération, sur une ligne présente : inférieure ⇒ `generation_non_croissante` ; égale avec une `cleViePub` reçue différente de l'inscrite ⇒ `message_refuse`.
 
+Les limites d'appels (`trop_d_appels`) se placent comme sur une route signée par `cleVie` (§6) : la limite par IP juste après le contrôle 2, la limite par `uid` juste après le contrôle 6, une fois l'appel authentifié autant que la route l'exige (`idToken`, et preuve quand elle est exigée, premier enrôlement sans preuve compris).
+
 **Erreurs** : `jeton_invalide` (401) ; `preuve_requise` (403 ; contrôle 6, ligne présente ou reprise) ; `defi_invalide` (409) ; `generation_non_croissante` (409) ; `reprise_absente` (409 ; `cleViePubAttendue` hors d'une reprise publiée) ; `message_refuse` (400 ; contrôles 1, 4, 6 et 7) ; `titulaire_indisponible` (409 ; contrôles 3 et 6) ; `registre_indisponible` (503 ; registre ou bucket des marqueurs illisible : aucun premier enrôlement).
 
 ### 2.4 `vie`
