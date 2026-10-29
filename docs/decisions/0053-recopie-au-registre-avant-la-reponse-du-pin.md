@@ -2,7 +2,7 @@
 
 # 0053 · L'état du PIN est recopié au registre avant la réponse ; sans KMS, ni dépôt ni évaluation
 
-**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau)
+**Date** : 2026-10-28 · **Statut** : actée (prise sur consigne de l'opérateur : l'option qui complexifie le moins le système, sans mécanisme nouveau) · **revue depuis** ([0054](0054-essai-decompte-sans-recopie-signale.md))
 
 ## Contexte et menace
 

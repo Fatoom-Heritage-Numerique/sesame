@@ -14,7 +14,7 @@ Les limites de débit du §7 sont des valeurs initiales, révisables avec les te
 
 - Sésame est joint à l'adresse publique de l'instance (pour Fatoom : `https://sesame.fatoom.fr`). TLS est terminé par le répartiteur de charge, hors de l'enclave : il ne protège rien à lui seul.
 - Sésame tourne sur trois VM, une par zone. `GET /attestation` est servie sans préfixe, par n'importe quelle VM de la version servie, hors canal ; pendant le passage d'une version à la suivante, le répartiteur sert l'ancienne jusqu'au basculement des trois préfixes (`ARCHITECTURE.md`). Elle renvoie l'`instanceId` de la VM, dont le client déduit le préfixe de la VM (`a`, `b` ou `c`, §1.2) ; il n'y a pas de champ `zone`.
-- Toute autre route passe par le **canal chiffré** d'`ARCHITECTURE.md`, à **un seul chemin** : `POST /n/{a|b|c}/canal`, adressé à la VM dont le client a vérifié l'attestation. Le nom de la route est dans le corps chiffré : le répartiteur, que l'administrateur règle, ne distingue pas une annulation d'une ouverture par un proche.
+- Toute autre route passe par le **canal chiffré** d'`ARCHITECTURE.md`, à **un seul chemin** : `POST /n/{a|b|c}/canal`, adressé à la VM dont le client a vérifié l'attestation. Le nom de la route est dans le corps chiffré : le répartiteur, que l'administrateur règle, ne distingue pas une annulation d'une ouverture par un proche. Ailleurs, une notation comme `POST /vie` ou `/etat` désigne la route `vie` ou `etat` sur ce chemin unique, jamais un chemin HTTP à servir.
 - Le canal est hybride X25519 + ML-KEM-768, avec une clé par sens (`K_req` pour les requêtes, `K_res` pour les réponses), dérivées comme le décrit `ARCHITECTURE.md`. Les messages du canal sont décrits au §1.2.
 - Requêtes et réponses sont en `Content-Type: application/json; charset=utf-8` ; toute réponse porte `Cache-Control: no-store`.
 - Le portail appelle Sésame depuis une autre origine. Toute réponse porte `Access-Control-Allow-Origin: *` ; une requête `OPTIONS` sur `/attestation` ou `/n/{a|b|c}/canal` reçoit `204` avec `Access-Control-Allow-Methods: GET, POST`, `Access-Control-Allow-Headers: Content-Type` et `Access-Control-Max-Age: 86400`. Sésame ne lit ni cookie ni en-tête d'authentification : l'origine ne protège rien, le canal protège tout.
@@ -181,7 +181,7 @@ Le client vérifie chaque claim du jeton (§3) et que `eat_nonce` contient deux 
 
 **Réponse `200`** : `{"defi": "<base64, 32 octets>", "expireLe": "<ISO>", "grappeId": "<hex, 64 caractères>" | null}`
 
-`grappeId` identifie la grappe du protocole de PIN en service : l'app en a besoin pour signer un dépôt (§2.12), y compris à la création du coffre, où aucune évaluation ne précède. Une VM sans grappe (`ARCHITECTURE.md`) répond `grappeId: null` : aucun dépôt n'est possible par elle.
+`grappeId` identifie la grappe du protocole de PIN en service : l'app en a besoin pour signer un dépôt (§2.12), y compris à la création du coffre, où aucune évaluation ne précède. Une VM sans grappe (`ARCHITECTURE.md`) répond `grappeId: null` : aucun dépôt n'est possible par elle, et l'app reprend à `GET /attestation`, sur un nouveau canal, comme après `pin_indisponible_temporaire`.
 
 **Erreurs** : seulement les erreurs communes.
 
@@ -470,7 +470,7 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Corps** : `{"uid": "<uid>", "idToken": "<jeton d'identité>", "elementAveugle": "<base64, 32 octets>"}`
 
-**Traitement** : le leader de la grappe lit la ligne du registre, puis **décompte un essai**, validé par la majorité et recopié dans la ligne du registre (`pinEvaluations`, `pinBloqueLe`), **avant** d'évaluer. Recopie impossible (registre illisible, transaction en conflit, KMS ou STS indisponible, dont tout retrait d'urgence) ⇒ `pin_indisponible_temporaire`, sans évaluation ni alerte : l'essai reste décompté, et la recopie suivante, qui écrit le compteur entier, le rattrape. Délai croissant entre essais : aucun pour les 3 premiers, puis 1 min, 5 min, 15 min, 1 h, 4 h, 12 h, 24 h. Le délai dépend du seul rang de l'essai depuis la dernière remise à 10 (premier dépôt, `nouveau_pin`, `ouverture`) et se compte depuis l'essai décompté précédent ; un `redepot` ne le change pas. Le 10ᵉ essai est décompté comme les autres, mais il n'est pas évalué : `essaisRestants` tombe à 0 et `cleOprf` est effacée dans la même entrée validée par la majorité, **avant** toute évaluation, et la réponse est `pin_bloque`, sans évaluation. L'app ne reçoit donc rien qui ouvre la copie serveur de la KMU : un 10ᵉ PIN, même juste, n'ouvre pas, et seul le code de récupération reste possible (R-PIN-02). Sésame alerte le titulaire à chaque essai décompté (au plus un message par heure). Sésame ne sait jamais si le PIN est juste : il n'existe pas de `pin_refuse`. Sésame note sur le canal la dernière évaluation, pour un dépôt `ouverture` (§2.12).
+**Traitement** : le leader de la grappe lit la ligne du registre, puis **décompte un essai**, validé par la majorité et recopié dans la ligne du registre (`pinEvaluations`, `pinBloqueLe`), **avant** d'évaluer. Recopie impossible (registre illisible, transaction en conflit, KMS ou STS indisponible entre la lecture de la ligne et la recopie) ⇒ `pin_indisponible_temporaire`, sans évaluation : l'essai reste décompté, comme celui d'un leader qui tombe entre la validation et sa réponse, et il est signalé comme tout essai décompté ; la recopie suivante, qui écrit le compteur entier, le rattrape. Pendant un retrait d'urgence, la lecture de la ligne échoue déjà (échange STS refusé) : aucun essai n'est décompté. Délai croissant entre essais : aucun pour les 3 premiers, puis 1 min, 5 min, 15 min, 1 h, 4 h, 12 h, 24 h. Le délai dépend du seul rang de l'essai depuis la dernière remise à 10 (premier dépôt, `nouveau_pin`, `ouverture`) et se compte depuis l'essai décompté précédent ; un `redepot` ne le change pas. Le 10ᵉ essai est décompté comme les autres, mais il n'est pas évalué : `essaisRestants` tombe à 0 et `cleOprf` est effacée dans la même entrée validée par la majorité, **avant** toute évaluation, et la réponse est `pin_bloque`, sans évaluation. L'app ne reçoit donc rien qui ouvre la copie serveur de la KMU : un 10ᵉ PIN, même juste, n'ouvre pas, et seul le code de récupération reste possible (R-PIN-02). Sésame alerte le titulaire à chaque essai décompté (au plus un message par heure). Sésame ne sait jamais si le PIN est juste : il n'existe pas de `pin_refuse`. Sésame note sur le canal la dernière évaluation, pour un dépôt `ouverture` (§2.12).
 
 **Réponse `200`**, du 1ᵉʳ au 9ᵉ essai : `{"evaluation": "<base64, 32 octets>"}`, sans nombre d'essais restants.
 
@@ -557,11 +557,11 @@ Un dépôt dans une autre grappe que celle de la ligne n'est admis que 30 jours 
 
 **Corps** : `{"sessionId": "<id>"}`
 
-**Traitement** : Sésame relit la session Stripe. `verified` et prénom, nom et date de naissance conformes aux champs d'identité de la charte gardés dans l'état de la session (§2.14 ; comparaison tolérante) : `essaisIdentite` remis à zéro, `identiteVerifieeLe` inscrit dans `lettres/{contactId}` (parcours « courrier »), puis comme au §2.15 (ouverture inscrite, jeton, `ouvertureNotifiee`). Sinon : `essaisIdentite + 1` dans le document d'identité du proche (`titulaires/{uid}/identites/{contactId}`, `ARCHITECTURE.md`), `identiteEchouee` au client, blocage de 24 h au 3ᵉ échec (`bloqueJusquau`). Dès le verdict (`verified` ou `requires_input`), Sésame demande à Stripe la suppression de la pièce et du selfie (R-COMPTE-20 ; nouvel essai et échec : `ARCHITECTURE.md`).
+**Traitement** : Sésame relit la session Stripe. `verified` et prénom, nom et date de naissance conformes aux champs d'identité de la charte gardés dans l'état de la session (§2.14 ; comparaison tolérante) : `essaisIdentite` remis à zéro, `identiteVerifieeLe` inscrit dans `lettres/{contactId}` (parcours « courrier »), puis comme au §2.15 (ouverture inscrite, jeton, `ouvertureNotifiee`). Sinon : `essaisIdentite + 1` dans le document d'identité du proche (`titulaires/{uid}/identites/{contactId}`, `ARCHITECTURE.md`), `identiteEchouee` au client, blocage de 24 h au 3ᵉ échec (`bloqueJusquau`) ; un échec dont l'écriture échoue reçoit `registre_indisponible`, jamais `identite_non_confirmee`, comme un code faux. Dès le verdict (`verified` ou `requires_input`), Sésame demande à Stripe la suppression de la pièce et du selfie (R-COMPTE-20 ; nouvel essai et échec : `ARCHITECTURE.md`).
 
 **Réponse `200`** : comme au §2.15.
 
-**Erreurs** : `identite_non_confirmee` (403 ; identité non conforme ou `requires_input` ; message neutre) ; `identite_bloquee` (423 ; 3ᵉ échec, `details.reessayerLe`) ; `identite_en_attente` (409 ; Stripe n'a pas fini : le portail réessaie) ; `reessayer_plus_tard` (503 ; contrôle anti-retour, sans décompte) ; `session_expiree` (410) ; `canal_invalide` (400, en clair) ; `fournisseur_indisponible` (503).
+**Erreurs** : `identite_non_confirmee` (403 ; identité non conforme ou `requires_input` ; message neutre) ; `identite_bloquee` (423 ; 3ᵉ échec, `details.reessayerLe`) ; `identite_en_attente` (409 ; Stripe n'a pas fini : le portail réessaie) ; `reessayer_plus_tard` (503 ; contrôle anti-retour, sans décompte) ; `registre_indisponible` (503 ; écriture de l'échec impossible) ; `session_expiree` (410) ; `canal_invalide` (400, en clair) ; `fournisseur_indisponible` (503).
 
 ### 2.18 `session/identite/bascule`
 
@@ -719,7 +719,7 @@ Route du canal du §1.2 : `POST /n/{a|b|c}/canal`, `{"route": "grappe/membres", 
 
 Commandé par l'exploitant après le remplacement des trois VM (nouvelle version, effacement total) ; procédure et raisons : `ARCHITECTURE.md`. Conçu au lot 1 bis avec le prototype Raft, écrit ici avant d'être servi.
 
-**Configuration initiale**, identique pour les trois VM, en JSON canonique, `membres` triés par `zone`, exactement trois éléments :
+**Configuration initiale**, identique pour les trois VM, en JSON canonique, `membres` triés par `zone` puis par `nodeId`, exactement trois éléments :
 
 ```json
 {"v": 1, "imageDigest": "sha256:<hex, 64 caractères>",
@@ -732,7 +732,7 @@ Commandé par l'exploitant après le remplacement des trois VM (nouvelle version
 
 | | |
 |---|---|
-| Appelant | l'exploitant, après avoir remplacé les trois VM, une par zone |
+| Appelant | l'exploitant, après avoir remplacé les trois VM, une par place (`-a`, `-b`, `-c`), dans les zones de l'option en service |
 | Authentification | `jetonExploitation` (§1.4), en plus du canal (§1.2) ; la route n'agit que sur trois VM sans grappe et ne donne ni état, ni essai, ni clé |
 | Limite | 2 / min par IP |
 
@@ -740,11 +740,11 @@ Route du canal du §1.2 : `POST /n/{a|b|c}/canal`, `{"route": "grappe/amorcer", 
 
 **Corps** : `{"jetonExploitation": "<OIDC>"}`
 
-**Traitement** : servie seulement par une VM qui n'est dans aucune grappe et n'a réservé aucune configuration. Elle joint les deux autres VM à leur adresse DNS interne zonale sur le canal entre VM et vérifie leur jeton de paire (contrôles entre VM du §3 : même `image_digest`, `hwmodel` admis) ; elle exige exactement trois VM, une par zone, aucune dans une grappe. Elle compose la configuration initiale, la fait réserver par les deux autres (`grappe/preparer`), puis ordonne leur démarrage (`grappe/demarrer`) et démarre la dernière. Les trois démarrent Raft en état `new`, les trois membres votants, avec la même configuration initiale. La grappe neuve est publiée dans la borne de chaque VM (`grappe`, `ARCHITECTURE.md`) ; l'amorçage est journalisé (`grappe_amorcee`, avec l'`email` du jeton).
+**Traitement** : servie seulement par une VM qui n'est dans aucune grappe et n'a réservé aucune configuration. Elle joint les deux autres VM à leur adresse DNS interne zonale sur le canal entre VM et vérifie leur jeton de paire (contrôles entre VM du §3 : même `image_digest`, `hwmodel` admis) ; elle exige exactement trois VM, une par place : les deux autres portent les noms dérivés du sien (même radical, autre dernière lettre), aucune dans une grappe ; leur zone n'est pas contrôlée, elle est inscrite dans la configuration. Elle compose la configuration initiale, la fait réserver par les deux autres (`grappe/preparer`), puis ordonne leur démarrage (`grappe/demarrer`) et démarre la dernière. Les trois démarrent Raft en état `new`, les trois membres votants, avec la même configuration initiale. La grappe neuve est publiée dans la borne de chaque VM (`grappe`, `ARCHITECTURE.md`) ; l'amorçage est journalisé (`grappe_amorcee`, avec l'`email` du jeton).
 
 **Réponse `200`**, une fois une première entrée validée par la majorité de la grappe neuve : `{"grappeId": "<hex, 64 caractères>", "votants": 3}`
 
-**Erreurs** : `jeton_invalide` (401) ; `amorcage_refuse` (409 ; VM déjà dans une grappe ou configuration réservée, autre VM injoignable, déjà dans une grappe ou d'une autre empreinte, attestation refusée, deux VM dans une même zone, réservation refusée) ; `pin_indisponible_temporaire` (503 ; grappe démarrée sans majorité dans le délai de réservation : elle reste en pause) ; `trop_d_appels` (429).
+**Erreurs** : `jeton_invalide` (401) ; `amorcage_refuse` (409 ; VM déjà dans une grappe ou configuration réservée, autre VM injoignable, déjà dans une grappe ou d'une autre empreinte, attestation refusée, réservation refusée) ; `pin_indisponible_temporaire` (503 ; grappe démarrée sans majorité dans le délai de réservation : elle reste en pause) ; `trop_d_appels` (429).
 
 #### `grappe/preparer`
 
@@ -896,7 +896,7 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 | `trop_d_appels` | 429 | limite d'une route dépassée (`details.reessayerLe`) ; en clair pour `GET /attestation` |
 | `pin_indisponible_temporaire` | 503 | pas de majorité, registre illisible, recopie au registre impossible (§2.12, §2.13), transaction refusée, mémoire pleine |
 | `reessayer_plus_tard` | 503 | le contrôle anti-retour global refuse d'ouvrir, de transmettre ou de changer de grappe (`ARCHITECTURE.md`) ; aucun détail, aucun essai décompté |
-| `registre_indisponible` | 503 | registre ou bucket des marqueurs illisible ; code faux d'un proche que le registre n'a pas inscrit |
+| `registre_indisponible` | 503 | registre ou bucket des marqueurs illisible ; code faux d'un proche, ou échec de sa vérification d'identité, que le registre n'a pas inscrit |
 | `passerelle_indisponible` | 503 | la passerelle ne répond pas ou répond hors contrat |
 | `fournisseur_indisponible` | 503 | Twilio, SendGrid, Stripe ou le prestataire d'impression en échec |
 | `enveloppe_refusee` | — | par enveloppe, dans `refusees` : aad étranger, tag invalide, contenu non ouvrable |
@@ -904,6 +904,8 @@ Il n'existe pas de notification `echeanceModifiee` : l'échéance d'un signaleme
 Sauf les trois premiers et `trop_d_appels` sur `GET /attestation`, le statut est celui du corps chiffré (§1.3) ; la réponse HTTP est `200`.
 
 Un appel à KMS (`Decrypt`, `AsymmetricSign`) ou un échange STS refusé ou sans réponse (panne, propagation de l'IAM, retrait d'urgence) reçoit `registre_indisponible`, et `pin_indisponible_temporaire` sur les routes du PIN ; rien n'est inscrit.
+
+**Ordre des contrôles hors `enroler`** (dont l'ordre est fixé au §2.3) : quand plusieurs erreurs s'appliquent, la réponse porte celle de la première étape qui échoue, dans cet ordre : (1) canal et forme du corps (`canal_invalide`, `message_refuse`) ; (2) authentification : `idToken`, jeton OIDC, jeton de session, signature (`jeton_invalide`, `session_expiree`, `message_refuse`) ; (3) limite d'appels (`trop_d_appels`) ; (4) défi (`defi_invalide`) ; (5) lecture de la ligne du registre et de son contrôle de fraîcheur (`registre_indisponible` ou `pin_indisponible_temporaire` ; ligne absente, rejetée ou `supprime` : le code de la route) ; (6) contrôle anti-retour, quand la route l'exige (`reessayer_plus_tard`) ; (7) les autres erreurs de la route, dans l'ordre de sa liste « Erreurs » ; (8) majorité de la grappe, mémoire et recopie au registre (`pin_indisponible_temporaire`) ; sans leader joignable, les étapes qui lisent l'état de la grappe ne se font pas, et la réponse est `pin_indisponible_temporaire`. Exemple : un `redepot` au plafond dans une grappe récente reçoit `pin_bloque`, listé avant `grappe_recente`.
 
 ## 7. Limites
 
