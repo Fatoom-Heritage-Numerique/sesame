@@ -138,34 +138,23 @@ func LessUTF16(a, b string) bool {
 	return len(ua) < len(ub)
 }
 
+// escapes sont les échappements courts de la RFC 8785, §3.2.2.2 ; les autres
+// caractères de contrôle s'écrivent \u00hh en minuscules, le reste tel quel.
+var escapes = map[byte]string{'\b': `\b`, '\t': `\t`, '\n': `\n`, '\f': `\f`, '\r': `\r`, '"': `\"`, '\\': `\\`}
+
 func encodeString(b *bytes.Buffer, s string) error {
 	if !IsNFC(s) {
 		return ErrInvalid
 	}
 	b.WriteByte('"')
 	for i := 0; i < len(s); i++ {
-		switch c := s[i]; c {
-		case '\b':
-			b.WriteString(`\b`)
-		case '\t':
-			b.WriteString(`\t`)
-		case '\n':
-			b.WriteString(`\n`)
-		case '\f':
-			b.WriteString(`\f`)
-		case '\r':
-			b.WriteString(`\r`)
-		case '"':
-			b.WriteString(`\"`)
-		case '\\':
-			b.WriteString(`\\`)
-		default:
-			if c < 0x20 {
-				b.WriteString(`\u00`)
-				b.WriteString(strconv.FormatUint(uint64(c)>>4, 16) + strconv.FormatUint(uint64(c)&0xf, 16))
-			} else {
-				b.WriteByte(c)
-			}
+		c := s[i]
+		if e, ok := escapes[c]; ok {
+			b.WriteString(e)
+		} else if c < 0x20 {
+			b.WriteString(`\u00` + strconv.FormatUint(uint64(c)>>4, 16) + strconv.FormatUint(uint64(c)&0xf, 16))
+		} else {
+			b.WriteByte(c)
 		}
 	}
 	b.WriteByte('"')
