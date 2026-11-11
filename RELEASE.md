@@ -142,7 +142,7 @@ Les contrôles de l'étape 2 (contrat exécutable) tournent sur chaque PR et sur
 | Image | un shell ; une étiquette `tee.launch_policy.*` d'`ARCHITECTURE.md` §2.1 absente ou différente ; image de base non épinglée par digest | 2 |
 | Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` ; un paquet lié par `cmd/sesame` hors de la bibliothèque standard et des modules d'`ARCHITECTURE.md` §2.4, modules transitifs compris | 2 |
 | OpenAPI | `api/openapi.json` diffère des routes que sert `sesame-fake`, une requête ou une réponse des tests des routes sort de son schéma, ou les routes et codes d'`API.md` diffèrent de l'OpenAPI (décision 0064) | 2 |
-| Noms de ressources | un `gs://`, un chemin `-docker.pkg.dev/`, une adresse `.iam.gserviceaccount.com`, un chemin `projects/…`, un hôte `run.app` ou un nombre de 12 chiffres d'un fichier suivi hors de la forme `<…>` de `CONTRIBUTING.md` ; les noms réels sont cherchés par la CI du client (décision 0065) | 2 |
+| Noms de ressources | un `gs://`, un chemin `-docker.pkg.dev/`, une adresse `.iam.gserviceaccount.com`, un chemin `projects/…`, un hôte `run.app` ou un nombre de 12 chiffres d'un fichier suivi hors de la forme `<…>` de `CONTRIBUTING.md`, hors des copies de vecteurs que nomme `SHA256SUMS` (`outils/controle-noms`, décision 0066) ; les noms réels sont cherchés par la CI du client, copies de vecteurs comprises (décision 0065) | 2 |
 | Image de `sesame-fake` (sur `main`) | la construction ou la publication de l'image échoue (décision 0063) | 2 |
 | `versions.json` | le fichier n'est pas conforme à son schéma | 6 |
 | `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) | 6 |
