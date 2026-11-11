@@ -141,12 +141,12 @@ Toutes les limites, adversaire par adversaire : `THREAT_MODEL.md` §2.
 
 ## État du projet
 
-Sésame est **en construction**. Ce dépôt ne contient encore que sa documentation : ni code, ni scripts de `build/`, ni `versions.json` ; aucune version n'est publiée et aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
+Sésame est **en construction**. Ce dépôt contient sa documentation et le début du contrat exécutable : vecteurs de test recopiés depuis le client, `Dockerfile`, `build/reproduire.sh`, et la CI de ses contrôles. Il ne contient encore ni le code de Sésame, ni `sesame-fake`, ni `versions.json` ; aucune version n'est publiée et aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
 
 Ordre de construction :
 
-1. **Documentation** : ce dépôt tel que vous le lisez (en cours).
-2. **Contrat exécutable** : OpenAPI, vecteurs de test partagés avec les clients, `sesame-fake` (un double local de Sésame pour développer l'app, le portail et la passerelle sans enclave, qui tourne en trois exemplaires pour la grappe du protocole de PIN), `Dockerfile` et `build/reproduire.sh`.
+1. **Documentation** : ce dépôt tel que vous le lisez.
+2. **Contrat exécutable** (en cours) : OpenAPI, vecteurs de test partagés avec les clients, `sesame-fake` (un double local de Sésame pour développer l'app, le portail et la passerelle sans enclave, qui tourne en trois exemplaires pour la grappe du protocole de PIN), `Dockerfile` et `build/reproduire.sh`.
 3. **Cœur** : attestation, canal chiffré, KMS, registre, protocoles, grappe du protocole de PIN dans l'enclave (son code, consensus compris, est écrit et testé dès l'étape 2, dans `sesame-fake`).
 4. **Fournisseurs** : SMS et email, alertes, vérification d'identité, lettre.
 5. **Infrastructure** : scripts `gcloud` du projet, du trousseau, du pool d'identités, des machines, du bucket d'audit ; `build/verifier-attestation.sh` et `build/verifier-journaux.sh`.

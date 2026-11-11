@@ -27,23 +27,36 @@ La prose est en **français** : documents, commentaires, messages de commit, des
 
 ## Outils et commandes
 
-Go est celui de `go.mod` (`go` et `toolchain`, dernière version stable) ; `GOTOOLCHAIN` le télécharge au besoin. Avant de pousser, à la racine du dépôt :
+Go est celui de la ligne `go` de `go.mod` (dernière version stable ; Go refuse une ligne `toolchain` qui la répète) ; `GOTOOLCHAIN` le télécharge au besoin. Avant de pousser, à la racine du dépôt :
 
 ```bash
 gofmt -l .                                   # n'affiche rien
 go vet ./...
-go test -race ./...                          # routes, grappe sur réseau simulé, vecteurs, OpenAPI
+go test -race ./...                          # vecteurs (forme, SHA256SUMS, couverture), outils
 go mod verify
-go run golang.org/x/vuln/cmd/govulncheck@<version épinglée par la CI> ./...
+go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...   # version épinglée par la CI
 (cd testdata/vecteurs && sha256sum -c SHA256SUMS)
-go run ./outils/generer-compteurpin -verifier
-go run ./outils/decompte-lignes             # plafond de 6 000 lignes
-docker compose -f build/grappe.compose.yaml up --abort-on-container-exit   # grappe sur trois conteneurs, Toxiproxy
+go run ./outils/decompte-lignes             # plafond de 6 000 lignes (-detail : par paquet)
+go run ./outils/controle-lanceur            # SESAME_FAKE_LAUNCHER lu seulement dans internal/factice/
+go run ./outils/controle-dependances        # paquets liés par cmd/sesame : liste d'ARCHITECTURE.md §2.4
+go run ./outils/controle-noms               # noms de ressources sous la forme <…> (décision 0066)
+go run ./outils/controle-image              # images de base du Dockerfile épinglées par digest
 ./build/reproduire.sh                        # image de cmd/sesame, sha256:<empreinte>
+SORTIE_OCI=image.tar ./build/reproduire.sh && go run ./outils/controle-image -oci image.tar   # image sans shell, étiquettes
 ```
 
-- `sesame-fake` en local : `go run ./cmd/sesame-fake -config <fichier>` (mode grappe locale ou instance, décision 0063).
-- La CI lance les mêmes commandes, plus la double construction sur deux exécuteurs et les contrôles de `RELEASE.md` §8 ; ses actions GitHub sont épinglées par l'empreinte de leur commit, la version en commentaire (décision 0065).
+Arrivent avec leur code, à la même étape :
+
+```bash
+go run ./outils/generer-compteurpin -verifier
+docker compose -f build/grappe.compose.yaml up --abort-on-container-exit   # grappe sur trois conteneurs, Toxiproxy
+go run ./cmd/sesame-fake -config <fichier>   # sesame-fake en local, mode grappe locale ou instance (décision 0063)
+```
+
+- `govulncheck` se lance avec le Go de `go.mod` (`GOTOOLCHAIN=go<version de go.mod>` si le Go local est plus ancien) : construit avec un Go plus ancien, il refuse les paquets du module.
+- `build/reproduire.sh` demande `docker` avec `buildx`, et `git` ; il construit le commit courant, pas les fichiers modifiés.
+- La CI (`.github/workflows/ci.yml`) lance ces commandes sur chaque PR et sur `main`, plus la double construction sur deux exécuteurs et le contrôle de l'image construite (`RELEASE.md` §8) ; ses actions GitHub sont épinglées par l'empreinte de leur commit, la version en commentaire (décision 0065).
+- Un test qui rejoue des vecteurs réclame ses groupes par `vecteurs.Track` (`internal/vecteurs`) et retire ces groupes de la liste `pending` de `internal/vecteurs/couverture_test.go` ; un groupe qu'aucun test ne réclame et qui n'est pas dans cette liste fait échouer la suite.
 - `compteurPin.json` ne s'écrit que par `go run ./outils/generer-compteurpin` ; les copies de `testdata/vecteurs/` que par une recopie depuis le client (« Formats et vecteurs »).
 
 ## Formats et vecteurs
