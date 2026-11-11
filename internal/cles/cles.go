@@ -272,5 +272,11 @@ func DrawCode(random []byte) (string, error) {
 	return string(b), nil
 }
 
-// DisplayCode rend un code normalisé sous la forme affichée XXXX-XXXX-XXXX.
-func DisplayCode(code string) string { return code[:4] + "-" + code[4:8] + "-" + code[8:] }
+// DisplayCode rend un code normalisé sous la forme affichée XXXX-XXXX-XXXX
+// (vide pour une chaîne qui n'a pas 12 caractères).
+func DisplayCode(code string) string {
+	if len(code) != 12 {
+		return ""
+	}
+	return code[:4] + "-" + code[4:8] + "-" + code[8:]
+}

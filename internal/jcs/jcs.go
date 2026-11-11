@@ -98,7 +98,7 @@ func encode(b *bytes.Buffer, v any) error {
 		for k := range v {
 			keys = append(keys, k)
 		}
-		sort.Slice(keys, func(i, j int) bool { return lessUTF16(keys[i], keys[j]) })
+		sort.Slice(keys, func(i, j int) bool { return LessUTF16(keys[i], keys[j]) })
 		b.WriteByte('{')
 		for i, k := range keys {
 			if i > 0 {
@@ -127,8 +127,8 @@ func encodeInt(b *bytes.Buffer, i int64) error {
 	return nil
 }
 
-// lessUTF16 compare deux chaînes par unités UTF-16 (RFC 8785, §3.2.3).
-func lessUTF16(a, b string) bool {
+// LessUTF16 compare deux chaînes par unités UTF-16 (RFC 8785, §3.2.3).
+func LessUTF16(a, b string) bool {
 	ua, ub := utf16.Encode([]rune(a)), utf16.Encode([]rune(b))
 	for i := 0; i < len(ua) && i < len(ub); i++ {
 		if ua[i] != ub[i] {
