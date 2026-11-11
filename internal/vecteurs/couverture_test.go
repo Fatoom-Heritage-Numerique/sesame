@@ -22,10 +22,7 @@ import (
 var pending = map[string][]string{
 	"attestation.json": {"attestation", "listeVersions"},
 	"primitives.json": {
-		"aesGcmChiffrer", "aesGcmDechiffrer", "aleatoire", "argon2id",
-		"ecdsaP256Verifier", "ed25519Publique", "ed25519Signer", "ed25519Verifier",
-		"hkdfSha256", "hmacSha256", "mlKem768Decapsuler", "mlKem768Encapsuler",
-		"rsaPkcs1Sha256Verifier", "sha256", "x25519", "x25519Paire", "x25519Publique",
+		"argon2id",
 	},
 	"sesame.json": {
 		"annulation", "antiRetour", "borne", "canal", "canalReponse", "canalRequete",

@@ -9,18 +9,18 @@ package jcs
 
 import (
 	"bytes"
-	"errors"
 	"math"
 	"sort"
 	"strconv"
 	"strings"
 	"unicode/utf16"
 	"unicode/utf8"
+
+	"github.com/Fatoom-Heritage-Numerique/sesame/internal/primitives"
 )
 
-// ErrInvalid est le refus de toute valeur ou de tout texte hors forme
-// (parametres_invalides des vecteurs).
-var ErrInvalid = errors.New("parametres_invalides")
+// ErrInvalid est le refus de toute valeur ou de tout texte hors forme.
+const ErrInvalid = primitives.ErrInvalid
 
 // Object est un objet JSON ; Array, un tableau. Les autres valeurs sont nil,
 // bool, string, float64 et les entiers Go (int, int64, uint32), bornés à
