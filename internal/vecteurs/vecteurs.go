@@ -15,6 +15,7 @@ package vecteurs
 
 import (
 	"bytes"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -263,5 +264,46 @@ func (tr *Tracker) Refusals(t *testing.T, op string, replay func(t *testing.T, r
 		if !skipped {
 			tr.mark("refus/" + r.Name)
 		}
+	}
+}
+
+// Hex est un champ d'octets écrit en hexadécimal minuscule.
+type Hex []byte
+
+// UnmarshalJSON lit l'hexadécimal minuscule d'une chaîne JSON.
+func (h *Hex) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	if strings.ToLower(s) != s {
+		return errors.New("hexadécimal en majuscules")
+	}
+	v, err := hex.DecodeString(s)
+	*h = v
+	return err
+}
+
+// Load lit des entrées ou des sorties JSON dans dst, sans champ inconnu : un
+// champ que le test ne lit pas le fait échouer.
+func Load(t testing.TB, raw json.RawMessage, dst any) {
+	t.Helper()
+	dec := json.NewDecoder(bytes.NewReader(raw))
+	dec.DisallowUnknownFields()
+	if err := dec.Decode(dst); err != nil {
+		t.Fatalf("vecteur illisible : %v", err)
+	}
+}
+
+// MarshalJSON écrit l'hexadécimal minuscule (vide pour nil).
+func (h Hex) MarshalJSON() ([]byte, error) { return json.Marshal(hex.EncodeToString(h)) }
+
+// Same compare deux valeurs par leur JSON : sorties obtenues et attendues.
+func Same(t testing.TB, got, want any) {
+	t.Helper()
+	g, err1 := json.Marshal(got)
+	w, err2 := json.Marshal(want)
+	if err1 != nil || err2 != nil || !bytes.Equal(g, w) {
+		t.Errorf("obtenu  %s\nattendu %s", g, w)
 	}
 }

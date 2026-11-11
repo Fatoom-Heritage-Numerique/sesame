@@ -19,29 +19,7 @@ import (
 // dépôt sesame » : ce que le code Go recalcule pour chaque groupe). Un groupe
 // sort de cette liste dans le commit qui écrit le test qui le réclame par
 // Track ; le test ci-dessous échoue s'il est à la fois réclamé et en attente.
-var pending = map[string][]string{
-	"attestation.json": {"attestation", "listeVersions"},
-	"json.json":        {"jsonCanonique", "nombre"},
-	"primitives.json": {
-		"aesGcmChiffrer", "aesGcmDechiffrer", "aleatoire", "argon2id",
-		"ecdsaP256Verifier", "ed25519Publique", "ed25519Signer", "ed25519Verifier",
-		"hkdfSha256", "hmacSha256", "mlKem768Decapsuler", "mlKem768Encapsuler",
-		"rsaPkcs1Sha256Verifier", "sha256", "x25519", "x25519Paire", "x25519Publique",
-	},
-	"sesame.json": {
-		"annulation", "antiRetour", "borne", "canal", "canalReponse", "canalRequete",
-		"chaineRegistre", "charte", "charteGen", "codeAcces", "codeInvitation",
-		"codeVerifier", "datePasserelle", "depotPin", "descellerFiche",
-		"descellerInvitation", "descellerKts", "empreinteRegistre", "enveloppeFichier",
-		"enveloppeMot", "enveloppeMotDePasse", "enveloppeVolontes", "ficheAlerte",
-		"indexAcces", "instanceId", "jetonPaire", "jetonSession", "kts", "ligneRegistre",
-		"lireInstanceId", "messageFichier", "noncesClient", "noncesPaire", "ouvrirCanal",
-		"ouvrirCharte", "ouvrirEnveloppe", "ouvrirKts", "passerelle", "preuveDeVie",
-		"preuveEnrolement", "recu", "scelle", "tirerCodeAcces", "verifierAnnulation",
-		"verifierBorne", "verifierCharteGen", "verifierDepotPin", "verifierFicheAlerte",
-		"verifierPreuveDeVie", "verifierPreuveEnrolement",
-	},
-}
+var pending = map[string][]string{}
 
 const importPath = "github.com/Fatoom-Heritage-Numerique/sesame/internal/vecteurs"
 

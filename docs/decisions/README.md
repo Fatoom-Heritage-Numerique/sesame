@@ -74,3 +74,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0064](0064-openapi-et-vecteurs-du-contrat.md) | OpenAPI en JSON vérifiée contre `sesame-fake` ; vecteurs sous `testdata/vecteurs/` ; `compteurPin` généré | 2026-11-11 |
 | [0065](0065-ci-du-contrat-executable.md) | CI du contrat exécutable ; contrôles de l'infrastructure écrits d'avance ; noms du déploiement cherchés hors de ce dépôt | 2026-11-11 · revue depuis 0066 |
 | [0066](0066-copies-des-vecteurs-hors-de-la-part-structurelle.md) | Copies des vecteurs hors de la part structurelle du contrôle des noms | 2026-11-11 |
+| [0067](0067-circl-et-x-crypto-verifiees-puis-epinglees.md) | `circl` v1.6.5 et `golang.org/x/crypto` v0.58.0 vérifiées sur leurs vecteurs, puis épinglées | 2026-11-11 |
