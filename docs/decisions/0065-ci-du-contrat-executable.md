@@ -2,7 +2,7 @@
 
 # 0065 · CI du contrat exécutable ; contrôles de l'infrastructure écrits d'avance ; noms du déploiement cherchés hors de ce dépôt
 
-**Date** : 2026-11-11 · **Statut** : actée (décision de l'opérateur)
+**Date** : 2026-11-11 · **Statut** : actée (décision de l'opérateur) · **revue depuis** ([0066](0066-copies-des-vecteurs-hors-de-la-part-structurelle.md))
 
 ## Contexte et menace
 

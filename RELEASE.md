@@ -24,7 +24,7 @@ git tag -v vX.Y.Z                      # tag signé par une clé SSH (§3)
 ./build/reproduire.sh vX.Y.Z           # construit, puis affiche sha256:<empreinte>
 ```
 
-Le script n'a besoin que de `docker` (ou `podman`) et de `git`. Le dépôt publie, pour chaque version, le journal de la construction reproductible officielle, à comparer au vôtre. `build/reproduire.sh` entre dans le dépôt à l'étape du contrat exécutable ; le journal officiel, avec la première version (`README.md`, « État du projet », étapes 2 et 6).
+Le script n'a besoin que de `docker`, avec `buildx`, et de `git`. Le dépôt publie, pour chaque version, le journal de la construction reproductible officielle, à comparer au vôtre. `build/reproduire.sh` entre dans le dépôt à l'étape du contrat exécutable ; le journal officiel, avec la première version (`README.md`, « État du projet », étapes 2 et 6).
 
 ### 1.2 Double construction en CI
 
@@ -130,7 +130,7 @@ Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit l
 
 ## 8. Contrôles CI du dépôt
 
-Les contrôles de l'étape 2 (contrat exécutable) tournent sur chaque PR et sur `main` dès cette étape ; ceux des étapes 5 et 6 se mettent en place avec l'infrastructure et la première version (`README.md`, « État du projet » ; décision 0065). Outils et commandes : `CONTRIBUTING.md`.
+Les contrôles de l'étape 2 (contrat exécutable) tournent sur chaque PR et sur `main` (`.github/workflows/ci.yml`) dès que leur objet est dans le dépôt : ceux de l'OpenAPI, de `compteurPin`, de l'image de `sesame-fake`, de la borne du registre et la part réseau des dépendances arrivent avec leur code. Ceux des étapes 5 et 6 se mettent en place avec l'infrastructure et la première version (`README.md`, « État du projet » ; décision 0065). Outils et commandes : `CONTRIBUTING.md`.
 
 | Contrôle | Échoue si | Étape |
 |---|---|---|
@@ -142,7 +142,7 @@ Les contrôles de l'étape 2 (contrat exécutable) tournent sur chaque PR et sur
 | Image | un shell ; une étiquette `tee.launch_policy.*` d'`ARCHITECTURE.md` §2.1 absente ou différente ; image de base non épinglée par digest | 2 |
 | Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` ; un paquet lié par `cmd/sesame` hors de la bibliothèque standard et des modules d'`ARCHITECTURE.md` §2.4, modules transitifs compris | 2 |
 | OpenAPI | `api/openapi.json` diffère des routes que sert `sesame-fake`, une requête ou une réponse des tests des routes sort de son schéma, ou les routes et codes d'`API.md` diffèrent de l'OpenAPI (décision 0064) | 2 |
-| Noms de ressources | un `gs://`, un chemin `-docker.pkg.dev/`, une adresse `.iam.gserviceaccount.com`, un chemin `projects/…`, un hôte `run.app` ou un nombre de 12 chiffres d'un fichier suivi hors de la forme `<…>` de `CONTRIBUTING.md` ; les noms réels sont cherchés par la CI du client (décision 0065) | 2 |
+| Noms de ressources | un `gs://`, un chemin `-docker.pkg.dev/`, une adresse `.iam.gserviceaccount.com`, un chemin `projects/…`, un hôte `run.app` ou un nombre de 12 chiffres d'un fichier suivi hors de la forme `<…>` de `CONTRIBUTING.md`, hors des copies de vecteurs que nomme `SHA256SUMS` (`outils/controle-noms`, décision 0066) ; les noms réels sont cherchés par la CI du client, copies de vecteurs comprises (décision 0065) | 2 |
 | Image de `sesame-fake` (sur `main`) | la construction ou la publication de l'image échoue (décision 0063) | 2 |
 | `versions.json` | le fichier n'est pas conforme à son schéma | 6 |
 | `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) | 6 |

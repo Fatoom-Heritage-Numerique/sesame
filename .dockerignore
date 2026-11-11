@@ -1,0 +1,6 @@
+# Contexte de construction de l'image : le module Go seul (Dockerfile).
+*
+!go.mod
+!go.sum
+!cmd/
+!internal/
