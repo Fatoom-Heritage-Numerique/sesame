@@ -69,3 +69,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0059](0059-lectures-locales-jeton-federe-et-fenetre-de-rotation.md) | État du PIN lu sur la copie locale ; jeton fédéré gardé jusqu'à son expiration ; fenêtre d'une rotation interrompue | 2026-10-29 |
 | [0060](0060-borne-rescellement-et-reessais-sans-reservation.md) | Événements d'une borne par période ; rescellement d'une autre KTS à génération égale ; suppression d'identité réessayée sans réservation | 2026-10-29 |
 | [0061](0061-nature-du-signalement-notifications-en-memoire-et-pertes-d-une-restauration.md) | Nature d'un signalement ; notifications réessayées en mémoire ; pertes d'une restauration assumées | 2026-10-29 |
+| [0062](0062-fusion-sans-delai-avant-la-mise-en-service.md) | Fusion sans délai tant qu'aucune version n'est en service | 2026-11-11 |

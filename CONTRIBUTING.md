@@ -27,9 +27,20 @@ La prose est en **français** : documents, commentaires, messages de commit, des
 
 ## Formats et vecteurs
 
-Les formats (`ARCHITECTURE.md` : hiérarchie et formats des clés, canal, borne du registre) sont partagés avec les clients, octet pour octet ; `versions.json` (`RELEASE.md` §2) est compilé dans les clients. Les vecteurs de test sont **générés par le client de référence** et recopiés ici ; la CI échoue s'ils diffèrent. Un changement de format :
+Les formats (`ARCHITECTURE.md` : hiérarchie et formats des clés, canal, borne du registre) sont partagés avec les clients, octet pour octet ; `versions.json` (`RELEASE.md` §2) est compilé dans les clients. Les vecteurs de test sont **générés par le client de référence** et recopiés ici octet pour octet, avec un fichier `SHA256SUMS` de leurs empreintes ; la CI échoue si une copie ne correspond pas à `SHA256SUMS`, et la CI du client de référence échoue si ses fichiers diffèrent des copies de ce dépôt.
 
-1. se décrit d'abord (menace, décision, alternatives écartées) dans une issue, puis dans un fichier de `docs/decisions/` ;
+Fichiers repris de `packages/crypto/vectors/` du dépôt `Fatoom-Heritage-Numerique/Fatoom`, ceux dont Sésame refait les calculs (la liste, et ce que le code Go recalcule pour chaque groupe, sont tenus par le client de référence : `docs/technique/tests.md`, « Vecteurs repris par le dépôt `sesame` ») :
+
+- `sesame.json` : canal, `instanceId`, jetons de paire, reçus, jeton de session et requêtes à la passerelle, KTS et dérivations, enveloppes, charte, code d'accès et son index, messages signés par `cleVie`, dépôts du PIN, fiche d'alerte, scellés, registre et borne ;
+- `primitives.json` : vecteurs publiés de chaque primitive, avec les refus de bord (secret X25519 nul, signature Ed25519 `S + ℓ`, clé ML-KEM-768 hors module) ;
+- `json.json` : JSON canonique RFC 8785 et refus d'une chaîne hors NFC ;
+- `attestation.json` : vérification d'un jeton PKI fabriqué sous une racine de test, et format de `versions.json` (`listeVersions`).
+
+Ils se lisent tels quels en Go (`encoding/json`, `encoding/hex`) : JSON en UTF-8 aux clés triées ; `{"vecteurs": [{"nom", "entrees", "sorties"}], "refus": [{"nom", "entrees", "erreur"}]}`, `nom` de la forme `<opération>/<cas>` ; octets en hexadécimal minuscule, et à côté la chaîne base64 ou base64url exacte quand le protocole transporte la valeur ainsi ; texte UTF-8 en chaîne JSON telle quelle. Chaque vecteur donne les clés de test qu'il faut (graines, clés AES tenant lieu des clés KMS, `cleOprf`) ; les signatures P-256 des vecteurs sont déterministes (RFC 6979), le code les vérifie sans chercher à les reproduire. Les fichiers sont recopiés octet pour octet, sous leur nom, et le commit qui les recopie cite le commit du client d'où ils viennent ; la CI compare l'empreinte SHA-256 de chaque copie à celle que porte `SHA256SUMS` et échoue au moindre écart.
+
+Un changement de format :
+
+1. se décrit d'abord (menace, décision, alternatives écartées) dans un fichier de `docs/decisions/`, précédé d'une issue dès qu'une version est en service ;
 2. est validé par l'opérateur avant tout code ;
 3. change les documents de ce dépôt, le code et les vecteurs dans la même PR ;
 4. est livré des deux côtés (Sésame et clients) dans la même série de PR.
@@ -43,7 +54,7 @@ On ne modifie jamais un vecteur à la main.
 - Les documents mis à jour si le changement les rend faux, et un fichier `docs/decisions/` si une décision est prise ou revue (une décision revue est un **nouveau** fichier, jamais une réécriture).
 - La CI verte : build reproductible (double construction), budget, vecteurs, schéma de `versions.json`, cohérence KMS ⇔ `versions.json`, dépendances, image sans shell, borne du registre (`RELEASE.md` §8).
 
-Une PR qui touche l'attestation, le canal, KMS, le registre, le protocole de PIN, les protocoles ou `versions.json` est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Tant qu'il n'y a qu'un administrateur, une telle PR cite une décision écrite (`docs/decisions/`) et reste publique au moins 7 jours avant sa fusion ; dès qu'une seconde personne de confiance existe, elle approuve aussi. L'équipe des propriétaires (`CODEOWNERS`) n'a aujourd'hui qu'un membre : l'auteur d'une telle PR en est aussi l'approbateur, et la décision écrite et les 7 jours de publicité tiennent lieu de second regard.
+Une PR qui touche l'attestation, le canal, KMS, le registre, le protocole de PIN, les protocoles ou `versions.json` est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Tant qu'aucune version n'est en service (aucune ligne `en_service` dans `versions.json`), elle se fusionne sans délai, dès que sa CI est verte (décision 0062). À partir de la première mise en service, et tant qu'il n'y a qu'un administrateur, une telle PR cite une décision écrite (`docs/decisions/`) et reste publique au moins 7 jours avant sa fusion ; dès qu'une seconde personne de confiance existe, elle approuve aussi. L'équipe des propriétaires (`CODEOWNERS`) n'a aujourd'hui qu'un membre : l'auteur d'une telle PR en est aussi l'approbateur, et la décision écrite et les 7 jours de publicité tiennent lieu de second regard.
 
 ## Vérifier et signaler
 
