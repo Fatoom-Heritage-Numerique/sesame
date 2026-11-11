@@ -775,6 +775,9 @@ func (g *Grappe) refuse() (int, []byte) {
 // join demande l'entrée dans la grappe en service à chaque autre place.
 func (g *Grappe) join(ctx context.Context) {
 	defer func() { g.mu.Lock(); g.joining = false; g.mu.Unlock() }()
+	g.mu.Lock()
+	g.links = map[string]*link{}
+	g.mu.Unlock()
 	own := g.self(ctx)
 	if own == nil {
 		return
@@ -816,7 +819,7 @@ func (g *Grappe) Amorcer(ctx context.Context, email string) (jcs.Object, string)
 		g.mu.Unlock()
 		return nil, "amorcage_refuse"
 	}
-	g.resa = &resa{from: g.NodeID, until: g.cfg.Horloge.Now().Add(Reservation)}
+	g.resa, g.links = &resa{from: g.NodeID, until: g.cfg.Horloge.Now().Add(Reservation)}, map[string]*link{}
 	g.mu.Unlock()
 	ms := []Membre{{g.NodeID, own.Name, own.Zone, base64.StdEncoding.EncodeToString(g.cle)}}
 	for _, vm := range peers(own.Name) {
@@ -904,6 +907,9 @@ func (g *Grappe) prepare(ctx context.Context, c *conn, conf jcs.Object) (int, []
 	own := g.self(ctx)
 	g.mu.Lock()
 	busy := g.n != nil || g.resa != nil
+	if !busy {
+		g.links = map[string]*link{}
+	}
 	g.mu.Unlock()
 	var ms []Membre
 	a, _ := conf["membres"].(jcs.Array)
