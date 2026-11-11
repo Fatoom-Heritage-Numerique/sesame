@@ -134,7 +134,7 @@ func (n *noeud) apply(e *pb.Entry, done func(uint64, result), lost func(string))
 			lost("entree_rejetee")
 			return
 		}
-		n.cs = n.rn.ApplyConfChange(&cc)
+		n.cs, n.snapLe = n.rn.ApplyConfChange(&cc), time.Time{} // instantané refait : il doit porter le nouveau membre
 		if id := cc.GetNodeId(); cc.GetType() == pb.ConfChangeRemoveNode {
 			if m, ok := n.s.nodes[id]; ok && len(n.s.removed) < MaxRemoved {
 				n.s.removed[m.NodeID] = true
@@ -165,8 +165,8 @@ func (n *noeud) apply(e *pb.Entry, done func(uint64, result), lost func(string))
 	case en.Places != nil && len(en.Places) == 3:
 		n.s.places, r.code = en.Places, ""
 	}
-	if r.code == "entree_rejetee" {
-		lost(r.code)
+	if r.code == "entree_rejetee" || r.code == "message_refuse" {
+		lost("entree_rejetee")
 	}
 	if en.From == n.id {
 		done(en.ID, r)
