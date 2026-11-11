@@ -9,6 +9,8 @@ import (
 	"testing"
 	"unicode"
 
+	"golang.org/x/text/unicode/norm"
+
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/vecteurs"
 )
 
@@ -67,9 +69,11 @@ func TestVectors(t *testing.T) {
 	})
 }
 
-func TestTablesVersion(t *testing.T) {
-	if unicodeVersion != unicode.Version {
-		t.Fatalf("tables NFC d'Unicode %s, Go en %s : relancer outils/generer-nfc", unicodeVersion, unicode.Version)
+// Les tables NFC de golang.org/x/text sont de la version Unicode de la
+// bibliothèque standard (décision 0068).
+func TestNormVersion(t *testing.T) {
+	if norm.Version != unicode.Version {
+		t.Fatalf("golang.org/x/text en Unicode %s, Go en %s", norm.Version, unicode.Version)
 	}
 }
 
@@ -79,6 +83,11 @@ func TestNFC(t *testing.T) {
 		"q\u0323\u0301": true, "q\u0301\u0323": false, "a\u0316\u0301": false, "a\u0301\u0316": false,
 		"\u091c\u093c": true, "\u0928\u093c": false, "\u0bb0\u0bbe": true, "\u0bca": true, "\u0bc6\u0bbe": false,
 		"\u1100\u1161": false, "\uac00\u11a8": false, "\uac01": true, "\xff": false,
+		// Précomposé suivi d'une marque de classe inférieure à celles de sa
+		// décomposition : la normalisation réordonne, la chaîne n'est pas en
+		// NFC (décision 0068 ; même réponse que String.prototype.normalize).
+		"\u1e67\u0327": false, "\u01d5\u0323": false, "\u1e09\u0323": true, "\u00e9\u0316": true,
+		"s\u0323\u0307": false, "\u1e69": true, "\u1e9b\u0323": true,
 	} {
 		if got := IsNFC(s); got != want {
 			t.Errorf("IsNFC(%+q) = %v, attendu %v", s, got, want)

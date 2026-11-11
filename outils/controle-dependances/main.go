@@ -19,8 +19,8 @@ import (
 )
 
 // AllowedModules est la liste d'ARCHITECTURE.md §2.4, par chemin de module :
-// les deux exceptions cryptographiques, Raft, et les modules qu'elles
-// requièrent. Les SDK Google officiels y entrent par leur chemin avec le code
+// les deux exceptions cryptographiques, la normalisation NFC (décision 0068),
+// Raft, et les modules qu'elles requièrent. Les SDK Google officiels y entrent par leur chemin avec le code
 // qui les appelle, et leurs modules transitifs avec eux, après les avoir
 // nommés dans ARCHITECTURE.md §2.4.
 var AllowedModules = []string{
@@ -28,6 +28,7 @@ var AllowedModules = []string{
 	"golang.org/x/crypto",
 	"golang.org/x/sys",
 	"github.com/bwesterb/go-ristretto",
+	"golang.org/x/text",
 	"go.etcd.io/raft/v3",
 	"google.golang.org/protobuf",
 }
