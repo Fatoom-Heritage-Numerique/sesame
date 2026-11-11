@@ -1,0 +1,338 @@
+{
+  "refus": [
+    {
+      "entrees": {
+        "json": "{\"\\u20ac\":\"Euro Sign\",\"\\r\":\"Carriage Return\",\"\\ufb33\":\"Hebrew Letter Dalet With Dagesh\",\"1\":\"One\",\"\\ud83d\\ude00\":\"Emoji: Grinning Face\",\"\\u0080\":\"Control\",\"\\u00f6\":\"Latin Small Letter O With Diaeresis\"}"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "jsonCanonique/rfc8785-3-2-3-tri-cle-hors-nfc"
+    },
+    {
+      "entrees": {
+        "ieee754": "7fffffffffffffff"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "nombre/rfc8785-annexe-b-7fffffffffffffff-nan"
+    },
+    {
+      "entrees": {
+        "ieee754": "7ff0000000000000"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "nombre/rfc8785-annexe-b-7ff0000000000000-infini"
+    },
+    {
+      "entrees": {
+        "ieee754": "fff0000000000000"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "nombre/moins-infini"
+    },
+    {
+      "entrees": {
+        "json": "\"\\ud83d\""
+      },
+      "erreur": "parametres_invalides",
+      "nom": "jsonCanonique/demi-paire-haute-isolee"
+    },
+    {
+      "entrees": {
+        "json": "[\"\\ude00\"]"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "jsonCanonique/demi-paire-basse-isolee"
+    },
+    {
+      "entrees": {
+        "json": "{\"email\":\"e\\u0301lise@exemple.fr\"}"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "jsonCanonique/valeur-nfd"
+    },
+    {
+      "entrees": {
+        "json": "{\"e\\u0301\":1}"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "jsonCanonique/cle-nfd"
+    }
+  ],
+  "vecteurs": [
+    {
+      "entrees": {
+        "json": "{\"numbers\":[333333333.33333329,1E30,4.50,2e-3,0.000000000000000000000000001],\"string\":\"\\u20ac$\\u000F\\u000aA'\\u0042\\u0022\\u005c\\\\\\\"\\/\",\"literals\":[null,true,false]}"
+      },
+      "nom": "jsonCanonique/rfc8785-3-2-3-echantillon",
+      "sorties": {
+        "texte": "{\"literals\":[null,true,false],\"numbers\":[333333333.3333333,1e+30,4.5,0.002,1e-27],\"string\":\"€$\\u000f\\nA'B\\\"\\\\\\\\\\\"/\"}",
+        "utf8": "7b226c69746572616c73223a5b6e756c6c2c747275652c66616c73655d2c226e756d62657273223a5b3333333333333333332e333333333333332c31652b33302c342e352c302e3030322c31652d32375d2c22737472696e67223a22e282ac245c75303030665c6e4127425c225c5c5c5c5c222f227d"
+      }
+    },
+    {
+      "entrees": {
+        "json": "{\"\\u20ac\":\"Euro Sign\",\"\\r\":\"Carriage Return\",\"\\uff21\":\"Fullwidth Latin Capital Letter A\",\"1\":\"One\",\"\\ud83d\\ude00\":\"Emoji: Grinning Face\",\"\\u0080\":\"Control\",\"\\u00f6\":\"Latin Small Letter O With Diaeresis\"}"
+      },
+      "nom": "jsonCanonique/tri-unites-utf16-nfc",
+      "sorties": {
+        "texte": "{\"\\r\":\"Carriage Return\",\"1\":\"One\",\"\":\"Control\",\"ö\":\"Latin Small Letter O With Diaeresis\",\"€\":\"Euro Sign\",\"😀\":\"Emoji: Grinning Face\",\"Ａ\":\"Fullwidth Latin Capital Letter A\"}",
+        "utf8": "7b225c72223a2243617272696167652052657475726e222c2231223a224f6e65222c22c280223a22436f6e74726f6c222c22c3b6223a224c6174696e20536d616c6c204c6574746572204f205769746820446961657265736973222c22e282ac223a224575726f205369676e222c22f09f9880223a22456d6f6a693a204772696e6e696e672046616365222c22efbca1223a2246756c6c7769647468204c6174696e204361706974616c204c65747465722041227d"
+      }
+    },
+    {
+      "entrees": {
+        "json": "{\"ab\":4,\"aa\":3,\"a\":2,\"\":1}"
+      },
+      "nom": "jsonCanonique/tri-prefixes",
+      "sorties": {
+        "texte": "{\"\":1,\"a\":2,\"aa\":3,\"ab\":4}",
+        "utf8": "7b22223a312c2261223a322c226161223a332c226162223a347d"
+      }
+    },
+    {
+      "entrees": {
+        "json": "{\"z\":[{\"b\":1,\"a\":[true,{\"d\":null,\"c\":\"x\"}]}],\"y\":{}}"
+      },
+      "nom": "jsonCanonique/objets-imbriques-tableaux",
+      "sorties": {
+        "texte": "{\"y\":{},\"z\":[{\"a\":[true,{\"c\":\"x\",\"d\":null}],\"b\":1}]}",
+        "utf8": "7b2279223a7b7d2c227a223a5b7b2261223a5b747275652c7b2263223a2278222c2264223a6e756c6c7d5d2c2262223a317d5d7d"
+      }
+    },
+    {
+      "entrees": {
+        "json": "\"\\u0000\\u0008\\u0009\\u000a\\u000b\\u000c\\u000d\\u001f\\u007f\\\"\\\\/\""
+      },
+      "nom": "jsonCanonique/controles-et-echappements",
+      "sorties": {
+        "texte": "\"\\u0000\\b\\t\\n\\u000b\\f\\r\\u001f\\\"\\\\/\"",
+        "utf8": "225c75303030305c625c745c6e5c75303030625c665c725c75303031667f5c225c5c2f22"
+      }
+    },
+    {
+      "entrees": {
+        "json": "{\"email\":\"\\u00e9lise@exemple.fr\"}"
+      },
+      "nom": "jsonCanonique/nfc-accepte",
+      "sorties": {
+        "texte": "{\"email\":\"élise@exemple.fr\"}",
+        "utf8": "7b22656d61696c223a22c3a96c697365406578656d706c652e6672227d"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "0000000000000000"
+      },
+      "nom": "nombre/rfc8785-annexe-b-0000000000000000",
+      "sorties": {
+        "texte": "0"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "8000000000000000"
+      },
+      "nom": "nombre/rfc8785-annexe-b-8000000000000000",
+      "sorties": {
+        "texte": "0"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "0000000000000001"
+      },
+      "nom": "nombre/rfc8785-annexe-b-0000000000000001",
+      "sorties": {
+        "texte": "5e-324"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "8000000000000001"
+      },
+      "nom": "nombre/rfc8785-annexe-b-8000000000000001",
+      "sorties": {
+        "texte": "-5e-324"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "7fefffffffffffff"
+      },
+      "nom": "nombre/rfc8785-annexe-b-7fefffffffffffff",
+      "sorties": {
+        "texte": "1.7976931348623157e+308"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "ffefffffffffffff"
+      },
+      "nom": "nombre/rfc8785-annexe-b-ffefffffffffffff",
+      "sorties": {
+        "texte": "-1.7976931348623157e+308"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "4340000000000000"
+      },
+      "nom": "nombre/rfc8785-annexe-b-4340000000000000",
+      "sorties": {
+        "texte": "9007199254740992"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "c340000000000000"
+      },
+      "nom": "nombre/rfc8785-annexe-b-c340000000000000",
+      "sorties": {
+        "texte": "-9007199254740992"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "4430000000000000"
+      },
+      "nom": "nombre/rfc8785-annexe-b-4430000000000000",
+      "sorties": {
+        "texte": "295147905179352830000"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "44b52d02c7e14af5"
+      },
+      "nom": "nombre/rfc8785-annexe-b-44b52d02c7e14af5",
+      "sorties": {
+        "texte": "9.999999999999997e+22"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "44b52d02c7e14af6"
+      },
+      "nom": "nombre/rfc8785-annexe-b-44b52d02c7e14af6",
+      "sorties": {
+        "texte": "1e+23"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "44b52d02c7e14af7"
+      },
+      "nom": "nombre/rfc8785-annexe-b-44b52d02c7e14af7",
+      "sorties": {
+        "texte": "1.0000000000000001e+23"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "444b1ae4d6e2ef4e"
+      },
+      "nom": "nombre/rfc8785-annexe-b-444b1ae4d6e2ef4e",
+      "sorties": {
+        "texte": "999999999999999700000"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "444b1ae4d6e2ef4f"
+      },
+      "nom": "nombre/rfc8785-annexe-b-444b1ae4d6e2ef4f",
+      "sorties": {
+        "texte": "999999999999999900000"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "444b1ae4d6e2ef50"
+      },
+      "nom": "nombre/rfc8785-annexe-b-444b1ae4d6e2ef50",
+      "sorties": {
+        "texte": "1e+21"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "3eb0c6f7a0b5ed8c"
+      },
+      "nom": "nombre/rfc8785-annexe-b-3eb0c6f7a0b5ed8c",
+      "sorties": {
+        "texte": "9.999999999999997e-7"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "3eb0c6f7a0b5ed8d"
+      },
+      "nom": "nombre/rfc8785-annexe-b-3eb0c6f7a0b5ed8d",
+      "sorties": {
+        "texte": "0.000001"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "41b3de4355555553"
+      },
+      "nom": "nombre/rfc8785-annexe-b-41b3de4355555553",
+      "sorties": {
+        "texte": "333333333.3333332"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "41b3de4355555554"
+      },
+      "nom": "nombre/rfc8785-annexe-b-41b3de4355555554",
+      "sorties": {
+        "texte": "333333333.33333325"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "41b3de4355555555"
+      },
+      "nom": "nombre/rfc8785-annexe-b-41b3de4355555555",
+      "sorties": {
+        "texte": "333333333.3333333"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "41b3de4355555556"
+      },
+      "nom": "nombre/rfc8785-annexe-b-41b3de4355555556",
+      "sorties": {
+        "texte": "333333333.3333334"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "41b3de4355555557"
+      },
+      "nom": "nombre/rfc8785-annexe-b-41b3de4355555557",
+      "sorties": {
+        "texte": "333333333.33333343"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "becbf647612f3696"
+      },
+      "nom": "nombre/rfc8785-annexe-b-becbf647612f3696",
+      "sorties": {
+        "texte": "-0.0000033333333333333333"
+      }
+    },
+    {
+      "entrees": {
+        "ieee754": "43143ff3c1cb0959"
+      },
+      "nom": "nombre/rfc8785-annexe-b-43143ff3c1cb0959",
+      "sorties": {
+        "texte": "1424953923781206.2"
+      }
+    }
+  ]
+}

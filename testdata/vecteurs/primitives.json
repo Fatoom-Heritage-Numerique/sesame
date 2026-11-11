@@ -1,0 +1,768 @@
+{
+  "refus": [
+    {
+      "entrees": {
+        "n": -1
+      },
+      "erreur": "parametres_invalides",
+      "nom": "aleatoire/negatif"
+    },
+    {
+      "entrees": {
+        "ikm": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+        "info": "",
+        "longueur": 8161,
+        "sel": ""
+      },
+      "erreur": "parametres_invalides",
+      "nom": "hkdfSha256/longueur-au-dela-de-255-blocs"
+    },
+    {
+      "entrees": {
+        "aad": "6f39c9ae7b8e8a58a95f0dd8ea6a9087cbccdfd6",
+        "chiffre": "a25f3f580306cd5065d22a6b7e9660110af7204bb77d370f7f34bee547feeff7b32a596fce29c9040e68b1589aad48da8819905b6dcd70eefb0892fab1539298b92a4b",
+        "cle": "e9d381a9c413bee66175d5586a189836e5c20f5583535ab4d3f3e612dc21700e",
+        "iv": "23e81571da1c7821c681c7ca"
+      },
+      "erreur": "dechiffrement_refuse",
+      "nom": "aesGcmDechiffrer/nist-cavp-decrypt-256-96-408-160-128-0-fail"
+    },
+    {
+      "entrees": {
+        "aad": "00",
+        "chiffre": "a4edbb76a9cf22342c50e3a11182b512960141d045e682e50b3b2c02a93cc794ab1841aef2fa012f46e64291fc76bd978796dbbf8dcaa16e2418980ce6f1917ef4b42f90580589d894d9987d13ee65e2",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9bad11b190c2f0aed85d7fb7816007e81a4",
+        "iv": "f45b40beb8b725847c9373ee"
+      },
+      "erreur": "dechiffrement_refuse",
+      "nom": "aesGcmDechiffrer/aad-autre"
+    },
+    {
+      "entrees": {
+        "aad": "",
+        "chiffre": "a4edbb76a9cf22342c50e3a11182b5",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9bad11b190c2f0aed85d7fb7816007e81a4",
+        "iv": "f45b40beb8b725847c9373ee"
+      },
+      "erreur": "dechiffrement_refuse",
+      "nom": "aesGcmDechiffrer/chiffre-plus-court-que-le-tag"
+    },
+    {
+      "entrees": {
+        "aad": "",
+        "chiffre": "a4edbb76a9cf22342c50e3a11182b512960141d045e682e50b3b2c02a93cc794ab1841aef2fa012f46e64291fc76bd978796dbbf8dcaa16e2418980ce6f1917ef4b42f90580589d894d9987d13ee65e2",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9ba",
+        "iv": "f45b40beb8b725847c9373ee"
+      },
+      "erreur": "cle_invalide",
+      "nom": "aesGcmDechiffrer/cle-de-16-octets"
+    },
+    {
+      "entrees": {
+        "aad": "",
+        "clair": "00",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9ba",
+        "iv": "f45b40beb8b725847c9373ee"
+      },
+      "erreur": "cle_invalide",
+      "nom": "aesGcmChiffrer/cle-de-16-octets"
+    },
+    {
+      "entrees": {
+        "aad": "",
+        "clair": "00",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9bad11b190c2f0aed85d7fb7816007e81a4",
+        "iv": "f45b40beb8b725847c9373ee0711e783"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "aesGcmChiffrer/iv-de-16-octets"
+    },
+    {
+      "entrees": {
+        "aad": "",
+        "chiffre": "a4edbb76a9cf22342c50e3a11182b512960141d045e682e50b3b2c02a93cc794ab1841aef2fa012f46e64291fc76bd978796dbbf8dcaa16e2418980ce6f1917ef4b42f90580589d894d9987d13ee65e2",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9bad11b190c2f0aed85d7fb7816007e81a4",
+        "iv": "f45b40beb8b72584"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "aesGcmDechiffrer/iv-de-8-octets"
+    },
+    {
+      "entrees": {
+        "prive": "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+        "publique": "0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "erreur": "secret_nul",
+      "nom": "x25519/point-nul"
+    },
+    {
+      "entrees": {
+        "prive": "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+        "publique": "0100000000000000000000000000000000000000000000000000000000000000"
+      },
+      "erreur": "secret_nul",
+      "nom": "x25519/point-un"
+    },
+    {
+      "entrees": {
+        "prive": "076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+        "publique": "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f"
+      },
+      "erreur": "cle_invalide",
+      "nom": "x25519/prive-de-31-octets"
+    },
+    {
+      "entrees": {
+        "prive": "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+        "publique": "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f00"
+      },
+      "erreur": "cle_invalide",
+      "nom": "x25519/publique-de-33-octets"
+    },
+    {
+      "entrees": {
+        "prive": "076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a"
+      },
+      "erreur": "cle_invalide",
+      "nom": "x25519Publique/prive-de-31-octets"
+    },
+    {
+      "entrees": {
+        "graine": "61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+      },
+      "erreur": "cle_invalide",
+      "nom": "ed25519Publique/graine-de-31-octets"
+    },
+    {
+      "entrees": {
+        "graine": "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f6000",
+        "message": ""
+      },
+      "erreur": "cle_invalide",
+      "nom": "ed25519Signer/graine-de-33-octets"
+    },
+    {
+      "entrees": {
+        "message": "72",
+        "publique": "4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+        "signature": "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da085ac1e43e15996e458f3613d0f11d8c387b2eaeb4302aeeb00d291612bb0c00"
+      },
+      "erreur": "cle_invalide",
+      "nom": "ed25519Verifier/publique-de-31-octets"
+    },
+    {
+      "entrees": {
+        "message": "74657374",
+        "publique": "0460fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb67903fe1008b8bc99a41ae9e95628bc64f2f1b20c2d7e9f5177a3c294d446229a",
+        "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8"
+      },
+      "erreur": "cle_invalide",
+      "nom": "ecdsaP256Verifier/point-hors-de-la-courbe"
+    },
+    {
+      "entrees": {
+        "message": "74657374",
+        "publique": "0360fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb6",
+        "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8"
+      },
+      "erreur": "cle_invalide",
+      "nom": "ecdsaP256Verifier/point-compresse"
+    },
+    {
+      "entrees": {
+        "message": "6661746f6f6d2d766563746575727c727361",
+        "publique": "30820122300d06092a864886f70d01010105000382010f003082010a0282010100e950ba65406e7ccd028bb31cf06001da2c4d06199c3b2a7c93d12fe6a6c82b446bfdd42aed170c532b87d131cebc11d8ff285575bd2ae5c54d6c4d4977f9d567fee8ee7cafb47a9358d475597c71c9d4f65783bae930a4141986f8b8ccee16e0ca39027b35eee51220e5e9fda933d7e1a0c43f1d3a3bcb0f3cf6ae5e6294114812d1c4e6017e662bcba93eabe238ba4c8c5fc6036fe904d500f26afb73243e7a10e6ed2d25a5ba2b8f6eeb6de68f857d64b88171bf9a22010f6fc9a897230c0c0da0757fe6599e53fc20e434b5ff4ef14c7b69b4e0636b432306b4d055ace757ad8e44b4d68cfe1cd3fd3737946a13987dbdfc69a7a220afbab6b9cdb00f589b02030100",
+        "signature": "a85c119d0d0c459c9b3d1ae14bcbbe3371233153685db2ad7df39dbd11b076a983f736c8aa299ce4c9c68c41c9382ff60c24c982bbd118c1ee5cb8082c9e5b83d729979a603215cf27a2866f5e8c5e27957a6bf46c746aa72b77dbe630b0c8624acd3b5f34b8bf93ae8466c3523842dd75135240a8b92f6bb5745c6cf68ac71da6708c07056da802d6a1d8b2395e544b4dd85c45ca287594d3ab86799cbe819f8d93923c4999944733abfe673e01b9101b54e16e6c19f39b2a0808eb0c6d96b522d0a7a2292ab012888c7a85fbfda5707148c7461a413e430643577ee5e76bc8329cc6f28f836fa6c97df782824024d3924a1336405636bdd6e69d4800efd916"
+      },
+      "erreur": "cle_invalide",
+      "nom": "rsaPkcs1Sha256Verifier/spki-tronque"
+    },
+    {
+      "entrees": {
+        "longueur": 32,
+        "motDePasse": "79f59c77a40e1719832c504bc7e5efb35c3bec4c7d866ff0dce1842f5eaf5942",
+        "parametres": {
+          "m": 64,
+          "p": 0,
+          "t": 3
+        },
+        "sel": "306a1acde876f5e614b2455451f4e2bb"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "argon2id/p-nul"
+    },
+    {
+      "entrees": {
+        "longueur": 32,
+        "motDePasse": "79f59c77a40e1719832c504bc7e5efb35c3bec4c7d866ff0dce1842f5eaf5942",
+        "parametres": {
+          "m": 64,
+          "p": 4,
+          "t": 0
+        },
+        "sel": "306a1acde876f5e614b2455451f4e2bb"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "argon2id/t-nul"
+    },
+    {
+      "entrees": {
+        "longueur": 32,
+        "motDePasse": "79f59c77a40e1719832c504bc7e5efb35c3bec4c7d866ff0dce1842f5eaf5942",
+        "parametres": {
+          "m": 16,
+          "p": 4,
+          "t": 3
+        },
+        "sel": "306a1acde876f5e614b2455451f4e2bb"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "argon2id/m-inferieur-a-8p"
+    },
+    {
+      "entrees": {
+        "longueur": 3,
+        "motDePasse": "79f59c77a40e1719832c504bc7e5efb35c3bec4c7d866ff0dce1842f5eaf5942",
+        "parametres": {
+          "m": 64,
+          "p": 4,
+          "t": 3
+        },
+        "sel": "306a1acde876f5e614b2455451f4e2bb"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "argon2id/longueur-de-3"
+    },
+    {
+      "entrees": {
+        "longueur": 32,
+        "motDePasse": "79f59c77a40e1719832c504bc7e5efb35c3bec4c7d866ff0dce1842f5eaf5942",
+        "parametres": {
+          "m": 64,
+          "p": 4,
+          "t": 3
+        },
+        "sel": "306a1acde876f5"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "argon2id/sel-de-7-octets"
+    },
+    {
+      "entrees": {
+        "publique": "ffef576f738fa044ae8ac261d4f73162f89362bb09f4a9c7d0890b79b999aa3aa1bb7418851862fe5b4871f6232d85b2984165b09c484cc7222cab035128057d4b5fc46c9c7f460d71db16102824e9a18a14ebb78cf775d9bbbad69249ea18a3ae291faa0aa4cf946e9b982d22f4b7230524a6fc4cd698009cc48d8c950adfe1430ca5afebebbd50a2106e4311f808c8e64000aa64a3626c2c4e23990713ce6eec15706481fd3b00baf9c7d1c38371541955492d6d17884a9173a0e10101e654e1fc6a0da7baa45c6c8b0b23b87c73b6f132599b2a444c087c0b4704f7a99ff265f748c644103426512e3b7ac80d74730c5489980cc27507bc69f140a84992d556b15dd49ff27b31b7dba59d89be8e87073478410a791b27aa886938aff72b9b663517f6273a6fe2c8fdd53ae7e614acbc41bd5b24ddfb2a0ad31fdcfa6aba46ccdc37c6d6c3bd0de70954602a11846443d275a0795bb762b168c46949831349a5135d40bc1fcc00b9236660901f567650f56050cdc07737818e3b7acc88a25e05e833d3ca92a5178e4bf06734964a6abaaeff8586ada26215e9cd5f8c46f82a3776646e7d83cc82f2468b23635f891026950046a02f9fe56e914c2259a4cc6ff40c042277d6a788b7a2b7fbb86621d232fe7a595e0a97262563fa50a052613474574a8bf3459f67b60fe190c4f452ded8734c3a3571eb60c631377ae714634b13dcf1396fc306c1a49a290622cf234a18e53b58772edee3076b68c5e6371f40953d8cd68070d5acc6e1b6d20634e6772f9c63c32999694d27593df04d6a67414d836fed376c32315e79a12ee7e4945e8c97bcd49ee4418c32c18d53b9694496824969c1b26935d2a00fff175ea133772dc35d242a367681404eec1b1250ae7c4abc6f273049fc19ff63b35434520728896c7c34e3379e7cd75007f478809a4fbaa56f07075d4f35cccc929528e55bf0e7b7a247139eec7afc034814499b6fe0ab2b0a625d642fa2db1dfa4b3a22222a6ea615daf605ff38748b3a4239c52d92f40737ac4bdd592dd2c77eb5e22727827445f71f6a953ea79a1a135745bb8731a10a0edb0936e6584c03cabdf3e3bb26a592855a1c90c1cc9763cdf9a87ed452be76a75f177690079c5372c5c040a538ce446bcb6108162abfd50b367a500c88b9a47f069b21e3ba25bac0725380494376828bbf806c312761011e570fb1b1af4f655aa8f85c04723861c24cc2a33da7f54e5cd02ee705cf1a3453042c977f711ae60989e8b1994ab98b40c50b015250c00a9e20094b630acf25931fb27b4300fd20d21b226f88c006f7ad0a66b296d58645a09a8beb60260c711fe91e89755cd0b2aa1483a81de5071760aa27092032e709580c29156cc6dc205acc0b20856562a1a3b48ba68281725bf3d6cef5945cdfb31a47bc41922c7b7baa3ea8279aa1091cc3311e1f31749f4764a689770c7390a34480274c7e218b8f58d7ac46bca84eb029820bacabf16b2c3a578f9c59569cca39a42bc9393d43c034119b847872acbac6af483209f09856236994da6648a9c97f2549a040c4acf67ccbe18b668b240f2ab5cffa175684040f4e6c08031a456653a5397575e67aa97f7872b137476b61d88bd72eec9bd717c4c2180b51b852dd475769f8bc9e912cdfe8a9bf3b20"
+      },
+      "erreur": "cle_invalide",
+      "nom": "mlKem768Encapsuler/cle-hors-module"
+    },
+    {
+      "entrees": {
+        "publique": "e8576f738fa044ae8ac261d4f73162f89362bb09f4a9c7d0890b79b999aa3aa1bb7418851862fe5b4871f6232d85b2984165b09c484cc7222cab035128057d4b5fc46c9c7f460d71db16102824e9a18a14ebb78cf775d9bbbad69249ea18a3ae291faa0aa4cf946e9b982d22f4b7230524a6fc4cd698009cc48d8c950adfe1430ca5afebebbd50a2106e4311f808c8e64000aa64a3626c2c4e23990713ce6eec15706481fd3b00baf9c7d1c38371541955492d6d17884a9173a0e10101e654e1fc6a0da7baa45c6c8b0b23b87c73b6f132599b2a444c087c0b4704f7a99ff265f748c644103426512e3b7ac80d74730c5489980cc27507bc69f140a84992d556b15dd49ff27b31b7dba59d89be8e87073478410a791b27aa886938aff72b9b663517f6273a6fe2c8fdd53ae7e614acbc41bd5b24ddfb2a0ad31fdcfa6aba46ccdc37c6d6c3bd0de70954602a11846443d275a0795bb762b168c46949831349a5135d40bc1fcc00b9236660901f567650f56050cdc07737818e3b7acc88a25e05e833d3ca92a5178e4bf06734964a6abaaeff8586ada26215e9cd5f8c46f82a3776646e7d83cc82f2468b23635f891026950046a02f9fe56e914c2259a4cc6ff40c042277d6a788b7a2b7fbb86621d232fe7a595e0a97262563fa50a052613474574a8bf3459f67b60fe190c4f452ded8734c3a3571eb60c631377ae714634b13dcf1396fc306c1a49a290622cf234a18e53b58772edee3076b68c5e6371f40953d8cd68070d5acc6e1b6d20634e6772f9c63c32999694d27593df04d6a67414d836fed376c32315e79a12ee7e4945e8c97bcd49ee4418c32c18d53b9694496824969c1b26935d2a00fff175ea133772dc35d242a367681404eec1b1250ae7c4abc6f273049fc19ff63b35434520728896c7c34e3379e7cd75007f478809a4fbaa56f07075d4f35cccc929528e55bf0e7b7a247139eec7afc034814499b6fe0ab2b0a625d642fa2db1dfa4b3a22222a6ea615daf605ff38748b3a4239c52d92f40737ac4bdd592dd2c77eb5e22727827445f71f6a953ea79a1a135745bb8731a10a0edb0936e6584c03cabdf3e3bb26a592855a1c90c1cc9763cdf9a87ed452be76a75f177690079c5372c5c040a538ce446bcb6108162abfd50b367a500c88b9a47f069b21e3ba25bac0725380494376828bbf806c312761011e570fb1b1af4f655aa8f85c04723861c24cc2a33da7f54e5cd02ee705cf1a3453042c977f711ae60989e8b1994ab98b40c50b015250c00a9e20094b630acf25931fb27b4300fd20d21b226f88c006f7ad0a66b296d58645a09a8beb60260c711fe91e89755cd0b2aa1483a81de5071760aa27092032e709580c29156cc6dc205acc0b20856562a1a3b48ba68281725bf3d6cef5945cdfb31a47bc41922c7b7baa3ea8279aa1091cc3311e1f31749f4764a689770c7390a34480274c7e218b8f58d7ac46bca84eb029820bacabf16b2c3a578f9c59569cca39a42bc9393d43c034119b847872acbac6af483209f09856236994da6648a9c97f2549a040c4acf67ccbe18b668b240f2ab5cffa175684040f4e6c08031a456653a5397575e67aa97f7872b137476b61d88bd72eec9bd717c4c2180b51b852dd475769f8bc9e912cdfe8a9bf3b20"
+      },
+      "erreur": "cle_invalide",
+      "nom": "mlKem768Encapsuler/cle-de-1183-octets"
+    },
+    {
+      "entrees": {
+        "chiffre": "a083d0fefff15ce219cc8673e2ba5bbd7aace5db61da3e372b1ee6721b999d7424f881dbf3d57c0cff3f9ee345c9fa4079b6f4adae6b0993cc82ce0972ef26aac28d9e34a4e9bd0c367dfd292ee4015ec4e0d27b28385d98db617fc3a5449caf6d45a4ad2244524e39b1edca76e1dfa6e33a6666b1783eaced1c5f3bb1febbd87dab66fa8e3803156ffcdcb0ca43bf20132b4ccbc1e62375f5f71873714de106b74afae2183151d778690b68cbdd16b824a8e3f0545bf6b343e6e3dfd21b019c21c1ee2ed89330fb67291df9ede3f71486aa44ce435cbdf4b74fded469b30a0fc04093e96f950d52804b95e7ee3390a398e5148bea71f94430a4eb89907a7d6f9c32f50259b57c50a5a4262fab32907f1fea90b12909a706254080bbb5f7b5a33e0f177773123cb422cfc2dd25ea44421bf779636b828bc6801fac5ccd182b1c99017afdb2b3d04ca2fba1ffc3461e1b07f767f9079633e81f1f0e2a2faf61cc945bd75c12c22764a431f363b4495175e8d0b21c0b2c3c3ec43521bbd8498bb39dcdaf92b2369ec060f125c5f3b0063abc40234b3bba08c2b0234da58f1af5a190b992b88c996fde3df89ec8a59ad637d9ca55c73b19e8a297eee890eeccb532d50dac673a97fd676f2e6272c0e9e6460c42795d534a30888d160022ecbff3df80708680c124fbe38691b125b48cf4b155598e1f59a3ae4748f1be8a19daa71e9a9d7fee02f9ad211dcaf1cb81dc2c534c3f1a4f23506f0c48b17e25455f6a022efb73cc61f4963c097851ff0bfc301ff8b19a6c5be12a5ed2d20114721106b323c50086e8236a30f7abfcd389c358d906b15db858f4000e97aa31e3fcf4005a3d3632a6cdee07969cb54a4d52cf864289d6990f22473fbed9f58466c3f49422771084cd651e80652020523abb59e34a48a1c7e9e1fe4d98cc278ff3b3f6dd27ae892aaa8e7aa1a0881c7fe2e89b31c20491b5ff6b3cb047d29c83765f01d1466b7cd90c1beb3e8bcf7ad6e62bea3a6aef71592ac44c34c750f7edca8e56c2c8d04583edd42579ad04ff72273a993ca3737342a7262c13803128c51f63dbe79ecdbfcabeb59ef9c58090d6bcfcd077704f58690b064335dfd0a059aa6a296938e7ac1ae5dfc7010c3e4e99f41fbbe8c0d7f2a36f7ef2e93bf7d40c5676e7f3ca6a5f3c6d18a82b4c5b80120ea5b1ddcb99d9be5ef8150bb64d3e371a222ec59d21be698bbdf41b2be56226aee7d19655a70daac15b2647d519b95249f4f27799ebe1b060e600c0e4eb21db8c39a9f00f45c2563ed89a612511cae4be0d11b6996d4a941e82e7fe0237dcff63f44a1678a4e9ff9f9b47a14da3802dfcf2a2e4177401cffda39df1af87780efb426c336d42b040fc061800a20b9dc49c1e15238b6591627251b6bec424f5576315469ce56ce6fb0ef47e1c71022b4cc0af6e50c5d8856fb2667c8e4af0f1fefcf56d309670022877be650bfd58868c37a633c9788f67bf5d4778888d0e5c2300244bde9311e1e466e7de6a35dc4c54078e972ba4",
+        "graine": "ee3332ca6c6049a1b4c3e7a178ec148dbcbf58f105dc0bd2b7ef864b22644640b5342f7529f97bf560c6ad200a4978d1e9bb40ce6d09445d8062bf85c0193e"
+      },
+      "erreur": "cle_invalide",
+      "nom": "mlKem768Decapsuler/graine-de-63-octets"
+    }
+  ],
+  "vecteurs": [
+    {
+      "entrees": {
+        "n": 0
+      },
+      "nom": "aleatoire/0-octets",
+      "sorties": {
+        "longueur": 0,
+        "tiragesDistincts": false
+      }
+    },
+    {
+      "entrees": {
+        "n": 32
+      },
+      "nom": "aleatoire/32-octets",
+      "sorties": {
+        "longueur": 32,
+        "tiragesDistincts": true
+      }
+    },
+    {
+      "entrees": {
+        "n": 65537
+      },
+      "nom": "aleatoire/65537-octets",
+      "sorties": {
+        "longueur": 65537,
+        "tiragesDistincts": true
+      }
+    },
+    {
+      "entrees": {
+        "donnees": "616263"
+      },
+      "nom": "sha256/fips180-2-b1",
+      "sorties": {
+        "empreinte": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+      }
+    },
+    {
+      "entrees": {
+        "donnees": "6162636462636465636465666465666765666768666768696768696a68696a6b696a6b6c6a6b6c6d6b6c6d6e6c6d6e6f6d6e6f706e6f7071"
+      },
+      "nom": "sha256/fips180-2-b2",
+      "sorties": {
+        "empreinte": "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1"
+      }
+    },
+    {
+      "entrees": {
+        "donnees": ""
+      },
+      "nom": "sha256/vide",
+      "sorties": {
+        "empreinte": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "entrees": {
+        "cle": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+        "donnees": "4869205468657265"
+      },
+      "nom": "hmacSha256/rfc4231-cas-1",
+      "sorties": {
+        "mac": "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7"
+      }
+    },
+    {
+      "entrees": {
+        "cle": "4a656665",
+        "donnees": "7768617420646f2079612077616e7420666f72206e6f7468696e673f"
+      },
+      "nom": "hmacSha256/rfc4231-cas-2",
+      "sorties": {
+        "mac": "5bdcc146bf60754e6a042426089575c75a003f089d2739839dec58b964ec3843"
+      }
+    },
+    {
+      "entrees": {
+        "cle": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "donnees": "54657374205573696e67204c6172676572205468616e20426c6f636b2d53697a65204b6579202d2048617368204b6579204669727374"
+      },
+      "nom": "hmacSha256/rfc4231-cas-6",
+      "sorties": {
+        "mac": "60e431591ee0b67f0d8a26aacbf5b77f8e0bc6213728c5140546040f0ee37f54"
+      }
+    },
+    {
+      "entrees": {
+        "ikm": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+        "info": "f0f1f2f3f4f5f6f7f8f9",
+        "longueur": 42,
+        "sel": "000102030405060708090a0b0c"
+      },
+      "nom": "hkdfSha256/rfc5869-a1",
+      "sorties": {
+        "okm": "3cb25f25faacd57a90434f64d0362f2a2d2d0a90cf1a5a4c5db02d56ecc4c5bf34007208d5b887185865"
+      }
+    },
+    {
+      "entrees": {
+        "ikm": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f",
+        "info": "b0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff",
+        "longueur": 82,
+        "sel": "606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeaf"
+      },
+      "nom": "hkdfSha256/rfc5869-a2",
+      "sorties": {
+        "okm": "b11e398dc80327a1c8e7f78c596a49344f012eda2d4efad8a050cc4c19afa97c59045a99cac7827271cb41c65e590e09da3275600c2f09b8367793a9aca3db71cc30c58179ec3e87c14c01d5c1f3434f1d87"
+      }
+    },
+    {
+      "entrees": {
+        "ikm": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+        "info": "",
+        "longueur": 42,
+        "sel": ""
+      },
+      "nom": "hkdfSha256/rfc5869-a3",
+      "sorties": {
+        "okm": "8da4e775a563c18f715f802a063c5a31b8a11f5c5ee1879ec3454e5f3c738d2d9d201395faa4b61a96c8"
+      }
+    },
+    {
+      "entrees": {
+        "aad": "adb5ec720ccf9898500028bf34afccbcaca126ef",
+        "clair": "27f348f9cdc0c5bd5e66b1ccb63ad920ff2219d14e8d631b3872265cf117ee86757accb158bd9abb3868fdc0d0b074b5f01b2c",
+        "cle": "24501ad384e473963d476edcfe08205237acfd49b5b8f33857f8114e863fec7f",
+        "iv": "9ff18563b978ec281b3f2794"
+      },
+      "nom": "aesGcmChiffrer/nist-cavp-encrypt-256-96-408-160-128-0",
+      "sorties": {
+        "chiffre": "eb7cb754c824e8d96f7c6d9b76c7d26fb874ffbf1d65c6f64a698d839b0b06145dae82057ad55994cf59ad7f67c0fa5e85fab8bc95c532fecc594c36d1550286a7a3f0"
+      }
+    },
+    {
+      "entrees": {
+        "aad": "adb5ec720ccf9898500028bf34afccbcaca126ef",
+        "chiffre": "eb7cb754c824e8d96f7c6d9b76c7d26fb874ffbf1d65c6f64a698d839b0b06145dae82057ad55994cf59ad7f67c0fa5e85fab8bc95c532fecc594c36d1550286a7a3f0",
+        "cle": "24501ad384e473963d476edcfe08205237acfd49b5b8f33857f8114e863fec7f",
+        "iv": "9ff18563b978ec281b3f2794"
+      },
+      "nom": "aesGcmDechiffrer/nist-cavp-encrypt-256-96-408-160-128-0",
+      "sorties": {
+        "clair": "27f348f9cdc0c5bd5e66b1ccb63ad920ff2219d14e8d631b3872265cf117ee86757accb158bd9abb3868fdc0d0b074b5f01b2c"
+      }
+    },
+    {
+      "entrees": {
+        "aad": "6661746f6f6d2d766563746575727c616164",
+        "clair": "822a6b8fa692cbab6402ef60dc6afba159ca222b57c5b122a252b3d2882d3f16ff5cbe976d0b227d9710e3a5bad2887775c0e3712b445a18e5284b5ba4b955d617607001bb2781ebdd2983eebe5b1558c4469747e797c26f17edf2b57ee057b90515d18df492abdee49d315a8051f8481ed2a10a0b0a21db18a42e7b856a75ab9e4f29e6f341c58bea1b63736f67fd764d6abed101556a14c9ef62bc8418c2fe94dc0e398f395290e2b7c2df6a35b3f3f540b0face5a7752ad69ea201b5351962636e1e950e0ce7c2996532415358784c0288d8664ff5089a11d7b94442903a41bcafc06e7bd9ecf66baec357c0ee6ed5ff01c22b26f9c8090e873d063633a82257468e3025872099b5dbf5ba10140b173649ebedaa5e8924e77f8a218bca2807fe9199aa6eae21f852110b534103c805ed77cb027d792d898600a50fdabea259e98abd05994685d9427637806dbdaf0d0d2c23ae68cb6706512318927a8f6739b96def61937cf74464943378b58682ad1b166880cbc8c8c98a74780630ae90460f74685b5e33f0c1028dd1d1acb3c7db3ed49da0af3601a0f4a611d17cb5fcd0fea1c0231b73fa198753a45c08deceb1cdf1803c462c3b9befa7fa9cd90479748757a4fb869db51da024c01459cf09c5a4c71e7ac0cda70e4b83cd9aa978b11d89c988a4118514f12bcf13199f7f437c8e57105126560551bb5caa78171d7d67d30058c16f9f9e926768df2ffed5224d26e0dc3ec0c6cd932342cdfc4d243c3511b970b770891aa0814de616f00e501f39d8cbe327e212a5cc1753cac042dbeb2977ebe16350d5335f79148cc5d5b0a2631c25db0e5fea56d9214ea10431564cb147fdeb972b8f256f686ef04a772c94aa52b99a6b893526b07a871426eb03e17a5544d67c6f2911672a5a4548c1a07f9a20d1c1afc0caaa8fe912a733ac665483ebfed80e0d81028d030865c2839ed19e0d5528727e6a91d4ae6e9850fa1a5583de19b793d96d9d00f4a26a13efb862e63a47c9150c90b9bb5a4de8edc49c8cc7aecdfa397d66fc50d9b731f71eae88abdbfa80ff3979934cf7f77f4d8948c1316827b5de5d7fdb4fdd1faa3e0abd3ca4e5fbcfa36344976accde7e7d2eba3b95ed5d6af83de33f2ec24d57ac01f7962120409dc194ac1aac7997bb585bdeb475fcafa0912c04b758e8282fe7c6baec5a2f93bbe03d944e326de612ccf66d6da9303d6180fedcd202d34b850a3bc3f05295bb16d084ab6fa33c3958068006f2d76312870a2b61ca11d1b5919fd1e10afbddc697157bbff8be2941eb3eab74898a0f2f8c2c0eecbd3f05cfd9c53c6e1543e5f311cde5f273dc7dc8f6653316f32edc35e0206d1de6505742685d63e450ff41102044e912a11b7d216922559062c8afa03385f0584",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9bad11b190c2f0aed85d7fb7816007e81a4",
+        "iv": "f45b40beb8b725847c9373ee"
+      },
+      "nom": "aesGcmChiffrer/fixe-1000-octets",
+      "sorties": {
+        "chiffre": "a4edbb76a9cf22342c50e3a11182b512960141d045e682e50b3b2c02a93cc794ab1841aef2fa012f46e64291fc76bd978796dbbf8dcaa16e2418980ce6f1917e2286fd3197389dfcdf7cb145621c29e4c8ecca5e14c120e4ee885440fb3c4cd3ba55b5cbf8ab1f74672003444d90b6c3e8e7cba9407eda6e31236adbb035990a1292d41a603863c76d5920948ee85bfa4d9772d4162b83aa4f44969ea8e03cf969801550844c10596dcb66c50fe9799cb4683475dce0d9303095b7120798989b20500cc9bcfc18fa272539f97579507985d728c46ae327d3cc5634fb86e8bab1ecba07a0e530a20f6c310083ee0c4b26a84678fc172c0ef63873aba53dd59b7d694e935471a9a5197dde027808d7cc8af785a51353090d67c829f812a3900ad929643c4334426a6cb2340f1490771bafefef1893e871da262beee3e2f0a8cf02528c3358b746a3b6d1225f2e8242c9f2d90a6d778a89223d8b6746e26e5d96e8aed6b75024f337de167b26c98fcfd113cbdd2a774b5b3427b67bee407d480104b21fdf6066ac4f7064e9ff6246755dffe7ed8d2504893c029a16d7f267ce77cb1e47ded8ff990f55a9e73434caa269673f8f34034eb301ef81737d62ff8a337ce8b749dc1cc145efc6530b8d248446c7c098c3172cba1f241ecfd99c892f7a221da635e229aa4bffaef7f6488b47f80b81cb4d620d4eb2806895e724477bc3add370aeff2cbeb77313e5f7923aec1db23589c1f2c9283443c2f88971d7efe170ccfebad82bb2191fff2c64ce27577697ecca630b9fbaafd0210b2d5626d965938c9a63ed70c4164d530b0c1b615008f57ec67596511acaf9b02227672b3ea35a3f3ad34486885a330110b3b7dc1fa30f25f3224ae3f83f419d77cd4c9d8db1f134549b42c9c8da0a10d8054a83492ff96319e8c8c8bcf780f019da4e9531e4b3185dc213bb21d9f9e034fd4c33913cc1bb78b25d5638daf037059f12a604518ec796e11b78fa4fb3bf548da261a986f6cc36173656b381aef5ce4e022b58eb171398523acade7e42219cded0eaa8f44c14b85470330b124a0a118d5c8d0baf942efd163d8e995a83966f930816c19189d8c32fda98d0f5cac8ca27c37d2b2bee5fa9235f0a8bebbeeb4131749192d5956d64279770fa91608d8f9c0f4454f7028b921f9ac420bd4011b660b290e37deb9311920e5eed8b78937c718f2e53aa62d8d2a04fe7b678d0d7ce6bd5988ad291653a9fd40ae84eaadb4cc44644cb07c84f999ceb7fd4f6b92f1e9d4f06751fa178cdba42e84af6886fb21ef51720969bba69030af90fc1a874bcebad1ad24133c28ce1391b0229f479d4eccacee947ebe2b63613ec86277d65fe86f68dd2ea69b30fd99347d005849be5f1026e1df12dff7804cc9ef5d6b1b45a89136ddad66650f57b18afa69e32"
+      }
+    },
+    {
+      "entrees": {
+        "aad": "6661746f6f6d2d766563746575727c616164",
+        "chiffre": "a4edbb76a9cf22342c50e3a11182b512960141d045e682e50b3b2c02a93cc794ab1841aef2fa012f46e64291fc76bd978796dbbf8dcaa16e2418980ce6f1917e2286fd3197389dfcdf7cb145621c29e4c8ecca5e14c120e4ee885440fb3c4cd3ba55b5cbf8ab1f74672003444d90b6c3e8e7cba9407eda6e31236adbb035990a1292d41a603863c76d5920948ee85bfa4d9772d4162b83aa4f44969ea8e03cf969801550844c10596dcb66c50fe9799cb4683475dce0d9303095b7120798989b20500cc9bcfc18fa272539f97579507985d728c46ae327d3cc5634fb86e8bab1ecba07a0e530a20f6c310083ee0c4b26a84678fc172c0ef63873aba53dd59b7d694e935471a9a5197dde027808d7cc8af785a51353090d67c829f812a3900ad929643c4334426a6cb2340f1490771bafefef1893e871da262beee3e2f0a8cf02528c3358b746a3b6d1225f2e8242c9f2d90a6d778a89223d8b6746e26e5d96e8aed6b75024f337de167b26c98fcfd113cbdd2a774b5b3427b67bee407d480104b21fdf6066ac4f7064e9ff6246755dffe7ed8d2504893c029a16d7f267ce77cb1e47ded8ff990f55a9e73434caa269673f8f34034eb301ef81737d62ff8a337ce8b749dc1cc145efc6530b8d248446c7c098c3172cba1f241ecfd99c892f7a221da635e229aa4bffaef7f6488b47f80b81cb4d620d4eb2806895e724477bc3add370aeff2cbeb77313e5f7923aec1db23589c1f2c9283443c2f88971d7efe170ccfebad82bb2191fff2c64ce27577697ecca630b9fbaafd0210b2d5626d965938c9a63ed70c4164d530b0c1b615008f57ec67596511acaf9b02227672b3ea35a3f3ad34486885a330110b3b7dc1fa30f25f3224ae3f83f419d77cd4c9d8db1f134549b42c9c8da0a10d8054a83492ff96319e8c8c8bcf780f019da4e9531e4b3185dc213bb21d9f9e034fd4c33913cc1bb78b25d5638daf037059f12a604518ec796e11b78fa4fb3bf548da261a986f6cc36173656b381aef5ce4e022b58eb171398523acade7e42219cded0eaa8f44c14b85470330b124a0a118d5c8d0baf942efd163d8e995a83966f930816c19189d8c32fda98d0f5cac8ca27c37d2b2bee5fa9235f0a8bebbeeb4131749192d5956d64279770fa91608d8f9c0f4454f7028b921f9ac420bd4011b660b290e37deb9311920e5eed8b78937c718f2e53aa62d8d2a04fe7b678d0d7ce6bd5988ad291653a9fd40ae84eaadb4cc44644cb07c84f999ceb7fd4f6b92f1e9d4f06751fa178cdba42e84af6886fb21ef51720969bba69030af90fc1a874bcebad1ad24133c28ce1391b0229f479d4eccacee947ebe2b63613ec86277d65fe86f68dd2ea69b30fd99347d005849be5f1026e1df12dff7804cc9ef5d6b1b45a89136ddad66650f57b18afa69e32",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9bad11b190c2f0aed85d7fb7816007e81a4",
+        "iv": "f45b40beb8b725847c9373ee"
+      },
+      "nom": "aesGcmDechiffrer/fixe-1000-octets",
+      "sorties": {
+        "clair": "822a6b8fa692cbab6402ef60dc6afba159ca222b57c5b122a252b3d2882d3f16ff5cbe976d0b227d9710e3a5bad2887775c0e3712b445a18e5284b5ba4b955d617607001bb2781ebdd2983eebe5b1558c4469747e797c26f17edf2b57ee057b90515d18df492abdee49d315a8051f8481ed2a10a0b0a21db18a42e7b856a75ab9e4f29e6f341c58bea1b63736f67fd764d6abed101556a14c9ef62bc8418c2fe94dc0e398f395290e2b7c2df6a35b3f3f540b0face5a7752ad69ea201b5351962636e1e950e0ce7c2996532415358784c0288d8664ff5089a11d7b94442903a41bcafc06e7bd9ecf66baec357c0ee6ed5ff01c22b26f9c8090e873d063633a82257468e3025872099b5dbf5ba10140b173649ebedaa5e8924e77f8a218bca2807fe9199aa6eae21f852110b534103c805ed77cb027d792d898600a50fdabea259e98abd05994685d9427637806dbdaf0d0d2c23ae68cb6706512318927a8f6739b96def61937cf74464943378b58682ad1b166880cbc8c8c98a74780630ae90460f74685b5e33f0c1028dd1d1acb3c7db3ed49da0af3601a0f4a611d17cb5fcd0fea1c0231b73fa198753a45c08deceb1cdf1803c462c3b9befa7fa9cd90479748757a4fb869db51da024c01459cf09c5a4c71e7ac0cda70e4b83cd9aa978b11d89c988a4118514f12bcf13199f7f437c8e57105126560551bb5caa78171d7d67d30058c16f9f9e926768df2ffed5224d26e0dc3ec0c6cd932342cdfc4d243c3511b970b770891aa0814de616f00e501f39d8cbe327e212a5cc1753cac042dbeb2977ebe16350d5335f79148cc5d5b0a2631c25db0e5fea56d9214ea10431564cb147fdeb972b8f256f686ef04a772c94aa52b99a6b893526b07a871426eb03e17a5544d67c6f2911672a5a4548c1a07f9a20d1c1afc0caaa8fe912a733ac665483ebfed80e0d81028d030865c2839ed19e0d5528727e6a91d4ae6e9850fa1a5583de19b793d96d9d00f4a26a13efb862e63a47c9150c90b9bb5a4de8edc49c8cc7aecdfa397d66fc50d9b731f71eae88abdbfa80ff3979934cf7f77f4d8948c1316827b5de5d7fdb4fdd1faa3e0abd3ca4e5fbcfa36344976accde7e7d2eba3b95ed5d6af83de33f2ec24d57ac01f7962120409dc194ac1aac7997bb585bdeb475fcafa0912c04b758e8282fe7c6baec5a2f93bbe03d944e326de612ccf66d6da9303d6180fedcd202d34b850a3bc3f05295bb16d084ab6fa33c3958068006f2d76312870a2b61ca11d1b5919fd1e10afbddc697157bbff8be2941eb3eab74898a0f2f8c2c0eecbd3f05cfd9c53c6e1543e5f311cde5f273dc7dc8f6653316f32edc35e0206d1de6505742685d63e450ff41102044e912a11b7d216922559062c8afa03385f0584"
+      }
+    },
+    {
+      "entrees": {
+        "aad": "",
+        "clair": "",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9bad11b190c2f0aed85d7fb7816007e81a4",
+        "iv": "f45b40beb8b725847c9373ee"
+      },
+      "nom": "aesGcmChiffrer/fixe-vide",
+      "sorties": {
+        "chiffre": "9c8d73117a3d86353d490e66d73fd43c"
+      }
+    },
+    {
+      "entrees": {
+        "aad": "",
+        "chiffre": "9c8d73117a3d86353d490e66d73fd43c",
+        "cle": "dd3a89a25828e1cc38608e66dcc9f9bad11b190c2f0aed85d7fb7816007e81a4",
+        "iv": "f45b40beb8b725847c9373ee"
+      },
+      "nom": "aesGcmDechiffrer/fixe-vide",
+      "sorties": {
+        "clair": ""
+      }
+    },
+    {
+      "entrees": {
+        "prive": "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a"
+      },
+      "nom": "x25519Publique/rfc7748-6-1-alice",
+      "sorties": {
+        "publique": "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a"
+      }
+    },
+    {
+      "entrees": {
+        "prive": "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb"
+      },
+      "nom": "x25519Publique/rfc7748-6-1-bob",
+      "sorties": {
+        "publique": "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f"
+      }
+    },
+    {
+      "entrees": {
+        "prive": "a546e36bf0527c9d3b16154b82465edd62144c0ac1fc5a18506a2244ba449ac4",
+        "publique": "e6db6867583030db3594c1a424b15f7c726624ec26b3353b10a903a6d0ab1c4c"
+      },
+      "nom": "x25519/rfc7748-5-2-1",
+      "sorties": {
+        "secret": "c3da55379de9c6908e94ea4df28d084f32eccf03491c71f754b4075577a28552"
+      }
+    },
+    {
+      "entrees": {
+        "prive": "4b66e9d4d1b4673c5ad22691957d6af5c11b6421e0ea01d42ca4169e7918ba0d",
+        "publique": "e5210f12786811d3f4b7959d0538ae2c31dbe7106fc03c3efc4cd549c715a493"
+      },
+      "nom": "x25519/rfc7748-5-2-2",
+      "sorties": {
+        "secret": "95cbde9476e8907d7aade45cb4b873f88b595a68799fa152e6f8f7647aac7957"
+      }
+    },
+    {
+      "entrees": {
+        "prive": "77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a",
+        "publique": "de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f"
+      },
+      "nom": "x25519/rfc7748-6-1-alice-vers-bob",
+      "sorties": {
+        "secret": "4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742"
+      }
+    },
+    {
+      "entrees": {
+        "prive": "5dab087e624a8a4b79e17f8b83800ee66f3bb1292618b6fd1c2f8b27ff88e0eb",
+        "publique": "8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a"
+      },
+      "nom": "x25519/rfc7748-6-1-bob-vers-alice",
+      "sorties": {
+        "secret": "4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742"
+      }
+    },
+    {
+      "entrees": {},
+      "nom": "x25519Paire/forme",
+      "sorties": {
+        "longueurPrive": 32,
+        "longueurPublique": 32,
+        "publiqueRecalculee": true
+      }
+    },
+    {
+      "entrees": {
+        "graine": "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+      },
+      "nom": "ed25519Publique/rfc8032-7-1-test-1",
+      "sorties": {
+        "publique": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"
+      }
+    },
+    {
+      "entrees": {
+        "graine": "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60",
+        "message": ""
+      },
+      "nom": "ed25519Signer/rfc8032-7-1-test-1",
+      "sorties": {
+        "signature": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b"
+      }
+    },
+    {
+      "entrees": {
+        "message": "",
+        "publique": "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a",
+        "signature": "e5564300c360ac729086e2cc806e828a84877f1eb8e5d974d873e065224901555fb8821590a33bacc61e39701cf9b46bd25bf5f0595bbe24655141438e7a100b"
+      },
+      "nom": "ed25519Verifier/rfc8032-7-1-test-1",
+      "sorties": {
+        "valide": true
+      }
+    },
+    {
+      "entrees": {
+        "graine": "4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb"
+      },
+      "nom": "ed25519Publique/rfc8032-7-1-test-2",
+      "sorties": {
+        "publique": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c"
+      }
+    },
+    {
+      "entrees": {
+        "graine": "4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb",
+        "message": "72"
+      },
+      "nom": "ed25519Signer/rfc8032-7-1-test-2",
+      "sorties": {
+        "signature": "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da085ac1e43e15996e458f3613d0f11d8c387b2eaeb4302aeeb00d291612bb0c00"
+      }
+    },
+    {
+      "entrees": {
+        "message": "72",
+        "publique": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+        "signature": "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da085ac1e43e15996e458f3613d0f11d8c387b2eaeb4302aeeb00d291612bb0c00"
+      },
+      "nom": "ed25519Verifier/rfc8032-7-1-test-2",
+      "sorties": {
+        "valide": true
+      }
+    },
+    {
+      "entrees": {
+        "graine": "c5aa8df43f9f837bedb7442f31dcb7b166d38535076f094b85ce3a2e0b4458f7"
+      },
+      "nom": "ed25519Publique/rfc8032-7-1-test-3",
+      "sorties": {
+        "publique": "fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025"
+      }
+    },
+    {
+      "entrees": {
+        "graine": "c5aa8df43f9f837bedb7442f31dcb7b166d38535076f094b85ce3a2e0b4458f7",
+        "message": "af82"
+      },
+      "nom": "ed25519Signer/rfc8032-7-1-test-3",
+      "sorties": {
+        "signature": "6291d657deec24024827e69c3abe01a30ce548a284743a445e3680d7db5ac3ac18ff9b538d16f290ae67f760984dc6594a7c15e9716ed28dc027beceea1ec40a"
+      }
+    },
+    {
+      "entrees": {
+        "message": "af82",
+        "publique": "fc51cd8e6218a1a38da47ed00230f0580816ed13ba3303ac5deb911548908025",
+        "signature": "6291d657deec24024827e69c3abe01a30ce548a284743a445e3680d7db5ac3ac18ff9b538d16f290ae67f760984dc6594a7c15e9716ed28dc027beceea1ec40a"
+      },
+      "nom": "ed25519Verifier/rfc8032-7-1-test-3",
+      "sorties": {
+        "valide": true
+      }
+    },
+    {
+      "entrees": {
+        "message": "73",
+        "publique": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+        "signature": "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69da085ac1e43e15996e458f3613d0f11d8c387b2eaeb4302aeeb00d291612bb0c00"
+      },
+      "nom": "ed25519Verifier/rfc8032-7-1-test-2-message-modifie",
+      "sorties": {
+        "valide": false
+      }
+    },
+    {
+      "entrees": {
+        "message": "72",
+        "publique": "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+        "signature": "92a009a9f0d4cab8720e820b5f642540a2b27b5416503f8fb3762223ebdb69daf52db7415978abc61b2c2eb6aeebfca0387b2eaeb4302aeeb00d291612bb0c10"
+      },
+      "nom": "ed25519Verifier/rfc8032-7-1-test-2-s-plus-ell",
+      "sorties": {
+        "valide": false
+      }
+    },
+    {
+      "entrees": {
+        "message": "73616d706c65",
+        "publique": "0460fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb67903fe1008b8bc99a41ae9e95628bc64f2f1b20c2d7e9f5177a3c294d4462299",
+        "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8"
+      },
+      "nom": "ecdsaP256Verifier/rfc6979-a-2-5-sha256-sample",
+      "sorties": {
+        "valide": true
+      }
+    },
+    {
+      "entrees": {
+        "message": "74657374",
+        "publique": "0460fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb67903fe1008b8bc99a41ae9e95628bc64f2f1b20c2d7e9f5177a3c294d4462299",
+        "signature": "f1abb023518351cd71d881567b1ea663ed3efcf6c5132b354f28d3b0b7d38367019f4113742a2b14bd25926b49c649155f267e60d3814b4c0cc84250e46f0083"
+      },
+      "nom": "ecdsaP256Verifier/rfc6979-a-2-5-sha256-test",
+      "sorties": {
+        "valide": true
+      }
+    },
+    {
+      "entrees": {
+        "message": "74657374",
+        "publique": "0460fed4ba255a9d31c961eb74c6356d68c049b8923b61fa6ce669622e60f29fb67903fe1008b8bc99a41ae9e95628bc64f2f1b20c2d7e9f5177a3c294d4462299",
+        "signature": "efd48b2aacb6a8fd1140dd9cd45e81d69d2c877b56aaf991c34d0ea84eaf3716f7cb1c942d657c41d436c7a1b6e29f65f3e900dbb9aff4064dc4ab2f843acda8"
+      },
+      "nom": "ecdsaP256Verifier/rfc6979-a-2-5-signature-sample-message-test",
+      "sorties": {
+        "valide": false
+      }
+    },
+    {
+      "entrees": {
+        "message": "6661746f6f6d2d766563746575727c727361",
+        "publique": "30820122300d06092a864886f70d01010105000382010f003082010a0282010100e950ba65406e7ccd028bb31cf06001da2c4d06199c3b2a7c93d12fe6a6c82b446bfdd42aed170c532b87d131cebc11d8ff285575bd2ae5c54d6c4d4977f9d567fee8ee7cafb47a9358d475597c71c9d4f65783bae930a4141986f8b8ccee16e0ca39027b35eee51220e5e9fda933d7e1a0c43f1d3a3bcb0f3cf6ae5e6294114812d1c4e6017e662bcba93eabe238ba4c8c5fc6036fe904d500f26afb73243e7a10e6ed2d25a5ba2b8f6eeb6de68f857d64b88171bf9a22010f6fc9a897230c0c0da0757fe6599e53fc20e434b5ff4ef14c7b69b4e0636b432306b4d055ace757ad8e44b4d68cfe1cd3fd3737946a13987dbdfc69a7a220afbab6b9cdb00f589b0203010001",
+        "signature": "a85c119d0d0c459c9b3d1ae14bcbbe3371233153685db2ad7df39dbd11b076a983f736c8aa299ce4c9c68c41c9382ff60c24c982bbd118c1ee5cb8082c9e5b83d729979a603215cf27a2866f5e8c5e27957a6bf46c746aa72b77dbe630b0c8624acd3b5f34b8bf93ae8466c3523842dd75135240a8b92f6bb5745c6cf68ac71da6708c07056da802d6a1d8b2395e544b4dd85c45ca287594d3ab86799cbe819f8d93923c4999944733abfe673e01b9101b54e16e6c19f39b2a0808eb0c6d96b522d0a7a2292ab012888c7a85fbfda5707148c7461a413e430643577ee5e76bc8329cc6f28f836fa6c97df782824024d3924a1336405636bdd6e69d4800efd916"
+      },
+      "nom": "rsaPkcs1Sha256Verifier/fixe-2048",
+      "sorties": {
+        "valide": true
+      }
+    },
+    {
+      "entrees": {
+        "message": "6661746f6f6d2d766563746575727c7273612d6175747265",
+        "publique": "30820122300d06092a864886f70d01010105000382010f003082010a0282010100e950ba65406e7ccd028bb31cf06001da2c4d06199c3b2a7c93d12fe6a6c82b446bfdd42aed170c532b87d131cebc11d8ff285575bd2ae5c54d6c4d4977f9d567fee8ee7cafb47a9358d475597c71c9d4f65783bae930a4141986f8b8ccee16e0ca39027b35eee51220e5e9fda933d7e1a0c43f1d3a3bcb0f3cf6ae5e6294114812d1c4e6017e662bcba93eabe238ba4c8c5fc6036fe904d500f26afb73243e7a10e6ed2d25a5ba2b8f6eeb6de68f857d64b88171bf9a22010f6fc9a897230c0c0da0757fe6599e53fc20e434b5ff4ef14c7b69b4e0636b432306b4d055ace757ad8e44b4d68cfe1cd3fd3737946a13987dbdfc69a7a220afbab6b9cdb00f589b0203010001",
+        "signature": "a85c119d0d0c459c9b3d1ae14bcbbe3371233153685db2ad7df39dbd11b076a983f736c8aa299ce4c9c68c41c9382ff60c24c982bbd118c1ee5cb8082c9e5b83d729979a603215cf27a2866f5e8c5e27957a6bf46c746aa72b77dbe630b0c8624acd3b5f34b8bf93ae8466c3523842dd75135240a8b92f6bb5745c6cf68ac71da6708c07056da802d6a1d8b2395e544b4dd85c45ca287594d3ab86799cbe819f8d93923c4999944733abfe673e01b9101b54e16e6c19f39b2a0808eb0c6d96b522d0a7a2292ab012888c7a85fbfda5707148c7461a413e430643577ee5e76bc8329cc6f28f836fa6c97df782824024d3924a1336405636bdd6e69d4800efd916"
+      },
+      "nom": "rsaPkcs1Sha256Verifier/fixe-2048-autre-message",
+      "sorties": {
+        "valide": false
+      }
+    },
+    {
+      "entrees": {
+        "longueur": 32,
+        "motDePasse": "79f59c77a40e1719832c504bc7e5efb35c3bec4c7d866ff0dce1842f5eaf5942",
+        "parametres": {
+          "m": 4096,
+          "p": 1,
+          "t": 2
+        },
+        "sel": "306a1acde876f5e614b2455451f4e2bb"
+      },
+      "nom": "argon2id/m4096-t2-p1",
+      "sorties": {
+        "cle": "1a7319d4b677e829ecd1b5f9b50c9d4cf52d635bf88665349be6c5b0a1a41b0b"
+      }
+    },
+    {
+      "entrees": {
+        "longueur": 32,
+        "motDePasse": "79f59c77a40e1719832c504bc7e5efb35c3bec4c7d866ff0dce1842f5eaf5942",
+        "parametres": {
+          "m": 64,
+          "p": 4,
+          "t": 3
+        },
+        "sel": "306a1acde876f5e614b2455451f4e2bb"
+      },
+      "nom": "argon2id/m64-t3-p4",
+      "sorties": {
+        "cle": "edf11ca0f18bab6e3864b2e506139265fb56f8a6276c69d9315e9ca1264404e4"
+      }
+    },
+    {
+      "entrees": {
+        "chiffre": "a083d0fefff15ce219cc8673e2ba5bbd7aace5db61da3e372b1ee6721b999d7424f881dbf3d57c0cff3f9ee345c9fa4079b6f4adae6b0993cc82ce0972ef26aac28d9e34a4e9bd0c367dfd292ee4015ec4e0d27b28385d98db617fc3a5449caf6d45a4ad2244524e39b1edca76e1dfa6e33a6666b1783eaced1c5f3bb1febbd87dab66fa8e3803156ffcdcb0ca43bf20132b4ccbc1e62375f5f71873714de106b74afae2183151d778690b68cbdd16b824a8e3f0545bf6b343e6e3dfd21b019c21c1ee2ed89330fb67291df9ede3f71486aa44ce435cbdf4b74fded469b30a0fc04093e96f950d52804b95e7ee3390a398e5148bea71f94430a4eb89907a7d6f9c32f50259b57c50a5a4262fab32907f1fea90b12909a706254080bbb5f7b5a33e0f177773123cb422cfc2dd25ea44421bf779636b828bc6801fac5ccd182b1c99017afdb2b3d04ca2fba1ffc3461e1b07f767f9079633e81f1f0e2a2faf61cc945bd75c12c22764a431f363b4495175e8d0b21c0b2c3c3ec43521bbd8498bb39dcdaf92b2369ec060f125c5f3b0063abc40234b3bba08c2b0234da58f1af5a190b992b88c996fde3df89ec8a59ad637d9ca55c73b19e8a297eee890eeccb532d50dac673a97fd676f2e6272c0e9e6460c42795d534a30888d160022ecbff3df80708680c124fbe38691b125b48cf4b155598e1f59a3ae4748f1be8a19daa71e9a9d7fee02f9ad211dcaf1cb81dc2c534c3f1a4f23506f0c48b17e25455f6a022efb73cc61f4963c097851ff0bfc301ff8b19a6c5be12a5ed2d20114721106b323c50086e8236a30f7abfcd389c358d906b15db858f4000e97aa31e3fcf4005a3d3632a6cdee07969cb54a4d52cf864289d6990f22473fbed9f58466c3f49422771084cd651e80652020523abb59e34a48a1c7e9e1fe4d98cc278ff3b3f6dd27ae892aaa8e7aa1a0881c7fe2e89b31c20491b5ff6b3cb047d29c83765f01d1466b7cd90c1beb3e8bcf7ad6e62bea3a6aef71592ac44c34c750f7edca8e56c2c8d04583edd42579ad04ff72273a993ca3737342a7262c13803128c51f63dbe79ecdbfcabeb59ef9c58090d6bcfcd077704f58690b064335dfd0a059aa6a296938e7ac1ae5dfc7010c3e4e99f41fbbe8c0d7f2a36f7ef2e93bf7d40c5676e7f3ca6a5f3c6d18a82b4c5b80120ea5b1ddcb99d9be5ef8150bb64d3e371a222ec59d21be698bbdf41b2be56226aee7d19655a70daac15b2647d519b95249f4f27799ebe1b060e600c0e4eb21db8c39a9f00f45c2563ed89a612511cae4be0d11b6996d4a941e82e7fe0237dcff63f44a1678a4e9ff9f9b47a14da3802dfcf2a2e4177401cffda39df1af87780efb426c336d42b040fc061800a20b9dc49c1e15238b6591627251b6bec424f5576315469ce56ce6fb0ef47e1c71022b4cc0af6e50c5d8856fb2667c8e4af0f1fefcf56d309670022877be650bfd58868c37a633c9788f67bf5d4778888d0e5c2300244bde9311e1e466e7de6a35dc4c54078e972ba4",
+        "graine": "37ee3332ca6c6049a1b4c3e7a178ec148dbcbf58f105dc0bd2b7ef864b22644640b5342f7529f97bf560c6ad200a4978d1e9bb40ce6d09445d8062bf85c0193e"
+      },
+      "nom": "mlKem768Decapsuler/fixe",
+      "sorties": {
+        "secret": "0db307c5edcb712e7c9e14ee0ca34e30ff8aff9e475e80c24d29c89b587d0bb0"
+      }
+    },
+    {
+      "entrees": {
+        "chiffre": "a183d0fefff15ce219cc8673e2ba5bbd7aace5db61da3e372b1ee6721b999d7424f881dbf3d57c0cff3f9ee345c9fa4079b6f4adae6b0993cc82ce0972ef26aac28d9e34a4e9bd0c367dfd292ee4015ec4e0d27b28385d98db617fc3a5449caf6d45a4ad2244524e39b1edca76e1dfa6e33a6666b1783eaced1c5f3bb1febbd87dab66fa8e3803156ffcdcb0ca43bf20132b4ccbc1e62375f5f71873714de106b74afae2183151d778690b68cbdd16b824a8e3f0545bf6b343e6e3dfd21b019c21c1ee2ed89330fb67291df9ede3f71486aa44ce435cbdf4b74fded469b30a0fc04093e96f950d52804b95e7ee3390a398e5148bea71f94430a4eb89907a7d6f9c32f50259b57c50a5a4262fab32907f1fea90b12909a706254080bbb5f7b5a33e0f177773123cb422cfc2dd25ea44421bf779636b828bc6801fac5ccd182b1c99017afdb2b3d04ca2fba1ffc3461e1b07f767f9079633e81f1f0e2a2faf61cc945bd75c12c22764a431f363b4495175e8d0b21c0b2c3c3ec43521bbd8498bb39dcdaf92b2369ec060f125c5f3b0063abc40234b3bba08c2b0234da58f1af5a190b992b88c996fde3df89ec8a59ad637d9ca55c73b19e8a297eee890eeccb532d50dac673a97fd676f2e6272c0e9e6460c42795d534a30888d160022ecbff3df80708680c124fbe38691b125b48cf4b155598e1f59a3ae4748f1be8a19daa71e9a9d7fee02f9ad211dcaf1cb81dc2c534c3f1a4f23506f0c48b17e25455f6a022efb73cc61f4963c097851ff0bfc301ff8b19a6c5be12a5ed2d20114721106b323c50086e8236a30f7abfcd389c358d906b15db858f4000e97aa31e3fcf4005a3d3632a6cdee07969cb54a4d52cf864289d6990f22473fbed9f58466c3f49422771084cd651e80652020523abb59e34a48a1c7e9e1fe4d98cc278ff3b3f6dd27ae892aaa8e7aa1a0881c7fe2e89b31c20491b5ff6b3cb047d29c83765f01d1466b7cd90c1beb3e8bcf7ad6e62bea3a6aef71592ac44c34c750f7edca8e56c2c8d04583edd42579ad04ff72273a993ca3737342a7262c13803128c51f63dbe79ecdbfcabeb59ef9c58090d6bcfcd077704f58690b064335dfd0a059aa6a296938e7ac1ae5dfc7010c3e4e99f41fbbe8c0d7f2a36f7ef2e93bf7d40c5676e7f3ca6a5f3c6d18a82b4c5b80120ea5b1ddcb99d9be5ef8150bb64d3e371a222ec59d21be698bbdf41b2be56226aee7d19655a70daac15b2647d519b95249f4f27799ebe1b060e600c0e4eb21db8c39a9f00f45c2563ed89a612511cae4be0d11b6996d4a941e82e7fe0237dcff63f44a1678a4e9ff9f9b47a14da3802dfcf2a2e4177401cffda39df1af87780efb426c336d42b040fc061800a20b9dc49c1e15238b6591627251b6bec424f5576315469ce56ce6fb0ef47e1c71022b4cc0af6e50c5d8856fb2667c8e4af0f1fefcf56d309670022877be650bfd58868c37a633c9788f67bf5d4778888d0e5c2300244bde9311e1e466e7de6a35dc4c54078e972ba4",
+        "graine": "37ee3332ca6c6049a1b4c3e7a178ec148dbcbf58f105dc0bd2b7ef864b22644640b5342f7529f97bf560c6ad200a4978d1e9bb40ce6d09445d8062bf85c0193e"
+      },
+      "nom": "mlKem768Decapsuler/chiffre-altere-rejet-implicite",
+      "sorties": {
+        "secret": "59a6141d840b20cb4e2d53d8ab4b64e09df4b0a4355ff8c9e92f0734b7cd0ad8"
+      }
+    },
+    {
+      "entrees": {
+        "graine": "37ee3332ca6c6049a1b4c3e7a178ec148dbcbf58f105dc0bd2b7ef864b22644640b5342f7529f97bf560c6ad200a4978d1e9bb40ce6d09445d8062bf85c0193e",
+        "publique": "e1e8576f738fa044ae8ac261d4f73162f89362bb09f4a9c7d0890b79b999aa3aa1bb7418851862fe5b4871f6232d85b2984165b09c484cc7222cab035128057d4b5fc46c9c7f460d71db16102824e9a18a14ebb78cf775d9bbbad69249ea18a3ae291faa0aa4cf946e9b982d22f4b7230524a6fc4cd698009cc48d8c950adfe1430ca5afebebbd50a2106e4311f808c8e64000aa64a3626c2c4e23990713ce6eec15706481fd3b00baf9c7d1c38371541955492d6d17884a9173a0e10101e654e1fc6a0da7baa45c6c8b0b23b87c73b6f132599b2a444c087c0b4704f7a99ff265f748c644103426512e3b7ac80d74730c5489980cc27507bc69f140a84992d556b15dd49ff27b31b7dba59d89be8e87073478410a791b27aa886938aff72b9b663517f6273a6fe2c8fdd53ae7e614acbc41bd5b24ddfb2a0ad31fdcfa6aba46ccdc37c6d6c3bd0de70954602a11846443d275a0795bb762b168c46949831349a5135d40bc1fcc00b9236660901f567650f56050cdc07737818e3b7acc88a25e05e833d3ca92a5178e4bf06734964a6abaaeff8586ada26215e9cd5f8c46f82a3776646e7d83cc82f2468b23635f891026950046a02f9fe56e914c2259a4cc6ff40c042277d6a788b7a2b7fbb86621d232fe7a595e0a97262563fa50a052613474574a8bf3459f67b60fe190c4f452ded8734c3a3571eb60c631377ae714634b13dcf1396fc306c1a49a290622cf234a18e53b58772edee3076b68c5e6371f40953d8cd68070d5acc6e1b6d20634e6772f9c63c32999694d27593df04d6a67414d836fed376c32315e79a12ee7e4945e8c97bcd49ee4418c32c18d53b9694496824969c1b26935d2a00fff175ea133772dc35d242a367681404eec1b1250ae7c4abc6f273049fc19ff63b35434520728896c7c34e3379e7cd75007f478809a4fbaa56f07075d4f35cccc929528e55bf0e7b7a247139eec7afc034814499b6fe0ab2b0a625d642fa2db1dfa4b3a22222a6ea615daf605ff38748b3a4239c52d92f40737ac4bdd592dd2c77eb5e22727827445f71f6a953ea79a1a135745bb8731a10a0edb0936e6584c03cabdf3e3bb26a592855a1c90c1cc9763cdf9a87ed452be76a75f177690079c5372c5c040a538ce446bcb6108162abfd50b367a500c88b9a47f069b21e3ba25bac0725380494376828bbf806c312761011e570fb1b1af4f655aa8f85c04723861c24cc2a33da7f54e5cd02ee705cf1a3453042c977f711ae60989e8b1994ab98b40c50b015250c00a9e20094b630acf25931fb27b4300fd20d21b226f88c006f7ad0a66b296d58645a09a8beb60260c711fe91e89755cd0b2aa1483a81de5071760aa27092032e709580c29156cc6dc205acc0b20856562a1a3b48ba68281725bf3d6cef5945cdfb31a47bc41922c7b7baa3ea8279aa1091cc3311e1f31749f4764a689770c7390a34480274c7e218b8f58d7ac46bca84eb029820bacabf16b2c3a578f9c59569cca39a42bc9393d43c034119b847872acbac6af483209f09856236994da6648a9c97f2549a040c4acf67ccbe18b668b240f2ab5cffa175684040f4e6c08031a456653a5397575e67aa97f7872b137476b61d88bd72eec9bd717c4c2180b51b852dd475769f8bc9e912cdfe8a9bf3b20"
+      },
+      "nom": "mlKem768Encapsuler/forme",
+      "sorties": {
+        "longueurChiffre": 1088,
+        "longueurSecret": 32,
+        "secretDecapsule": true
+      }
+    }
+  ]
+}
