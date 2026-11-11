@@ -64,6 +64,8 @@ jobs:
         run: go run ./outils/controle-noms
       - name: Dockerfile (images de base épinglées)
         run: go run ./outils/controle-image
+      - name: Dockerfile de sesame-fake (images de base épinglées)
+        run: go run ./outils/controle-image -dockerfile build/sesame-fake.Dockerfile
 
   # Double construction (RELEASE.md §1.2) : deux jobs, donc deux exécuteurs
   # distincts, puis comparaison des digests.
@@ -130,3 +132,51 @@ jobs:
             echo "Les deux constructions diffèrent : la construction n'est pas reproductible."
             exit 1
           fi
+
+  # Grappe du PIN sur trois conteneurs de sesame-fake et Toxiproxy (décision
+  # 0071) : amorçage, relais, pause, un contre deux, VM recréée admise.
+  grappe-conteneurs:
+    name: Grappe du PIN sur trois conteneurs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: build/grappe.sh
+        run: ./build/grappe.sh
+
+  # Image de sesame-fake publiée sur ghcr.io à chaque fusion sur main
+  # (tests.md du client, « Où tourne sesame-fake ») : seul job à écrire un
+  # paquet, par le GITHUB_TOKEN du job, aucun autre secret. Le client épingle
+  # l'empreinte affichée ici.
+  publication-sesame-fake:
+    name: Publication de l'image de sesame-fake
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [controles, grappe-conteneurs]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Construire et publier
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPOT: ${{ github.repository }}
+        run: |
+          image="ghcr.io/${DEPOT,,}-fake"
+          echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          docker buildx build --platform linux/amd64 -f build/sesame-fake.Dockerfile \
+            --provenance=false --sbom=false --metadata-file "$RUNNER_TEMP/meta.json" \
+            -t "$image:${GITHUB_SHA}" -t "$image:main" --push .
+          empreinte=$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1]))["containerimage.digest"])' "$RUNNER_TEMP/meta.json")
+          echo "Image publiée : $image@$empreinte"
+          echo "### sesame-fake : \`$image@$empreinte\`" >> "$GITHUB_STEP_SUMMARY"

@@ -31,13 +31,17 @@ func (e *env) grappeID() string { return e.f.Server.Instances[0].Grappe().ID() }
 
 // depotBody compose un corps de pin/deposer signé par signer.
 func (c *ch) depotBody(h, signer *titulaire, motif string, elem []byte, gid string) jcs.Object {
-	d := c.defi(h.uid)
+	r := ok(c.e.t, c.call("defi", jcs.Object{"uid": h.uid}))
+	d := str(r, "defi")
+	if gid == "" { // grappeId que rend defi (grappe en service de la VM jointe)
+		gid = str(r, "grappeId")
+	}
 	return jcs.Object{"uid": h.uid, "idToken": c.e.idToken(h.uid), "grappeId": gid, "elementAveugle": b64(elem), "defi": d, "motif": motif,
 		"signature": signer.sign(vie.PinDepositMessage(h.uid, gid, elem, d, motif))}
 }
 
 func (c *ch) depot(h *titulaire, motif string, elem []byte) jcs.Object {
-	return c.call("pin/deposer", c.depotBody(h, h, motif, elem, c.e.grappeID()))
+	return c.call("pin/deposer", c.depotBody(h, h, motif, elem, ""))
 }
 
 func (c *ch) evaluer(h *titulaire, elem []byte) jcs.Object {

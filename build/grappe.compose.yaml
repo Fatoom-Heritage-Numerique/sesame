@@ -1,0 +1,38 @@
+# Grappe du PIN sur trois conteneurs de sesame-fake en mode instance
+# (tests.md du client, « Grappe du PIN » ; décision 0071), jouée par
+# build/grappe.sh. Chaque lien entre deux instances passe par un proxy
+# Toxiproxy « <de>-<vers> » (coupures, latence) ; image de Toxiproxy épinglée
+# par l'empreinte de son index lue sur ghcr.io. Configuration de test du
+# dépôt (testdata/factice), jamais celle d'un déploiement.
+name: sesame-grappe
+services:
+  toxiproxy:
+    image: ghcr.io/shopify/toxiproxy:2.10.0@sha256:3866784ec3527e3a425780d73c763f6133bf3a034ddba64254e903d445d3668f
+    ports: ["127.0.0.1:28474:8474"]
+  sesame-a:
+    build:
+      context: ..
+      dockerfile: build/sesame-fake.Dockerfile
+    image: sesame-fake:grappe
+    command: ["-config", "/config/configuration.json", "-prefixe", "a", "-ecoute", "0.0.0.0:8090", "-ecoute-grappe", "0.0.0.0:8091", "-pair", "sesame-test-b=http://toxiproxy:18102", "-pair", "sesame-test-c=http://toxiproxy:18103"]
+    volumes: ["../testdata/factice:/config:ro"]
+    ports: ["127.0.0.1:28090:8090"]
+    depends_on: [toxiproxy]
+  sesame-b:
+    build:
+      context: ..
+      dockerfile: build/sesame-fake.Dockerfile
+    image: sesame-fake:grappe
+    command: ["-config", "/config/configuration.json", "-prefixe", "b", "-ecoute", "0.0.0.0:8090", "-ecoute-grappe", "0.0.0.0:8091", "-pair", "sesame-test-a=http://toxiproxy:18201", "-pair", "sesame-test-c=http://toxiproxy:18203"]
+    volumes: ["../testdata/factice:/config:ro"]
+    ports: ["127.0.0.1:28091:8090"]
+    depends_on: [toxiproxy]
+  sesame-c:
+    build:
+      context: ..
+      dockerfile: build/sesame-fake.Dockerfile
+    image: sesame-fake:grappe
+    command: ["-config", "/config/configuration.json", "-prefixe", "c", "-ecoute", "0.0.0.0:8090", "-ecoute-grappe", "0.0.0.0:8091", "-pair", "sesame-test-a=http://toxiproxy:18301", "-pair", "sesame-test-b=http://toxiproxy:18302"]
+    volumes: ["../testdata/factice:/config:ro"]
+    ports: ["127.0.0.1:28092:8090"]
+    depends_on: [toxiproxy]

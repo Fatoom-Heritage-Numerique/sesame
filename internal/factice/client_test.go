@@ -12,6 +12,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -41,6 +42,8 @@ type env struct {
 	f       *factice.Fake
 	cfg     *factice.Config
 	issuers map[string]*rsa.PrivateKey
+	remote  map[string]string // conteneurs de sesame-fake joints en HTTP, par préfixe (conteneurs_test.go)
+	target  string
 }
 
 type option func(*factice.Options)
@@ -100,7 +103,26 @@ func (e *env) do(method, path, ip string, body []byte) *httptest.ResponseRecorde
 	r := httptest.NewRequest(method, path, bytes.NewReader(body))
 	r.Header.Set("X-Forwarded-For", ip+", 10.0.0.1")
 	w := httptest.NewRecorder()
-	e.f.Server.ServeHTTP(w, r)
+	if e.remote == nil {
+		e.f.Server.ServeHTTP(w, r)
+		return w
+	}
+	base := e.remote[e.target]
+	if p, ok := strings.CutPrefix(path, "/n/"); ok {
+		base = e.remote[p[:1]]
+	}
+	req, _ := http.NewRequest(method, base+path, bytes.NewReader(body))
+	req.Header = r.Header
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		e.t.Fatal(err)
+	}
+	defer resp.Body.Close()
+	for k, v := range resp.Header {
+		w.Header()[k] = v
+	}
+	w.WriteHeader(resp.StatusCode)
+	_, _ = io.Copy(w, resp.Body)
 	return w
 }
 
@@ -149,6 +171,9 @@ type ch struct {
 // (vide : la première) et vérifie le jeton comme un client.
 func (e *env) attest(p string) jcs.Object {
 	e.t.Helper()
+	if e.target = p; p == "" {
+		e.target = "a"
+	}
 	for range 6 {
 		e.ips++
 		w := e.do("GET", "/attestation", "10.9."+itoa(int64(e.ips/250))+"."+itoa(int64(e.ips%250)), nil)
@@ -327,8 +352,6 @@ func (h *titulaire) sign(msg []byte, err error) string {
 	}
 	return b64(ed25519.Sign(ed25519.NewKeyFromSeed(h.seed), msg))
 }
-
-var _ = http.MethodGet
 
 func hexOf(b []byte) string {
 	const digits = "0123456789abcdef"
