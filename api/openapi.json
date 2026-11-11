@@ -1995,41 +1995,88 @@
     "/interne/relais": {
       "section": "3",
       "requete": {
-        "type": "object",
-        "additionalProperties": false,
-        "required": [
-          "route",
-          "corps",
-          "canal"
-        ],
-        "properties": {
-          "route": {
-            "enum": [
-              "pin/deposer",
-              "pin/evaluer",
-              "grappe/membres"
-            ]
-          },
-          "corps": {
-            "type": "object"
-          },
-          "canal": {
+        "anyOf": [
+          {
             "type": "object",
             "additionalProperties": false,
             "required": [
-              "instanceId",
-              "cliPub"
+              "route",
+              "corps",
+              "canal"
             ],
             "properties": {
-              "instanceId": {
-                "$ref": "#/components/schemas/InstanceId"
+              "route": {
+                "enum": [
+                  "pin/deposer",
+                  "pin/evaluer",
+                  "grappe/membres"
+                ]
               },
-              "cliPub": {
-                "type": "string"
+              "corps": {
+                "type": "object"
+              },
+              "canal": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "instanceId",
+                  "cliPub"
+                ],
+                "properties": {
+                  "instanceId": {
+                    "$ref": "#/components/schemas/InstanceId"
+                  },
+                  "cliPub": {
+                    "type": "string"
+                  }
+                }
               }
             }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "route",
+              "corps"
+            ],
+            "properties": {
+              "route": {
+                "enum": [
+                  "grappe/rejoindre"
+                ]
+              },
+              "corps": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "nodeId",
+                  "vm",
+                  "zone",
+                  "cle"
+                ],
+                "properties": {
+                  "nodeId": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_-]{22}$",
+                    "description": "identifiant de nœud du demandeur, lu dans son jeton de paire"
+                  },
+                  "vm": {
+                    "type": "string"
+                  },
+                  "zone": {
+                    "type": "string"
+                  },
+                  "cle": {
+                    "type": "string",
+                    "description": "clé du certificat entre VM du demandeur, SubjectPublicKeyInfo DER en base64"
+                  }
+                }
+              }
+            },
+            "description": "grappe/rejoindre reçue par un membre qui n'est pas leader : identité attestée du demandeur, sans canal ; réponse {statut, corps} du §4.1"
           }
-        }
+        ]
       },
       "reponse": {
         "$ref": "#/components/schemas/StatutChiffre"
