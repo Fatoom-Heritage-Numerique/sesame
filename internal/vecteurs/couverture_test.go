@@ -20,7 +20,6 @@ import (
 // sort de cette liste dans le commit qui écrit le test qui le réclame par
 // Track ; le test ci-dessous échoue s'il est à la fois réclamé et en attente.
 var pending = map[string][]string{
-	"attestation.json": {"attestation", "listeVersions"},
 	"primitives.json": {
 		"argon2id",
 	},
@@ -30,8 +29,8 @@ var pending = map[string][]string{
 		"codeVerifier", "datePasserelle", "depotPin", "descellerFiche",
 		"descellerInvitation", "descellerKts", "empreinteRegistre", "enveloppeFichier",
 		"enveloppeMot", "enveloppeMotDePasse", "enveloppeVolontes", "ficheAlerte",
-		"indexAcces", "instanceId", "jetonPaire", "jetonSession", "kts", "ligneRegistre",
-		"lireInstanceId", "messageFichier", "noncesClient", "noncesPaire", "ouvrirCanal",
+		"indexAcces", "instanceId", "jetonSession", "kts", "ligneRegistre",
+		"lireInstanceId", "messageFichier", "ouvrirCanal",
 		"ouvrirCharte", "ouvrirEnveloppe", "ouvrirKts", "passerelle", "preuveDeVie",
 		"preuveEnrolement", "recu", "scelle", "tirerCodeAcces", "verifierAnnulation",
 		"verifierBorne", "verifierCharteGen", "verifierDepotPin", "verifierFicheAlerte",

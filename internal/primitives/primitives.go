@@ -22,7 +22,9 @@ import (
 	"crypto/sha256"
 	"crypto/subtle"
 	"crypto/x509"
+	"encoding/base64"
 	"math/big"
+	"time"
 )
 
 // Error est un refus typé ; son texte est le code d'ErreurCrypto des vecteurs.
@@ -215,4 +217,34 @@ func MLKEMPublic(seed []byte) ([]byte, error) {
 		return nil, ErrKey
 	}
 	return dk.EncapsulationKey().Bytes(), nil
+}
+
+// B64 décode le base64 standard avec remplissage, forme canonique seule.
+func B64(s string) ([]byte, error) {
+	b, err := base64.StdEncoding.Strict().DecodeString(s)
+	if err != nil {
+		return nil, ErrInvalid
+	}
+	return b, nil
+}
+
+// B64URL décode le base64url sans remplissage, forme canonique seule.
+func B64URL(s string) ([]byte, error) {
+	b, err := base64.RawURLEncoding.Strict().DecodeString(s)
+	if err != nil {
+		return nil, ErrInvalid
+	}
+	return b, nil
+}
+
+// TimeLayout est l'horodatage des formats : ISO 8601 UTC à la milliseconde.
+const TimeLayout = "2006-01-02T15:04:05.000Z"
+
+// ReadTime lit un horodatage exactement sous la forme TimeLayout.
+func ReadTime(s string) (time.Time, error) {
+	t, err := time.Parse(TimeLayout, s)
+	if err != nil || t.Format(TimeLayout) != s {
+		return time.Time{}, ErrInvalid
+	}
+	return t, nil
 }
