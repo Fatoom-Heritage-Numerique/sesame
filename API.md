@@ -137,7 +137,7 @@ Le `typ` sépare les domaines : une pièce d'un type n'est jamais acceptée pour
 - Nombres : entiers JSON sans fraction ni exposant, de −(2⁵³ − 1) à 2⁵³ − 1.
 - Dans une chaîne de domaine ou une aad, un entier s'écrit en décimal ASCII sans zéro en tête, `-1` avec son signe.
 - Téléphone : E.164, `^\+[1-9][0-9]{1,14}$`.
-- Chaînes saisies par une personne : en NFC (`ARCHITECTURE.md`) ; Sésame refuse une chaîne qui n'est pas en NFC (`message_refuse`) au lieu de la normaliser. Seul le code d'accès est envoyé tel que saisi : Sésame le normalise lui-même (`normalize`, `ARCHITECTURE.md`).
+- Chaînes saisies par une personne : en NFC (`ARCHITECTURE.md`) ; Sésame refuse une chaîne qui n'est pas en NFC (`message_refuse`) au lieu de la normaliser. Seul le code d'accès est envoyé tel que saisi : Sésame le normalise lui-même (`normalize`, `ARCHITECTURE.md`). Comme tout le corps, il est écrit en JSON canonique, donc en NFC : une saisie hors NFC porte forcément un caractère hors de l'alphabet du code, que `normalize` refuserait de toute façon ; le corps est alors refusé (`message_refuse`), sans essai décompté, et le portail l'affiche comme un `code_refuse`.
 
 ## 2. Routes de Sésame
 

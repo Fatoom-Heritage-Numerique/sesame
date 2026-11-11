@@ -224,8 +224,8 @@ func TestOuvrirGardien(t *testing.T) { // SOU-01, SOU-11, SOU-17, SVE-01, SVE-04
 func TestOuvrirMasques(t *testing.T) { // SOU-01, API.md §2.14
 	e := newEnv(t)
 	k := newCoffre(t, e, "u-masque")
-	p := k.add("p-uk", "gardien", "+447700900112", nil)
-	if o := ok(t, e.open("b").openCode(p.code, p.lookup)); o["masque"] != "+447•••••••12" {
+	p := k.add("p-be", "gardien", "+3225551234", nil) // hors +33 : 4 premiers caractères et 2 derniers chiffres
+	if o := ok(t, e.open("b").openCode(p.code, p.lookup)); o["masque"] != "+322•••••34" {
 		t.Fatalf("masque : %v", o["masque"])
 	}
 }

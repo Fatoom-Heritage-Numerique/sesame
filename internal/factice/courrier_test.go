@@ -322,7 +322,7 @@ func TestPasserelleDeTest(t *testing.T) { // PAS-02, PAS-03, PAS-04, PAS-10, API
 		"autre kem":        func(h map[string]string) { h["X-Sesame-Kem-Pub"] = b64(random(1184)) },
 		"signature":        func(h map[string]string) { h["X-Sesame-Signature"] = b64(random(64)) },
 		"attestation":      func(h map[string]string) { h["X-Sesame-Attestation"] = "x.y.z" },
-		"identifiant":      func(h map[string]string) { h["X-Sesame-Request-Id"] = "00000000-0000-4000-8000-000000000000" },
+		"identifiant":      func(h map[string]string) { h["X-Sesame-Request-Id"] = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa" },
 		"echeanceModifiee": func(h map[string]string) {},
 	} {
 		r := post
@@ -334,7 +334,7 @@ func TestPasserelleDeTest(t *testing.T) { // PAS-02, PAS-03, PAS-04, PAS-10, API
 		}
 	}
 	e.f.Clock.Advance(6 * time.Minute)
-	if send(post, func(h map[string]string) { h["X-Sesame-Request-Id"] = "11111111-1111-4111-8111-111111111111" }) != 401 {
+	if send(post, func(h map[string]string) { h["X-Sesame-Request-Id"] = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb" }) != 401 {
 		t.Fatal("horodatage de plus de 5 min accepté")
 	}
 }
