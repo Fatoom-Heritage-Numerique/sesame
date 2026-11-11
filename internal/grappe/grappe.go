@@ -240,8 +240,14 @@ func (g *Grappe) token(ctx context.Context, nonce []byte) (string, error) {
 	return jwt, err
 }
 
+// self rend les claims de cette VM. Sans grappe (demande d'entrée, amorçage,
+// réservation), elle oublie aussi ses connexions : un pair recréé depuis est
+// joint de nouveau, jamais sous son ancienne identité.
 func (g *Grappe) self(ctx context.Context) *attestation.Claims {
 	g.mu.Lock()
+	if g.n == nil {
+		g.links = map[string]*link{}
+	}
 	own := g.own
 	g.mu.Unlock()
 	if nonce, err := g.cfg.Alea.Read(32); own == nil && err == nil {
@@ -775,9 +781,6 @@ func (g *Grappe) refuse() (int, []byte) {
 // join demande l'entrée dans la grappe en service à chaque autre place.
 func (g *Grappe) join(ctx context.Context) {
 	defer func() { g.mu.Lock(); g.joining = false; g.mu.Unlock() }()
-	g.mu.Lock()
-	g.links = map[string]*link{}
-	g.mu.Unlock()
 	own := g.self(ctx)
 	if own == nil {
 		return
@@ -819,7 +822,7 @@ func (g *Grappe) Amorcer(ctx context.Context, email string) (jcs.Object, string)
 		g.mu.Unlock()
 		return nil, "amorcage_refuse"
 	}
-	g.resa, g.links = &resa{from: g.NodeID, until: g.cfg.Horloge.Now().Add(Reservation)}, map[string]*link{}
+	g.resa = &resa{from: g.NodeID, until: g.cfg.Horloge.Now().Add(Reservation)}
 	g.mu.Unlock()
 	ms := []Membre{{g.NodeID, own.Name, own.Zone, base64.StdEncoding.EncodeToString(g.cle)}}
 	for _, vm := range peers(own.Name) {
@@ -907,9 +910,6 @@ func (g *Grappe) prepare(ctx context.Context, c *conn, conf jcs.Object) (int, []
 	own := g.self(ctx)
 	g.mu.Lock()
 	busy := g.n != nil || g.resa != nil
-	if !busy {
-		g.links = map[string]*link{}
-	}
 	g.mu.Unlock()
 	var ms []Membre
 	a, _ := conf["membres"].(jcs.Array)
