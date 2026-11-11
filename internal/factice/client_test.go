@@ -23,6 +23,7 @@ import (
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/canal"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/factice"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/jcs"
+	"github.com/Fatoom-Heritage-Numerique/sesame/internal/jetons"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/primitives"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/registre"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/vie"
@@ -360,4 +361,37 @@ func (e *env) generation(c *ch, h *titulaire, contact string, gen int64) jcs.Obj
 func (e *env) advance(d time.Duration) {
 	e.f.Clock.Advance(d)
 	tick(e)
+}
+
+// put écrit un document signé comme Sésame l'écrirait, hors de la chaîne
+// (pour préparer un état : ouverture, plafond du PIN).
+func (e *env) put(path string, doc jcs.Object) {
+	doc["ecritLe"] = e.now().Format(primitives.TimeLayout)
+	delete(doc, "sig")
+	msg, _ := registre.LineMessage(doc)
+	der, _ := e.f.KMS.Sign(context.Background(), "registre-sign", msg)
+	raw, _ := jetons.DERToRaw(der)
+	doc["sig"] = base64.RawURLEncoding.EncodeToString(raw)
+	e.f.Base.Tamper(path, doc, e.now())
+}
+
+// notes rend les corps des notifications name reçues par la passerelle de
+// test, après avoir vérifié leurs en-têtes et leur signature (API.md §5.1).
+func (e *env) notes(name string) []jcs.Object {
+	e.t.Helper()
+	var out []jcs.Object
+	for _, r := range e.f.Gateway.Requests() {
+		if r.PathQuery != "/"+name {
+			continue
+		}
+		h := r.Headers
+		msg, err := jetons.GatewayMessage(r.Method, r.PathQuery, h["X-Sesame-Date"], h["X-Sesame-Request-Id"], r.Body)
+		sig, _ := primitives.B64(h["X-Sesame-Signature"])
+		key := e.cfg.VersionList().SessionKeys[e.cfg.SessionSign.Kid]
+		if valid, _ := primitives.P256Verify(key, msg, sig); err != nil || !valid || h["X-Sesame-Attestation"] == "" || h["X-Sesame-Session-Pub"] == "" || h["X-Sesame-Kem-Pub"] == "" {
+			e.t.Fatalf("requête à la passerelle hors contrat : %v", h)
+		}
+		out = append(out, decode(e.t, r.Body))
+	}
+	return out
 }

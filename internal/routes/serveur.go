@@ -343,3 +343,6 @@ func (in *Instance) channel(w http.ResponseWriter, r *http.Request) {
 
 // Channels rend le nombre de canaux ouverts de l'instance.
 func (in *Instance) Channels() int { return in.table.Len() }
+
+// UpToDate fait le contrôle anti-retour de l'instance (ARCHITECTURE.md §6.3).
+func (in *Instance) UpToDate(ctx context.Context) bool { return in.borne.UpToDate(ctx) }

@@ -65,7 +65,7 @@ type Borne struct {
 	events                              map[[2]string]string
 	listed                              []Deposited
 	keys                                map[string][]byte
-	failing, ownSeen                    bool
+	ownSeen, unreadable                 bool
 }
 
 // Signal note un événement (type, ressource) à sa première occurrence de la
@@ -101,6 +101,9 @@ func (b *Borne) relist(ctx context.Context) error {
 	for h := 3; h >= 0; h-- {
 		objs, err := b.Stockage.List(ctx, ports.BucketAudit, now.Add(-time.Duration(h)*time.Hour).Format("bornes/2006/01/02/15-"), maxListed)
 		if err != nil {
+			b.mu.Lock()
+			b.unreadable = true
+			b.mu.Unlock()
 			return ErrUnavailable
 		}
 		for _, o := range objs {
@@ -111,15 +114,16 @@ func (b *Borne) relist(ctx context.Context) error {
 		}
 	}
 	b.mu.Lock()
-	b.listed = listed
+	b.listed, b.unreadable = listed, false
 	b.mu.Unlock()
 	return nil
 }
 
-// UpToDate fait le contrôle anti-retour à l'heure du contrôle : le registre
-// lu n'est plus ancien ni que « la dernière borne », ni que la dernière
-// époque écrite par l'instance. En échec (bucket ou registre illisible
-// compris), l'événement registre_ancien est noté.
+// UpToDate fait le contrôle anti-retour à l'heure du contrôle, sur la
+// dernière lecture du bucket : le registre lu n'est plus ancien ni que « la
+// dernière borne », ni que la dernière époque écrite par l'instance. En échec
+// (dernière lecture du bucket ou registre illisible compris), l'événement
+// registre_ancien est noté.
 func (b *Borne) UpToDate(ctx context.Context) bool {
 	read, _, err := b.R.HeadEpoch(ctx)
 	b.mu.Lock()
@@ -139,8 +143,7 @@ func (b *Borne) UpToDate(ctx context.Context) bool {
 		ref, ok = b.Reprise.Epoque, true
 	}
 	b.ownSeen = b.ownSeen || (b.Reprise != nil && len(bornes) > 0)
-	up := err == nil && b.keys != nil && UpToDate(read, ref, ok, b.R.last.get())
-	b.failing = !up
+	up := err == nil && b.keys != nil && !b.unreadable && UpToDate(read, ref, ok, b.R.last.get())
 	b.mu.Unlock()
 	if !up {
 		b.Signal("registre_ancien", Head)
