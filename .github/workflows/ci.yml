@@ -1,0 +1,130 @@
+# CI du contrat exécutable (RELEASE.md §8 ; décision 0065), sur chaque PR et
+# sur main. Outils et commandes : CONTRIBUTING.md, « Outils et commandes ».
+# Actions épinglées par l'empreinte de leur commit, la version en commentaire ;
+# aucun secret ; Go de go.mod (GOTOOLCHAIN=local : aucune autre chaîne).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  GOTOOLCHAIN: local
+  GOVULNCHECK: golang.org/x/vuln/cmd/govulncheck@v1.9.0
+
+jobs:
+  controles:
+    name: Format, analyse, tests et contrôles du dépôt
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Format (gofmt -l)
+        run: |
+          fichiers=$(gofmt -l .)
+          if [ -n "$fichiers" ]; then
+            echo "Fichiers à formater par gofmt :"
+            echo "$fichiers"
+            exit 1
+          fi
+      - name: Analyse (go vet)
+        run: go vet ./...
+      - name: Tests (go test -race)
+        run: go test -race ./...
+      - name: Sommes des modules (go mod verify)
+        run: go mod verify
+      - name: Failles connues (govulncheck)
+        run: go run "$GOVULNCHECK" ./...
+      - name: Vecteurs (SHA256SUMS)
+        working-directory: testdata/vecteurs
+        run: sha256sum -c SHA256SUMS
+      - name: Budget de code
+        run: go run ./outils/decompte-lignes -detail
+      - name: Lanceur factice hors de l'image
+        run: go run ./outils/controle-lanceur
+      - name: Dépendances de cmd/sesame
+        run: go run ./outils/controle-dependances
+      - name: Noms de ressources (part structurelle)
+        run: go run ./outils/controle-noms
+      - name: Dockerfile (images de base épinglées)
+        run: go run ./outils/controle-image
+
+  # Double construction (RELEASE.md §1.2) : deux jobs, donc deux exécuteurs
+  # distincts, puis comparaison des digests.
+  construction-a:
+    name: Construction reproductible (exécuteur A)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      empreinte: ${{ steps.construire.outputs.empreinte }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: construire
+        name: build/reproduire.sh
+        run: |
+          empreinte=$(./build/reproduire.sh)
+          echo "Empreinte : $empreinte"
+          echo "empreinte=$empreinte" >> "$GITHUB_OUTPUT"
+
+  construction-b:
+    name: Construction reproductible (exécuteur B) et contrôle de l'image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    outputs:
+      empreinte: ${{ steps.construire.outputs.empreinte }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - id: construire
+        name: build/reproduire.sh
+        env:
+          SORTIE_OCI: ${{ runner.temp }}/sesame.oci.tar
+        run: |
+          empreinte=$(./build/reproduire.sh)
+          echo "Empreinte : $empreinte"
+          echo "empreinte=$empreinte" >> "$GITHUB_OUTPUT"
+      - name: Image sans shell, politique de lancement
+        run: go run ./outils/controle-image -oci "$RUNNER_TEMP/sesame.oci.tar"
+
+  comparaison:
+    name: Double construction (digests identiques)
+    needs: [construction-a, construction-b]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Comparer les digests
+        env:
+          EMPREINTE_A: ${{ needs.construction-a.outputs.empreinte }}
+          EMPREINTE_B: ${{ needs.construction-b.outputs.empreinte }}
+        run: |
+          echo "Exécuteur A : $EMPREINTE_A"
+          echo "Exécuteur B : $EMPREINTE_B"
+          if [[ ! "$EMPREINTE_A" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "Empreinte A illisible"
+            exit 1
+          fi
+          if [ "$EMPREINTE_A" != "$EMPREINTE_B" ]; then
+            echo "Les deux constructions diffèrent : la construction n'est pas reproductible."
+            exit 1
+          fi
