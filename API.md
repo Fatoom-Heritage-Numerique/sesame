@@ -114,6 +114,7 @@ Toutes sont signées par la clé KMS `session-sign` (ECDSA P-256, SHA-256), en `
 
 - Chaque pièce est un JWS compact (RFC 7515) d'en-tête `{"alg": "ES256", "kid": "session-sign/<version KMS>"}`, plus `"typ": "JWT"` pour le jeton de session.
 - La signature est au format JWS, `R ‖ S` sur 64 octets (RFC 7518) ; KMS rend une signature DER, que Sésame convertit.
+- L'en-tête et la charge utile sont écrits en JSON canonique (§1.7) avant leur encodage base64url : le client refuse une autre forme, un champ en plus ou en moins, un `kid` absent de `clesSession` et toute signature qui n'a pas 64 octets.
 - `iat` et `exp` sont en secondes depuis l'époque Unix ; les autres dates sont des horodatages (§1.7).
 
 | Pièce | Forme |
@@ -342,7 +343,7 @@ La même requête renvoyée après son succès reçoit `generation_non_croissant
 
 **Corps** : `{"uid": "<uid>", "generation": 1, "telephone": "<E.164>" | null, "email": "<adresse>", "signature": "<base64>"}`. `generation` est un entier ≥ 1 ; `email`, l'adresse du compte, en NFC (§1.7). La signature porte sur `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation ‖ JSON canonique de la fiche`, la fiche étant `{"email":"<adresse>","generation":1,"telephone":"<E.164>"|null,"uid":"<uid>","v":1}` : clés triées, UTF-8, sans espace ni retour à la ligne. La génération empêche de rejouer une ancienne fiche. Les vecteurs sont générés par script (A-27).
 
-**Traitement** : exige une génération strictement supérieure à `ficheGeneration` (absente ⇒ `0`) ; scelle la fiche sous la clé KMS `alerte-seal` (aad `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation`) et la garde au registre (`ficheGeneration`, `ficheScellee`). Le client n'en garde aucune copie. Sésame l'ouvre seul pour envoyer ses alertes au titulaire.
+**Traitement** : exige une génération strictement supérieure à `ficheGeneration` (absente ⇒ `0`) ; scelle la fiche, c'est-à-dire son JSON canonique, celui qui suit la chaîne de domaine dans le message signé, sous la clé KMS `alerte-seal` (aad `"fatoom-sesame-alerte|1|" ‖ uid ‖ "|" ‖ generation`) et la garde au registre (`ficheGeneration`, `ficheScellee`). Le client n'en garde aucune copie. Sésame l'ouvre seul pour envoyer ses alertes au titulaire.
 
 **Réponse `200`** : `{"ficheGeneration": 1}`
 

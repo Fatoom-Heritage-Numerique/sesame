@@ -27,7 +27,18 @@ La prose est en **français** : documents, commentaires, messages de commit, des
 
 ## Formats et vecteurs
 
-Les formats (`ARCHITECTURE.md` : hiérarchie et formats des clés, canal, borne du registre) sont partagés avec les clients, octet pour octet ; `versions.json` (`RELEASE.md` §2) est compilé dans les clients. Les vecteurs de test sont **générés par le client de référence** et recopiés ici ; la CI échoue s'ils diffèrent. Un changement de format :
+Les formats (`ARCHITECTURE.md` : hiérarchie et formats des clés, canal, borne du registre) sont partagés avec les clients, octet pour octet ; `versions.json` (`RELEASE.md` §2) est compilé dans les clients. Les vecteurs de test sont **générés par le client de référence** et recopiés ici ; la CI échoue s'ils diffèrent.
+
+Fichiers repris de `packages/crypto/vectors/` du dépôt `Fatoom-Heritage-Numerique/Fatoom`, ceux dont Sésame refait les calculs (la liste, et ce que le code Go recalcule pour chaque groupe, sont tenus par le client de référence : `docs/technique/tests.md`, « Vecteurs repris par le dépôt `sesame` ») :
+
+- `sesame.json` : canal, `instanceId`, jetons de paire, reçus, jeton de session et requêtes à la passerelle, KTS et dérivations, enveloppes, charte, code d'accès et son index, messages signés par `cleVie`, dépôts du PIN, fiche d'alerte, scellés, registre et borne ;
+- `primitives.json` : vecteurs publiés de chaque primitive, avec les refus de bord (secret X25519 nul, signature Ed25519 `S + ℓ`, clé ML-KEM-768 hors module) ;
+- `json.json` : JSON canonique RFC 8785 et refus d'une chaîne hors NFC ;
+- `attestation.json` : vérification d'un jeton PKI fabriqué sous une racine de test, et format de `versions.json` (`listeVersions`).
+
+Ils se lisent tels quels en Go (`encoding/json`, `encoding/hex`) : JSON en UTF-8 aux clés triées ; `{"vecteurs": [{"nom", "entrees", "sorties"}], "refus": [{"nom", "entrees", "erreur"}]}`, `nom` de la forme `<opération>/<cas>` ; octets en hexadécimal minuscule, et à côté la chaîne base64 ou base64url exacte quand le protocole transporte la valeur ainsi ; texte UTF-8 en chaîne JSON telle quelle. Chaque vecteur donne les clés de test qu'il faut (graines, clés AES tenant lieu des clés KMS, `cleOprf`) ; les signatures P-256 des vecteurs sont déterministes (RFC 6979), le code les vérifie sans chercher à les reproduire. Les fichiers sont recopiés octet pour octet, sous leur nom, et le commit qui les recopie cite le commit du client d'où ils viennent ; la CI compare l'empreinte SHA-256 de chaque copie à celle du fichier sur la branche `main` du client et échoue au moindre écart.
+
+Un changement de format :
 
 1. se décrit d'abord (menace, décision, alternatives écartées) dans une issue, puis dans un fichier de `docs/decisions/` ;
 2. est validé par l'opérateur avant tout code ;

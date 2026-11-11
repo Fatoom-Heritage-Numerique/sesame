@@ -73,6 +73,8 @@ Format exact, à la racine du dépôt, sur la branche `main` protégée :
 | `hwmodels` | les valeurs de `hwmodel` acceptées pour cette version, par les clients comme par la condition KMS (§6) |
 | `statut` | `en_service` à l'ajout ; `retiree` avec `retireLe` au retrait |
 
+Formes : `imageDigest` et `envDigest` valent `"sha256:"` suivi de 64 chiffres hexadécimaux en minuscules ; `cle` de `clesSession` est le point P-256 non compressé (65 octets, `04 ‖ X ‖ Y`) en base64 standard ; `kid` vaut `session-sign/<version KMS>`. Un champ inconnu, absent ou hors de ces formes rend la liste illisible : le build du client qui la recopie échoue (vecteurs de test `listeVersions`, `CONTRIBUTING.md`, « Formats et vecteurs »).
+
 `versions.json` ne change que par un commit sur `main` : son historique est public. Le client le recopie à la construction de chacune de ses versions (pour Fatoom : l'app, le portail et la passerelle). Une empreinte absente de la liste compilée ou `retiree`, ou un `hwmodel` hors de `hwmodels`, fait refuser l'attestation. La passerelle applique la même règle aux appels de Sésame.
 
 Le client affiche aussi la liste et son historique sur sa page de transparence (pour Fatoom : <https://fatoom.fr/sesame>).
@@ -132,7 +134,7 @@ Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit l
 |---|---|
 | Double construction | les deux digests diffèrent |
 | Budget | plus de 6 000 lignes de Go hors tests et hors bibliothèques épinglées |
-| Vecteurs | les vecteurs de test diffèrent de ceux du client de référence |
+| Vecteurs | l'empreinte SHA-256 d'un fichier de vecteurs recopié diffère de celle du même fichier chez le client de référence (`CONTRIBUTING.md`, « Formats et vecteurs ») |
 | `versions.json` | le fichier n'est pas conforme à son schéma |
 | `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) |
 | KMS ⇔ `versions.json` | les couples (empreinte, dictionnaire `env_override`) de la condition, la clause `dbgstat` ou les valeurs de `hwmodel` ne correspondent pas (§7) |
