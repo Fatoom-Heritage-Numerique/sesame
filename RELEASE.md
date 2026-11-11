@@ -130,19 +130,26 @@ Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit l
 
 ## 8. Contrôles CI du dépôt
 
-| Contrôle | Échoue si |
-|---|---|
-| Double construction | les deux digests diffèrent |
-| Budget | plus de 6 000 lignes de Go hors tests et hors bibliothèques épinglées |
-| Vecteurs | l'empreinte SHA-256 d'un fichier de vecteurs recopié diffère de celle que porte `SHA256SUMS`, recopié avec lui depuis le client de référence (`CONTRIBUTING.md`, « Formats et vecteurs ») |
-| `versions.json` | le fichier n'est pas conforme à son schéma |
-| `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) |
-| KMS ⇔ `versions.json` | les couples (empreinte, dictionnaire `env_override`) de la condition, la clause `dbgstat` ou les valeurs de `hwmodel` ne correspondent pas (§7) |
-| Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` |
-| Image | un shell ; une variable de lanceur factice lue hors du paquet de test |
-| Scripts publics | `build/verifier-attestation.sh` ou `build/verifier-journaux.sh` accepte un argument manquant de sa signature (`README.md`) ; le premier accepte un jeton d'un autre projet ou d'un autre dépôt d'images, le second ne signale pas un appel aux clés d'un sujet fédéré d'un autre projet |
-| Borne du registre | borne non signée ou non déposée toutes les 10 minutes en création seule ; pas d'échec fermé sans borne ; une version activée de la clé de signature refusée |
-| Journaux (chaque jour) | `build/verifier-journaux.sh` signale un appel d'une identité inconnue, un surplus, une modification inattendue ou un trou ; le résultat est publié |
+Les contrôles de l'étape 2 (contrat exécutable) tournent sur chaque PR et sur `main` dès cette étape ; ceux des étapes 5 et 6 se mettent en place avec l'infrastructure et la première version (`README.md`, « État du projet » ; décision 0065). Outils et commandes : `CONTRIBUTING.md`.
+
+| Contrôle | Échoue si | Étape |
+|---|---|---|
+| Format, analyse, tests | `gofmt -l` liste un fichier ; `go vet ./...`, `go test -race ./...`, `go mod verify` ou `govulncheck ./...` échoue | 2 |
+| Double construction | les deux digests diffèrent | 2 |
+| Budget | plus de 6 000 lignes de Go hors tests et hors bibliothèques épinglées ; décompte sur les paquets que lie `cmd/sesame`, lignes non vides hors commentaires (`outils/decompte-lignes`) | 2 |
+| Vecteurs | l'empreinte SHA-256 d'un fichier de vecteurs recopié diffère de celle que porte `SHA256SUMS`, recopié avec lui depuis le client de référence (`CONTRIBUTING.md`, « Formats et vecteurs ») ; `compteurPin` régénéré par `outils/generer-compteurpin` diffère du fichier commité | 2 |
+| Lanceur factice | `SESAME_FAKE_LAUNCHER` lu hors de `internal/factice/`, ou un paquet de `internal/factice/` lié par `cmd/sesame` (`go list -deps`) | 2 |
+| Image | un shell ; une étiquette `tee.launch_policy.*` d'`ARCHITECTURE.md` §2.1 absente ou différente ; image de base non épinglée par digest | 2 |
+| Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` ; un paquet lié par `cmd/sesame` hors de la bibliothèque standard et des modules d'`ARCHITECTURE.md` §2.4, modules transitifs compris | 2 |
+| OpenAPI | `api/openapi.json` diffère des routes que sert `sesame-fake`, une requête ou une réponse des tests des routes sort de son schéma, ou les routes et codes d'`API.md` diffèrent de l'OpenAPI (décision 0064) | 2 |
+| Noms de ressources | un `gs://`, un chemin `-docker.pkg.dev/`, une adresse `.iam.gserviceaccount.com`, un chemin `projects/…`, un hôte `run.app` ou un nombre de 12 chiffres d'un fichier suivi hors de la forme `<…>` de `CONTRIBUTING.md` ; les noms réels sont cherchés par la CI du client (décision 0065) | 2 |
+| Image de `sesame-fake` (sur `main`) | la construction ou la publication de l'image échoue (décision 0063) | 2 |
+| `versions.json` | le fichier n'est pas conforme à son schéma | 6 |
+| `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) | 6 |
+| KMS ⇔ `versions.json` | les couples (empreinte, dictionnaire `env_override`) de la condition, la clause `dbgstat` ou les valeurs de `hwmodel` ne correspondent pas (§7) | 5 |
+| Scripts publics | `build/verifier-attestation.sh` ou `build/verifier-journaux.sh` accepte un argument manquant de sa signature (`README.md`) ; le premier accepte un jeton d'un autre projet ou d'un autre dépôt d'images, le second ne signale pas un appel aux clés d'un sujet fédéré d'un autre projet | 5 |
+| Borne du registre | borne non signée ou non déposée toutes les 10 minutes en création seule ; pas d'échec fermé sans borne ; une version activée de la clé de signature refusée | 2 (doubles), 5 (instance réelle) |
+| Journaux (chaque jour) | `build/verifier-journaux.sh` signale un appel d'une identité inconnue, un surplus, une modification inattendue ou un trou ; le résultat est publié | 5 |
 
 ## 9. Actions manuelles de l'opérateur
 

@@ -2,7 +2,7 @@
 
 # API de Sésame
 
-Ce document est le contrat des routes que Sésame expose et des routes que le client doit exposer à Sésame (la passerelle). Il publie le contrat HTTP de la spécification de l'opérateur (« Sésame : contrat HTTP », dépôt Fatoom), qui fait foi ; l'OpenAPI, les vecteurs de test et le double local `sesame-fake` en dérivent. En cas d'écart, la source se corrige d'abord.
+Ce document est le contrat des routes que Sésame expose et des routes que le client doit exposer à Sésame (la passerelle). Il publie le contrat HTTP de la spécification de l'opérateur (« Sésame : contrat HTTP », dépôt Fatoom), qui fait foi ; l'OpenAPI (`api/openapi.json`, décision 0064), les vecteurs de test et le double local `sesame-fake` en dérivent. En cas d'écart, la source se corrige d'abord.
 
 Le corps (§1 à 7) reprend mot pour mot la spécification de référence, avec quelques termes du premier client, Fatoom : « lot 1 bis » réunit les étapes 1 et 2 de l'ordre de construction de ce dépôt (documentation, puis contrat exécutable : OpenAPI, vecteurs, `sesame-fake` ; `README.md`, « État du projet ») ; un identifiant `R-<DOMAINE>-<NN>` est une règle métier du client, `A-<NN>` une de ses règles d'architecture, `LIM-<n>` une limite assumée (`THREAT_MODEL.md` §2, limite n) ; un nom en `CamelCase` sans espace (`TransmissionDefinitive`, `DmsRetour`) est un écran de l'app du client.
 
@@ -918,6 +918,13 @@ Spécifiées : 5 codes faux dans une fenêtre de 15 min, puis blocage de 15 min 
 Décidée par le porteur du produit : `etat`, 100 / jour par `uid` (§2.5).
 
 Toutes les autres valeurs sont des valeurs initiales.
+
+Révision des valeurs initiales, au lot 1 bis, contre `sesame-fake` (mesures du contrat exécutable, `RELEASE.md` §8) :
+
+- une limite par `uid`, par proche, par session ou par canal est au moins le double du nombre d'appels du parcours légitime le plus chargé de cette route (par exemple 30 proches d'une `Migration` pour `charte/generation`) ; une valeur plus basse se relève, une plus haute ne baisse que si le test de charge montre un coût ;
+- une limite par IP se compare au même parcours joué par plusieurs titulaires derrière une seule adresse (réseau d'opérateur mobile) ;
+- les tailles (corps, enveloppe, filtre de Bloom, durée d'un canal, réservation d'une configuration) se fixent sur la mémoire mesurée d'une instance, rapportée aux 1,38 Gio du conteneur ;
+- une valeur révisée garde sa ligne ci-dessous, avec le statut « révisée au lot 1 bis », et passe dans ce document dans la PR liée à celle de la spécification de référence.
 
 Décompte :
 

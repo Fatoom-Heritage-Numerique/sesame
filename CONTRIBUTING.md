@@ -25,6 +25,27 @@ La prose est en **français** : documents, commentaires, messages de commit, des
 - **Lanceur factice** (`SESAME_FAKE_LAUNCHER`) et doubles de KMS, Twilio, SendGrid, Stripe, Pingen, Firestore, Cloud Logging : uniquement dans le paquet de test ; le build échoue si la variable est lue ailleurs.
 - Pas de rétrocompatibilité tant qu'aucune version n'est en production : un format se remplace, il ne se versionne pas.
 
+## Outils et commandes
+
+Go est celui de `go.mod` (`go` et `toolchain`, dernière version stable) ; `GOTOOLCHAIN` le télécharge au besoin. Avant de pousser, à la racine du dépôt :
+
+```bash
+gofmt -l .                                   # n'affiche rien
+go vet ./...
+go test -race ./...                          # routes, grappe sur réseau simulé, vecteurs, OpenAPI
+go mod verify
+go run golang.org/x/vuln/cmd/govulncheck@<version épinglée par la CI> ./...
+(cd testdata/vecteurs && sha256sum -c SHA256SUMS)
+go run ./outils/generer-compteurpin -verifier
+go run ./outils/decompte-lignes             # plafond de 6 000 lignes
+docker compose -f build/grappe.compose.yaml up --abort-on-container-exit   # grappe sur trois conteneurs, Toxiproxy
+./build/reproduire.sh                        # image de cmd/sesame, sha256:<empreinte>
+```
+
+- `sesame-fake` en local : `go run ./cmd/sesame-fake -config <fichier>` (mode grappe locale ou instance, décision 0063).
+- La CI lance les mêmes commandes, plus la double construction sur deux exécuteurs et les contrôles de `RELEASE.md` §8 ; ses actions GitHub sont épinglées par l'empreinte de leur commit, la version en commentaire (décision 0065).
+- `compteurPin.json` ne s'écrit que par `go run ./outils/generer-compteurpin` ; les copies de `testdata/vecteurs/` que par une recopie depuis le client (« Formats et vecteurs »).
+
 ## Formats et vecteurs
 
 Les formats (`ARCHITECTURE.md` : hiérarchie et formats des clés, canal, borne du registre) sont partagés avec les clients, octet pour octet ; `versions.json` (`RELEASE.md` §2) est compilé dans les clients. Les vecteurs de test sont **générés par le client de référence** et recopiés ici octet pour octet, avec un fichier `SHA256SUMS` de leurs empreintes ; la CI échoue si une copie ne correspond pas à `SHA256SUMS`, et la CI du client de référence échoue si ses fichiers diffèrent des copies de ce dépôt.
