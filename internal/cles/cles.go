@@ -109,10 +109,12 @@ var (
 		"generation", "nom", "prenom", "role", "telephone", "titulaireAffiche", "uid", "v"}
 )
 
-// EmailNormalized dit si e est égal à sa forme normalisée : NFC, sans espace
-// de bord, en minuscules (§10.4 ; API.md §2.7).
+// EmailNormalized dit si e est sous la forme normalisée de l'email de la
+// charte et de la fiche d'alerte (§10 ; décision 0076) : au moins un
+// caractère, tous ASCII de 0x21 à 0x7E, aucun de A à Z. Sésame ne normalise
+// rien : le client a retiré les espaces de bord et mis A-Z en minuscules.
 func EmailNormalized(e string) bool {
-	return jcs.IsNFC(e) && e == strings.ToLower(strings.TrimFunc(e, func(r rune) bool { return unicode.IsSpace(r) || r == '\uFEFF' }))
+	return e != "" && strings.IndexFunc(e, func(r rune) bool { return r < 0x21 || r > 0x7E || (r >= 'A' && r <= 'Z') }) < 0
 }
 
 // Charter est une charte ouverte et contrôlée.

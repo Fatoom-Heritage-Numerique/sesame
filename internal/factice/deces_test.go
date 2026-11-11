@@ -83,6 +83,11 @@ func TestAlerteFiche(t *testing.T) { // ALF-01, ALF-02, ALF-03, ALF-04, ALF-05, 
 	b["generation"] = gen + 4
 	expect(t, c.call("alerte/fiche", b), 400, "message_refuse")
 	expect(t, c.call("alerte/fiche", e.fiche(c, newTitulaire("jamais"), 1, "a@b.fr", nil, h)), 409, "titulaire_indisponible")
+	// Email hors de sa forme (ARCHITECTURE.md §10, décision 0076) : refusé avant la lecture de la ligne.
+	autre := newTitulaire("u-alf-email")
+	for _, email := range []string{"l\u00e9a@exemple.fr", "\u0130nes@exemple.fr", "\u03bd\u03b9\u03ba\u03bf\u03c2@exemple.gr", "lea@exemple.fr\u0085", " lea@exemple.fr"} {
+		expect(t, c.call("alerte/fiche", e.fiche(c, autre, 1, email, nil, autre)), 400, "message_refuse")
+	}
 	for i := range 6 {
 		ok(t, c.call("alerte/fiche", e.fiche(c, h, gen+10+int64(i), "lea@exemple.fr", nil, h)))
 	}

@@ -225,6 +225,30 @@ func TestCharter(t *testing.T) {
 	})
 }
 
+// TestEmailForm rejoue normaliserEmail, que Sésame ne calcule pas (décision
+// 0076) : chaque email rendu par le client passe EmailNormalized, aucune
+// saisie refusée ne le passe.
+func TestEmailForm(t *testing.T) {
+	tr := vecteurs.Track(t, "sesame.json", "normaliserEmail")
+	tr.Vectors(t, "normaliserEmail", func(t *testing.T, v vecteurs.Vector) {
+		var want struct{ Email string }
+		vecteurs.Load(t, v.Outputs, &want)
+		if !EmailNormalized(want.Email) {
+			t.Errorf("email rendu %q refusé", want.Email)
+		}
+	})
+	tr.Refusals(t, "normaliserEmail", func(t *testing.T, r vecteurs.Refusal) {
+		var e in
+		vecteurs.Load(t, r.Inputs, &e)
+		if EmailNormalized(e.Saisie) {
+			t.Errorf("saisie refusée %q acceptée", e.Saisie)
+		}
+	})
+	if EmailNormalized("lea\xff@exemple.fr") { // UTF-8 mal formé
+		t.Error("octet hors ASCII accepté")
+	}
+}
+
 func TestCodesAndSeals(t *testing.T) {
 	tr := vecteurs.Track(t, "sesame.json", "codeAcces", "codeInvitation", "codeVerifier", "descellerInvitation",
 		"descellerKts", "indexAcces", "scelle", "tirerCodeAcces")
