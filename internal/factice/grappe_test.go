@@ -266,3 +266,50 @@ func TestArretDuLeader(t *testing.T) { // « Consensus », « Une VM perdue », 
 		t.Fatalf("après l'élection : %+v", r)
 	}
 }
+
+func TestDecompteAuLeader(t *testing.T) { // ENV-13, « Transport » (limite par uid décomptée au leader), API.md §7
+	e := newEnv(t)
+	h, _ := enrolled(t, e, "u-dec")
+	for i := range 10 { // même compte quelle que soit la VM qui reçoit
+		ok(t, e.open([]string{"a", "b", "c"}[i%3]).life(h))
+	}
+	expect(t, e.open("c").life(h), 429, "trop_d_appels")
+}
+
+func TestMembres(t *testing.T) { // GMB-01, GMB-03, GMB-04, GMB-05, « Zone indisponible longtemps », API.md §4.2
+	for _, absent := range []bool{false, true} {
+		e, _, _ := pinCluster(t)
+		id, lead := e.g("a").ID(), e.leader()
+		tok := e.oidc(e.cfg.EnvOverride["COMPTE_EXPLOITATION"])
+		victim, other := map[string][2]string{"a": {"c", "b"}, "b": {"c", "a"}, "c": {"b", "a"}}[lead][0], map[string][2]string{"a": {"c", "b"}, "b": {"c", "a"}, "c": {"b", "a"}}[lead][1]
+		l := jcs.Array{}
+		for _, p := range []string{"a", "b", "c"} {
+			z := "europe-west9-" + p
+			if p == victim {
+				z = "europe-west9-" + other // place déplacée dans la zone d'un autre membre
+			}
+			l = append(l, jcs.Object{"vm": "sesame-test-" + p, "zone": z})
+		}
+		call := func(p string, b jcs.Object) jcs.Object {
+			c := e.open(p)
+			return e.run(func() jcs.Object { return c.call("grappe/membres", b) }, true)
+		}
+		body := func(gid string, m jcs.Array) jcs.Object {
+			return jcs.Object{"jetonExploitation": tok, "grappeId": gid, "membres": m}
+		}
+		if !absent {
+			expect(t, call(lead, jcs.Object{"jetonExploitation": e.oidc("autre@example.org"), "grappeId": id, "membres": l}), 401, "jeton_invalide")
+			expect(t, call(lead, body(id, l[:2])), 400, "message_refuse")
+			expect(t, call(lead, body(id, l)), 409, "membres_refuses")                        // membre encore joignable
+			expect(t, call(other, body(strings.Repeat("ab", 32), l)), 409, "membres_refuses") // autre grappeId
+			expect(t, call(lead, body(id, l)), 429, "trop_d_appels")                          // 3ᵉ commande en une heure pour la grappe
+			continue
+		}
+		e.f.Net.Remove("sesame-test-" + victim)
+		e.ticks(grappe.AbsentTicks + 10)
+		o := ok(t, call(other, body(id, l))) // reçue par un autre membre : jeton vérifié, puis relayée au leader
+		if o["inscrite"] != true || o["grappeId"] != id || e.events("grappe_membres_commandee") != 1 {
+			t.Fatalf("membres : %v", o)
+		}
+	}
+}
