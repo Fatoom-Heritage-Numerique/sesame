@@ -8,15 +8,17 @@ import (
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/primitives"
 )
 
-// Durées et tailles du canal (API.md §1.2, §1.5, §7) ; MaxChannels est un
-// choix de ce dépôt : au-delà, le canal resté le plus longtemps sans requête
-// est fermé comme après 1 h.
+// Durées et tailles du canal (API.md §1.2, §1.5, §7) ; MaxChannels et
+// MaxChallenges sont des choix de ce dépôt : au-delà de MaxChannels, le canal
+// resté le plus longtemps sans requête est fermé comme après 1 h ;
+// MaxChallenges couvre deux fenêtres de la limite de defi (30 / h par canal)
+// pendant la vie d'un défi.
 const (
 	Idle          = time.Hour
 	ChallengeLife = 5 * time.Minute
 	BloomBytes    = 16 << 20
 	MaxChannels   = 100_000
-	MaxChallenges = 30
+	MaxChallenges = 60
 )
 
 // ErrChannel est le refus en clair 400 canal_invalide.
