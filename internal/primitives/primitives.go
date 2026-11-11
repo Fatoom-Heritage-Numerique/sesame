@@ -24,6 +24,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"math/big"
+	"regexp"
 	"time"
 )
 
@@ -248,3 +249,10 @@ func ReadTime(s string) (time.Time, error) {
 	}
 	return t, nil
 }
+
+var reID = regexp.MustCompile(`^[A-Za-z0-9_-]{1,128}$`)
+
+// ID dit si s est un identifiant des formats (uid, contactId, contentId,
+// signalementId…) : 1 à 128 caractères de [A-Za-z0-9_-] (ARCHITECTURE.md
+// §10 ; API.md §1).
+func ID(s string) bool { return reID.MatchString(s) }

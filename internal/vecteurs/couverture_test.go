@@ -24,17 +24,11 @@ var pending = map[string][]string{
 		"argon2id",
 	},
 	"sesame.json": {
-		"annulation", "antiRetour", "borne",
-		"chaineRegistre", "charte", "charteGen", "codeAcces", "codeInvitation",
-		"codeVerifier", "depotPin", "descellerFiche",
-		"descellerInvitation", "descellerKts", "empreinteRegistre", "enveloppeFichier",
-		"enveloppeMot", "enveloppeMotDePasse", "enveloppeVolontes", "ficheAlerte",
-		"indexAcces", "kts", "ligneRegistre",
-		"messageFichier",
-		"ouvrirCharte", "ouvrirEnveloppe", "ouvrirKts", "preuveDeVie",
-		"preuveEnrolement", "scelle", "tirerCodeAcces", "verifierAnnulation",
-		"verifierBorne", "verifierCharteGen", "verifierDepotPin", "verifierFicheAlerte",
-		"verifierPreuveDeVie", "verifierPreuveEnrolement",
+		"annulation", "antiRetour", "borne", "chaineRegistre", "charteGen", "depotPin",
+		"descellerFiche", "empreinteRegistre", "ficheAlerte", "indexAcces", "ligneRegistre",
+		"preuveDeVie", "preuveEnrolement", "verifierAnnulation", "verifierBorne",
+		"verifierCharteGen", "verifierDepotPin", "verifierFicheAlerte", "verifierPreuveDeVie",
+		"verifierPreuveEnrolement",
 	},
 }
 

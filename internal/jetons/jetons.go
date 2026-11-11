@@ -148,21 +148,16 @@ func ReadSession(jws string, keys map[string][]byte, now time.Time) (*Session, e
 	case len(c) != 8 || c["scope"] != "destine" || float64(s.Iat) != iat || float64(s.Exp) != exp,
 		s.Base != "vivant" && s.Base != "deces" && s.Base != "inactivite",
 		s.Role != "proche" && s.Role != "gardien",
-		!ID(s.Sub) || !ID(s.UID), s.Exp != s.Iat+SessionDuration, s.Exp*1000 <= now.UnixMilli():
+		!primitives.ID(s.Sub) || !primitives.ID(s.UID), s.Exp != s.Iat+SessionDuration, s.Exp*1000 <= now.UnixMilli():
 		return nil, errInvalid
 	}
 	return s, nil
 }
 
 var (
-	reID   = regexp.MustCompile(`^[A-Za-z0-9_-]{1,128}$`)
 	reUUID = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$`)
 	rePath = regexp.MustCompile(`^/[^|\s]*$`)
 )
-
-// ID dit si s est un identifiant des formats : 1 à 128 caractères de
-// [A-Za-z0-9_-] (ARCHITECTURE.md §10 ; API.md §1).
-func ID(s string) bool { return reID.MatchString(s) }
 
 // GatewayMessage rend le message signé d'une requête à la passerelle
 // (API.md §5.1) : méthode|chemin et query|X-Sesame-Date|X-Sesame-Request-Id|
