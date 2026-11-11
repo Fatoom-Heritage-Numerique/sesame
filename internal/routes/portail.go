@@ -253,6 +253,9 @@ func (a *call) ouvrir() (jcs.Object, error) {
 	var d denied
 	if !errors.As(err, &d) {
 		if err != nil {
+			if s != nil {
+				clear(s.KTS)
+			}
 			return nil, err
 		}
 		return a.started(s)
