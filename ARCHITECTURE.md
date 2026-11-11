@@ -371,6 +371,8 @@ Il n'existe pas de route d'effacement : une ancienne grappe est arrêtée par l'
 
 Tout est AES-256-GCM, IV 12 octets, tag 16 octets **concaténé à la fin**, encodage base64 standard. HKDF = HKDF-SHA256. Les chaînes de domaine sont en UTF-8 sans terminateur. JSON canonique = **RFC 8785 (JCS)** : clés triées par unités UTF-16, sans espace, nombres et échappements selon la RFC, UTF-8 ; les chaînes saisies par une personne (noms, prénoms, adresse) sont normalisées en **NFC** avant tout chiffrement ou comparaison. Les identifiants qui entrent dans une AAD ou un message signé (`uid`, `contactId`, `fileId`, `contentId`, `signalementId`) n'ont que des caractères `[A-Za-z0-9_-]`, vérifiés avant chiffrement : le séparateur `|` et l'accolade `{` ne peuvent pas y apparaître. Les jetons de Sésame (session, reçus) ne sont acceptés qu'en `ES256` (en-tête `alg` imposé, tout autre refusé).
 
+Email de la charte (`email`, §10.4) et de la fiche d'alerte (`API.md`, §2.7) : ASCII imprimable seul. Le client retire de la saisie les espaces ASCII de bord (U+0020, U+0009, U+000A, U+000D), met en minuscules les seules lettres `A` à `Z`, sans autre transformation (ni NFC, ni minuscules Unicode), puis refuse l'email vide ou qui contient un caractère hors de U+0021 à U+007E : accent, autre alphabet, espace Unicode (U+00A0, U+0085, U+FEFF…), caractère de contrôle, espace intérieure (vecteurs `normaliserEmail`). Sésame ne normalise rien : il exige l'email déjà sous cette forme, au moins un caractère, tous de U+0021 à U+007E, aucun de `A` à `Z` ; sinon la charte est refusée (§10.4) et la fiche d'alerte aussi (`message_refuse`, `API.md` §2.7). Pourquoi : les minuscules et les espaces d'Unicode ne se calculent pas de la même façon d'une bibliothèque à l'autre (`İ`, sigma final, U+0085, caractères d'une version récente d'Unicode) ; en ASCII, le téléphone, le navigateur et Sésame font le même calcul (décision 0076).
+
 ### 10.1 Vue d'ensemble
 
 ```
@@ -424,7 +426,7 @@ charteJson (canonique) = {
   "role": "proche" | "gardien",
   "codeVerifier": "<base64(SHA-256(\"fatoom-code|\" ‖ normalize(code)))>",
   "telephone": "<E.164>" | null,          # second facteur SMS (obligatoire si role = gardien)
-  "email": "<email normalisé>" | null,    # second facteur email ; normalisé : Unicode NFC, espaces de bord retirés, tout en minuscules, rien d'autre
+  "email": "<email normalisé>" | null,    # second facteur email ; forme du §10 : ASCII de U+0021 à U+007E, sans majuscule
   "prenom": "<prénom tel que saisi>",     # affichage (« Bonjour Léa ») et comparaison d'identité (§11.9)
   "nom": "<nom tel que saisi>" | null,    # exigé pour un proche "courrier"
   "dateNaissance": "<AAAA-MM-JJ>" | null, # exigée pour un proche "courrier" ; sert à la comparaison d'identité
@@ -440,7 +442,7 @@ charte     = AES-256-GCM(KTS_auth, iv, UTF-8(charteJson), aad_charte)
 
 - `normalize(code)` retire les tirets et les espaces (U+0020), puis met en majuscules les lettres a à z ; le résultat, 12 caractères ASCII, est encodé en UTF-8 dans `codeVerifier` et `indexAcces`. Le client refuse une saisie qui ne donne pas 12 caractères de l'alphabet, sans calculer l'index. Sésame applique la même fonction au code reçu tel que saisi (`API.md`, §1.7).
 - Le code a 12 caractères de l'alphabet `23456789ABCDEFGHJKLMNPQRSTUVWXYZ` (32 caractères, sans `0`, `1`, `I`, `O` : 60 bits d'entropie), tirés sans biais modulo : 12 octets tirés, chaque caractère vaut `alphabet[octet mod 32]`, 32 divisant 256. Il s'affiche `XXXX-XXXX-XXXX`.
-- Forme de la charte, contrôlée à l'écriture par l'app et à l'ouverture : exactement ces 15 champs ; une valeur facultative absente vaut `null`, jamais une chaîne vide ; `telephone` en E.164 (`+` puis 2 à 15 chiffres, le premier non nul) ; `email` égal à sa forme normalisée ; `dateNaissance` une date réelle ; `creeLe` ISO 8601 UTC à la milliseconde ; `courrier` vrai si et seulement si `telephone` et `email` sont `null`. Une charte hors de cette forme, ou dont le contenu déchiffré n'est pas exactement son JSON canonique, est refusée ; sous une autre AAD, son ouverture échoue.
+- Forme de la charte, contrôlée à l'écriture par l'app et à l'ouverture : exactement ces 15 champs ; une valeur facultative absente vaut `null`, jamais une chaîne vide ; `telephone` en E.164 (`+` puis 2 à 15 chiffres, le premier non nul) ; `email` sous sa forme normalisée (§10) ; `dateNaissance` une date réelle ; `creeLe` ISO 8601 UTC à la milliseconde ; `courrier` vrai si et seulement si `telephone` et `email` sont `null`. Une charte hors de cette forme, ou dont le contenu déchiffré n'est pas exactement son JSON canonique, est refusée ; sous une autre AAD, son ouverture échoue.
 - La charte ne porte aucun lien de parenté.
 
 Le client range `charte`, `charteIv`, `charteGeneration` et l'**index du code** :
