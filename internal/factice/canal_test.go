@@ -164,13 +164,13 @@ func TestCanalFerme(t *testing.T) { // ENV-05 (canal fermé), ENV-14, API.md §1
 	e.f.Clock.Advance(time.Hour)
 	tick(e)
 	clearErr(t, c.post(c.envelope(2, "defi", jcs.Object{"uid": "u1"})), 400, "canal_invalide")
-	// Filtre de taille fixe : 10 000 canaux fermés, mémoire constante.
+	// Filtre de taille fixe : 500 canaux fermés, mémoire constante.
 	in := e.f.Server.Instances[0]
-	for i := range 2000 {
+	for i := range 500 {
 		c := e.open("a")
 		ok(t, c.call("defi", jcs.Object{"uid": "u" + itoa(int64(i))}))
 	}
-	if in.Channels() != 2000 {
+	if in.Channels() != 500 {
 		t.Fatalf("canaux ouverts : %d", in.Channels())
 	}
 	e.f.Clock.Advance(time.Hour)

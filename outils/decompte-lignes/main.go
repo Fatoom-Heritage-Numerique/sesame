@@ -1,11 +1,13 @@
 // Commande decompte-lignes : budget de code de Sésame (ARCHITECTURE.md §2.2,
 // RELEASE.md §8, contrôle « Budget »).
 //
-// Le décompte porte sur les fichiers .go des paquets que lie cmd/sesame
-// (`go list -deps`, plateforme de l'image), du seul module de ce dépôt : la
-// bibliothèque standard et les modules épinglés n'y entrent pas, ni les
-// fichiers _test.go (absents de GoFiles), ni les paquets du lanceur factice et
-// des doubles (internal/factice/). Une ligne compte si elle porte au moins un
+// Le décompte porte sur les fichiers .go des paquets que lient cmd/sesame et
+// cmd/sesame-fake (`go list -deps`, plateforme de l'image), du seul module de
+// ce dépôt : la bibliothèque standard et les modules épinglés n'y entrent
+// pas, ni les fichiers _test.go (absents de GoFiles), ni les paquets du
+// lanceur factice et des doubles (internal/factice/), ni l'assemblage de
+// sesame-fake (cmd/sesame-fake). Le code des décisions compte donc dès que
+// sesame-fake le lie, avant que l'image ait ses adaptateurs réels. Une ligne compte si elle porte au moins un
 // élément de code : les lignes vides et celles qui ne portent qu'un
 // commentaire ne comptent pas. La commande échoue au-delà du plafond.
 package main
@@ -47,7 +49,11 @@ func run(root string, limit int, detail bool, out io.Writer) error {
 	if err != nil {
 		return err
 	}
-	pkgs, err := golist.Deps(root, "./cmd/sesame")
+	patterns := []string{"./cmd/sesame"}
+	if _, err := os.Stat(filepath.Join(root, "cmd", "sesame-fake")); err == nil {
+		patterns = append(patterns, "./cmd/sesame-fake")
+	}
+	pkgs, err := golist.Deps(root, patterns...)
 	if err != nil {
 		return err
 	}
@@ -65,7 +71,7 @@ func run(root string, limit int, detail bool, out io.Writer) error {
 			fmt.Fprintf(out, "%6d  %s\n", perPackage[name], name)
 		}
 	}
-	fmt.Fprintf(out, "%d lignes de Go liées par cmd/sesame (plafond %d)\n", total, limit)
+	fmt.Fprintf(out, "%d lignes de Go liées par cmd/sesame et cmd/sesame-fake, hors internal/factice/ (plafond %d)\n", total, limit)
 	if total > limit {
 		return fmt.Errorf("budget dépassé : %d lignes pour un plafond de %d", total, limit)
 	}
@@ -97,14 +103,15 @@ func Count(pkgs []golist.Package, mainModule string) (map[string]int, int, error
 	return perPackage, total, nil
 }
 
-// Selected garde les paquets du module principal, hors internal/factice/.
+// Selected garde les paquets du module principal, hors internal/factice/ et
+// cmd/sesame-fake.
 func Selected(pkgs []golist.Package, mainModule string) []golist.Package {
 	var kept []golist.Package
 	for _, p := range pkgs {
 		if p.Standard || p.Module == nil || p.Module.Path != mainModule {
 			continue
 		}
-		if golist.Within(p.ImportPath, mainModule+"/internal/factice") {
+		if golist.Within(p.ImportPath, mainModule+"/internal/factice") || p.ImportPath == mainModule+"/cmd/sesame-fake" {
 			continue
 		}
 		kept = append(kept, p)

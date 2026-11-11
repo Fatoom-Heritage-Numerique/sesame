@@ -20,7 +20,7 @@ La prose est en **français** : documents, commentaires, messages de commit, des
 - **Cryptographie de la bibliothèque standard** (`crypto/ecdh`, `crypto/aes`, `crypto/ed25519`, `crypto/hkdf`, `crypto/mlkem`, et `crypto/ecdsa`, `crypto/rsa`, `crypto/x509` pour vérifier l'attestation et les signatures du registre). Deux exceptions cryptographiques, épinglées : `github.com/cloudflare/circl` pour l'OPRF du protocole de PIN et `golang.org/x/crypto/argon2` pour l'Argon2id de l'index des lettres d'invitation. Aucune autre bibliothèque cryptographique. Forme normale NFC : `golang.org/x/text/unicode/norm` (extension officielle de Go), épinglée (décision 0068).
 - **Dépendances** : SDK Google officiels (KMS, Firestore, Secret Manager, Cloud Storage, Cloud Logging) ; `go.etcd.io/raft/v3`, épinglée, pour la grappe du protocole de PIN ; `net/http` brut pour Twilio Verify, Twilio Messaging, SendGrid, Stripe Identity et Pingen. Toute nouvelle dépendance se justifie dans la PR et entre dans les listes d'`ARCHITECTURE.md` §2.4 (bibliothèques) et §2.2 (réseau) ; la CI refuse une dépendance réseau hors liste.
 - **Adresses des fournisseurs en dur** dans le code, jamais lues au démarrage. Ce qui est propre à un client va dans des variables attestées (identifiants de compte, adresse de la passerelle) et, pour les textes et les gabarits des lettres, dans un document lu au démarrage et attesté par son empreinte, elle-même variable attestée (`ARCHITECTURE.md` §2.3) ; les clés d'API et ce document sont dans Secret Manager. **Rien de propre à un client dans ce dépôt** : ni identifiant, ni nom de projet, de bucket ou de compte, ni texte de marque. Les noms de ressources sont écrits en `<projet-sesame>`, `<bucket-audit>`, `<bucket-inscrits>`, `<bucket-ecritures>`, `<compte-charge>`, `<compte-deces>`, `<compte-exploitation>`, `<cle-codes-deces>`, `<secret-textes>`, `<registre-images>`, `<numero-projet-sesame>` ; les valeurs concrètes sont celles du déploiement de Fatoom et ne s'écrivent nulle part dans ce dépôt. Cette règle porte sur le dépôt seul : la page de transparence du client (pour Fatoom : fatoom.fr/sesame) publie les valeurs des arguments des scripts publics, `<numero-projet-sesame>`, `<registre-images>` et `<bucket-audit>`, dont les deux derniers contiennent le nom du projet, pour que chacun puisse exécuter ces scripts (`README.md`, étape 4) ; les autres valeurs ne sont publiées nulle part.
-- **Budget** : de l'ordre de 5 000 à 6 000 lignes de Go visées, plafond dur de 6 000 lignes hors tests et hors bibliothèques épinglées (`ARCHITECTURE.md` §2.2), contrôlé en CI. Une PR qui le dépasse doit retirer autant qu'elle ajoute.
+- **Budget** : de l'ordre de 5 000 à 6 000 lignes de Go visées, plafond dur de 6 000 lignes hors tests et hors bibliothèques épinglées (`ARCHITECTURE.md` §2.2), contrôlé en CI sur les paquets que lient `cmd/sesame` et `cmd/sesame-fake`, hors `internal/factice/` et hors l'assemblage `cmd/sesame-fake` : le code des décisions compte dès que `sesame-fake` le lie. Une PR qui le dépasse doit retirer autant qu'elle ajoute.
 - **Journaux** : jamais de clé, de code, de numéro, d'email, de nom, de libellé ni de corps de requête (`ARCHITECTURE.md` §7). Les identifiants sont masqués (`uidMasque`).
 - **Lanceur factice** (`SESAME_FAKE_LAUNCHER`) et doubles de KMS, Twilio, SendGrid, Stripe, Pingen, Firestore, Cloud Logging : uniquement dans le paquet de test ; le build échoue si la variable est lue ailleurs.
 - Pas de rétrocompatibilité tant qu'aucune version n'est en production : un format se remplace, il ne se versionne pas.
@@ -36,12 +36,13 @@ go test -race ./...                          # vecteurs (forme, SHA256SUMS, couv
 go mod verify
 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...   # version épinglée par la CI
 (cd testdata/vecteurs && sha256sum -c SHA256SUMS)
-go run ./outils/decompte-lignes             # plafond de 6 000 lignes (-detail : par paquet)
+go run ./outils/decompte-lignes             # plafond de 6 000 lignes, cmd/sesame et cmd/sesame-fake hors internal/factice/ (-detail : par paquet)
 go run ./outils/controle-lanceur            # SESAME_FAKE_LAUNCHER lu seulement dans internal/factice/
 go run ./outils/controle-dependances        # paquets liés par cmd/sesame : liste d'ARCHITECTURE.md §2.4
 go run ./outils/controle-noms               # noms de ressources sous la forme <…> (décision 0066)
 go run ./outils/controle-image              # images de base du Dockerfile épinglées par digest
 ./build/reproduire.sh                        # image de cmd/sesame, sha256:<empreinte>
+go run ./cmd/sesame-fake -config testdata/factice/configuration.json   # sesame-fake en local (variable du lanceur factice à 1, décision 0063)
 SORTIE_OCI=image.tar ./build/reproduire.sh && go run ./outils/controle-image -oci image.tar   # image sans shell, étiquettes
 ```
 
@@ -50,13 +51,13 @@ Arrivent avec leur code, à la même étape :
 ```bash
 go run ./outils/generer-compteurpin -verifier
 docker compose -f build/grappe.compose.yaml up --abort-on-container-exit   # grappe sur trois conteneurs, Toxiproxy
-go run ./cmd/sesame-fake -config <fichier>   # sesame-fake en local, mode grappe locale ou instance (décision 0063)
 ```
 
 - `govulncheck` se lance avec le Go de `go.mod` (`GOTOOLCHAIN=go<version de go.mod>` si le Go local est plus ancien) : construit avec un Go plus ancien, il refuse les paquets du module.
 - `build/reproduire.sh` demande `docker` avec `buildx`, et `git` ; il construit le commit courant, pas les fichiers modifiés.
 - La CI (`.github/workflows/ci.yml`) lance ces commandes sur chaque PR et sur `main`, plus la double construction sur deux exécuteurs et le contrôle de l'image construite (`RELEASE.md` §8) ; ses actions GitHub sont épinglées par l'empreinte de leur commit, la version en commentaire (décision 0065).
 - Un test qui rejoue des vecteurs réclame ses groupes par `vecteurs.Track` (`internal/vecteurs`), dans le paquet qui porte leur format (`ARCHITECTURE.md` §2.4), et retire ces groupes de la liste `pending` de `internal/vecteurs/couverture_test.go` ; un groupe qu'aucun test ne réclame et qui n'est pas dans cette liste fait échouer la suite. Tous les groupes des quatre copies sont réclamés : un groupe nouveau d'une recopie entre dans `pending` jusqu'à son test.
+- La configuration de test de `sesame-fake` (`testdata/factice/configuration.json`, clés de test publiques et sans valeur, de même forme que celle d'un client) et les clés privées de test des émetteurs de jetons (`testdata/factice/emetteurs-prives.json`) ne s'écrivent que par `go run ./outils/generer-config-test testdata/factice`. Les tests du contrat (`internal/factice`) font tourner `sesame-fake` sur cette configuration ; chaque requête et chaque réponse y est validée contre `api/openapi.json`, et le test de concordance nomme, dans sa liste `aVenir`, les routes d'`API.md` pas encore servies (décision 0064).
 - `compteurPin.json` ne s'écrit que par `go run ./outils/generer-compteurpin` ; les copies de `testdata/vecteurs/` que par une recopie depuis le client (« Formats et vecteurs »).
 - Le contrôle NFC est celui de `golang.org/x/text/unicode/norm` (décision 0068) ; le test de `internal/jcs` échoue si ses tables sont d'une autre version Unicode que la bibliothèque standard.
 
