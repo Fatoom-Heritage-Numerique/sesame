@@ -46,7 +46,7 @@ func open(reports []registre.Line, now time.Time) *registre.Line {
 // nouveau code d'invitation tiré, scellé et inscrit avec invitations/{lookup}
 // et lettres/{contactId}, envoi réservé ; sinon réimpression du code descellé
 // (nouvel envoi, renvoi ou reprise), sans nouvelle inscription.
-func (a *call) post(uid, titular string, report *registre.Line, c cles.Charter, code string) error {
+func (a *call) post(uid string, report *registre.Line, c cles.Charter, code string) error {
 	contact := str(c, "contactId")
 	letterPath := a.path(uid, "lettres", contact)
 	if code == "" {
@@ -75,7 +75,7 @@ func (a *call) post(uid, titular string, report *registre.Line, c cles.Charter, 
 	if !isDeath(*report) {
 		name = "lettre_inactivite"
 	}
-	_, text := a.in.render(name, "titulaire", titular, "prenom", str(c, "prenom"), "code", cles.DisplayCode(code))
+	_, text := a.in.render(name, "titulaire", str(c, "titulaireAffiche"), "prenom", str(c, "prenom"), "code", cles.DisplayCode(code))
 	pdf := lettres.PDF(lettres.Letter{Address: strings.Split(str(c, "adresse"), "\n"), Text: text, Code: cles.DisplayCode(code)})
 	id, err := a.in.cfg.Courrier.Send(a.ctx, a.in.cfg.reglages.CourrierOrganisation, pdf)
 	if err != nil {
@@ -164,7 +164,7 @@ func (a *call) secours() (jcs.Object, error) {
 	} else if err != nil {
 		return nil, err
 	}
-	if err := a.post(uid, str(b, "titulaireAffiche"), report, c, ""); err != nil {
+	if err := a.post(uid, report, c, ""); err != nil {
 		return nil, err
 	}
 	return jcs.Object{"commandee": true}, nil
@@ -324,7 +324,7 @@ func (a *call) letters(uid string, h registre.Line, reports []registre.Line) {
 				a.in.log("lettre_ignoree", uid, "charte")
 				continue
 			}
-			if err := a.post(uid, str(b, "titulaireAffiche"), &s, c, ""); err != nil {
+			if err := a.post(uid, &s, c, ""); err != nil {
 				a.in.log("lettre_non_envoyee", uid, "fournisseur_indisponible")
 			}
 		}
@@ -407,7 +407,7 @@ func (a *call) reprint(uid string, h registre.Line, report *registre.Line, l reg
 	sealed, _ := primitives.B64(str(l.Doc, "codeInvitationScelle"))
 	code, err2 := a.in.cfg.KMS.Decrypt(a.ctx, ports.InvitationSeal, sealed, aad)
 	if err == nil && err2 == nil && postable(c) {
-		err = a.post(uid, str(b, "titulaireAffiche"), report, c, string(code))
+		err = a.post(uid, report, c, string(code))
 	}
 	clear(code)
 	if err != nil || err2 != nil {
