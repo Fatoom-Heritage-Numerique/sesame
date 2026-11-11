@@ -17,6 +17,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/attestation"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/jcs"
@@ -46,6 +47,9 @@ type Config struct {
 	// Emetteurs : par émetteur (idToken, google), clés publiques RS256 de
 	// test par kid, en SubjectPublicKeyInfo DER base64.
 	Emetteurs map[string]map[string]string `json:"emetteurs"`
+	// EmetteursDistants : par émetteur, adresse HTTPS d'un JWKS ou de
+	// certificats PEM par kid, relue périodiquement (emetteurs.go).
+	EmetteursDistants map[string]string `json:"emetteursDistants"`
 	// Textes : le document des textes, d'empreinte SESAME_TEXTES.
 	Textes json.RawMessage `json:"textes"`
 	// Mode : "grappe-locale" (trois instances a, b, c) ou "instance".
@@ -143,6 +147,11 @@ func ParseConfig(b []byte) (*Config, error) {
 			if c.issuers[iss][kid], err = primitives.B64(s); err != nil {
 				return bad("emetteurs")
 			}
+		}
+	}
+	for iss, u := range c.EmetteursDistants {
+		if (iss != "idToken" && iss != "google") || !strings.HasPrefix(u, "https://") {
+			return bad("emetteursDistants")
 		}
 	}
 	switch {

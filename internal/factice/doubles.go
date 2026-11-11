@@ -434,6 +434,7 @@ type Gateway struct {
 	mu       sync.Mutex
 	requests []Request
 	Answer   func(Request) (int, []byte, error)
+	Check    *Check // vérification des requêtes de Sésame (passerelle.go), nil : aucune
 }
 
 // MaxRequests borne les requêtes gardées par la passerelle de test.
@@ -448,10 +449,19 @@ func (g *Gateway) Send(_ context.Context, method, pq string, h map[string]string
 	g.requests = append(g.requests, r)
 	answer := g.Answer
 	g.mu.Unlock()
-	if answer != nil {
-		return answer(r)
+	if g.Check != nil {
+		if st := g.Check.verdict(r); st != 0 {
+			return st, []byte("{}"), nil
+		}
 	}
-	return 200, []byte("{}"), nil
+	st, body, err := 200, []byte("{}"), error(nil)
+	if answer != nil {
+		st, body, err = answer(r)
+	}
+	if g.Check != nil && method == "POST" && (err != nil || st != 200) {
+		g.Check.forget(h["X-Sesame-Request-Id"])
+	}
+	return st, body, err
 }
 
 // Requests rend une copie des requêtes reçues.

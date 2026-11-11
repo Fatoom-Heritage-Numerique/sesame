@@ -287,3 +287,54 @@ func TestSessionsPerdues(t *testing.T) { // SFE-03, SOU-19, API.md §5.5 ; regis
 }
 
 func jcsString(o jcs.Object) string { b, _ := jcs.Marshal(o); return string(b) }
+
+func TestPasserelleDeTest(t *testing.T) { // PAS-02, PAS-03, PAS-04, PAS-10, API.md §5.1, §5.5
+	e := newEnv(t)
+	k := newCoffre(t, e, "u-passerelle")
+	g := k.add("g", "gardien", "+33600000001", nil)
+	k.session(t, g)
+	if r := e.f.Gateway.Check.Refused; len(r) != 0 {
+		t.Fatalf("requêtes de Sésame refusées : %v", r)
+	}
+	var get, post factice.Request
+	for _, r := range e.f.Gateway.Requests() {
+		if r.Method == "GET" {
+			get = r
+		} else {
+			post = r
+		}
+	}
+	send := func(r factice.Request, edit func(h map[string]string)) int {
+		h := map[string]string{}
+		for k, v := range r.Headers {
+			h[k] = v
+		}
+		edit(h)
+		st, _, _ := e.f.Gateway.Send(t.Context(), r.Method, r.PathQuery, h, r.Body)
+		return st
+	}
+	same := func(map[string]string) {}
+	if send(get, same) != 401 || send(post, same) != 200 {
+		t.Fatal("rejeu d'un GET /bundle ou notification déjà traitée")
+	}
+	for name, edit := range map[string]func(h map[string]string){
+		"kem absent":       func(h map[string]string) { delete(h, "X-Sesame-Kem-Pub") },
+		"autre kem":        func(h map[string]string) { h["X-Sesame-Kem-Pub"] = b64(random(1184)) },
+		"signature":        func(h map[string]string) { h["X-Sesame-Signature"] = b64(random(64)) },
+		"attestation":      func(h map[string]string) { h["X-Sesame-Attestation"] = "x.y.z" },
+		"identifiant":      func(h map[string]string) { h["X-Sesame-Request-Id"] = "00000000-0000-4000-8000-000000000000" },
+		"echeanceModifiee": func(h map[string]string) {},
+	} {
+		r := post
+		if name == "echeanceModifiee" {
+			r.PathQuery = "/echeanceModifiee"
+		}
+		if st := send(r, edit); st != 401 && st != 400 {
+			t.Fatalf("%s : %d", name, st)
+		}
+	}
+	e.f.Clock.Advance(6 * time.Minute)
+	if send(post, func(h map[string]string) { h["X-Sesame-Request-Id"] = "11111111-1111-4111-8111-111111111111" }) != 401 {
+		t.Fatal("horodatage de plus de 5 min accepté")
+	}
+}
