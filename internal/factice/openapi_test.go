@@ -22,9 +22,7 @@ import (
 // ses tests (décision 0064). Une route servie absente de l'OpenAPI, ou
 // décrite et non servie, fait échouer TestOpenAPIRoutes.
 var aVenir = []string{
-	"lettre/secours", "pin/deposer", "pin/evaluer", "session/ouvrir", "session/verifier", "session/identite/demarrer",
-	"session/identite/verifier", "session/identite/bascule", "session/ouvrir-cles", "session/fermer", "session/refuser-role",
-	"grappe/rejoindre", "grappe/membres", "grappe/amorcer", "grappe/preparer", "grappe/demarrer",
+	"pin/deposer", "pin/evaluer", "grappe/rejoindre", "grappe/membres", "grappe/amorcer", "grappe/preparer", "grappe/demarrer",
 }
 
 // communes sont les erreurs que toute route du canal peut rendre (API.md §2).

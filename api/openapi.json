@@ -379,6 +379,19 @@
       "StatutChiffre": {
         "type": "object",
         "description": "{statut: 200, corps} ou {statut, erreur, message, details?} (API.md §1.3) ; corps et codes par route sous x-sesame-routes"
+      },
+      "IdSession": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{43}$",
+        "description": "sessionId : 32 octets de la primitive d'aléa en base64url (API.md §1.7)"
+      },
+      "Octets12": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9+/]{16}$"
+      },
+      "Octets48": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9+/]{64}$"
       }
     },
     "responses": {
@@ -933,6 +946,542 @@
       "erreurs": [
         "jeton_invalide",
         "titulaire_indisponible"
+      ]
+    },
+    "lettre/secours": {
+      "section": "2.10",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jetonFatoom",
+          "uid",
+          "contactId"
+        ],
+        "properties": {
+          "jetonFatoom": {
+            "$ref": "#/components/schemas/Jeton"
+          },
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "contactId": {
+            "$ref": "#/components/schemas/Id"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "commandee"
+        ],
+        "properties": {
+          "commandee": {
+            "type": "boolean"
+          }
+        }
+      },
+      "erreurs": [
+        "jeton_invalide",
+        "titulaire_indisponible",
+        "reessayer_plus_tard",
+        "passerelle_indisponible",
+        "fournisseur_indisponible"
+      ]
+    },
+    "session/ouvrir": {
+      "section": "2.14",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [],
+        "properties": {
+          "code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "lookup": {
+            "$ref": "#/components/schemas/Hex64"
+          },
+          "sessionId": {
+            "$ref": "#/components/schemas/IdSession"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId",
+          "canal",
+          "masque"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/IdSession"
+          },
+          "canal": {
+            "enum": [
+              "sms",
+              "email",
+              "identite",
+              "aucun"
+            ]
+          },
+          "masque": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "jeton": {
+            "$ref": "#/components/schemas/JWS"
+          },
+          "scope": {
+            "enum": [
+              "destine"
+            ]
+          },
+          "base": {
+            "enum": [
+              "vivant",
+              "deces",
+              "inactivite"
+            ]
+          },
+          "role": {
+            "enum": [
+              "proche",
+              "gardien"
+            ]
+          },
+          "expireLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          },
+          "prenom": {
+            "type": "string",
+            "minLength": 1
+          },
+          "titulaireAffiche": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "erreurs": [
+        "code_refuse",
+        "trop_d_essais",
+        "reessayer_plus_tard",
+        "passerelle_indisponible",
+        "fournisseur_indisponible",
+        "session_expiree"
+      ]
+    },
+    "session/verifier": {
+      "section": "2.15",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId",
+          "otp"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/IdSession"
+          },
+          "otp": {
+            "type": "string",
+            "pattern": "^[0-9]{4,10}$"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jeton",
+          "scope",
+          "base",
+          "role",
+          "expireLe",
+          "prenom",
+          "titulaireAffiche"
+        ],
+        "properties": {
+          "jeton": {
+            "$ref": "#/components/schemas/JWS"
+          },
+          "scope": {
+            "enum": [
+              "destine"
+            ]
+          },
+          "base": {
+            "enum": [
+              "vivant",
+              "deces",
+              "inactivite"
+            ]
+          },
+          "role": {
+            "enum": [
+              "proche",
+              "gardien"
+            ]
+          },
+          "expireLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          },
+          "prenom": {
+            "type": "string",
+            "minLength": 1
+          },
+          "titulaireAffiche": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "erreurs": [
+        "otp_refuse",
+        "trop_d_essais",
+        "reessayer_plus_tard",
+        "session_expiree",
+        "fournisseur_indisponible"
+      ]
+    },
+    "session/identite/demarrer": {
+      "section": "2.16",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/IdSession"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "clientSecret"
+        ],
+        "properties": {
+          "clientSecret": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "erreurs": [
+        "identite_bloquee",
+        "session_expiree",
+        "fournisseur_indisponible"
+      ]
+    },
+    "session/identite/verifier": {
+      "section": "2.17",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/IdSession"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jeton",
+          "scope",
+          "base",
+          "role",
+          "expireLe",
+          "prenom",
+          "titulaireAffiche"
+        ],
+        "properties": {
+          "jeton": {
+            "$ref": "#/components/schemas/JWS"
+          },
+          "scope": {
+            "enum": [
+              "destine"
+            ]
+          },
+          "base": {
+            "enum": [
+              "vivant",
+              "deces",
+              "inactivite"
+            ]
+          },
+          "role": {
+            "enum": [
+              "proche",
+              "gardien"
+            ]
+          },
+          "expireLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          },
+          "prenom": {
+            "type": "string",
+            "minLength": 1
+          },
+          "titulaireAffiche": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "erreurs": [
+        "identite_non_confirmee",
+        "identite_bloquee",
+        "identite_en_attente",
+        "reessayer_plus_tard",
+        "session_expiree",
+        "fournisseur_indisponible"
+      ]
+    },
+    "session/identite/bascule": {
+      "section": "2.18",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/IdSession"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "canal"
+        ],
+        "properties": {
+          "canal": {
+            "enum": [
+              "identite"
+            ]
+          }
+        }
+      },
+      "erreurs": [
+        "bascule_impossible",
+        "session_expiree"
+      ]
+    },
+    "session/ouvrir-cles": {
+      "section": "2.19",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId",
+          "enveloppes"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/IdSession"
+          },
+          "enveloppes": {
+            "type": "array",
+            "maxItems": 500,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "id",
+                "contactId",
+                "enveloppe",
+                "iv"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "fichier",
+                    "motdepasse",
+                    "mot",
+                    "volontes"
+                  ]
+                },
+                "id": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "contactId": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "enveloppe": {
+                  "$ref": "#/components/schemas/Octets48"
+                },
+                "iv": {
+                  "$ref": "#/components/schemas/Octets12"
+                }
+              }
+            }
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "cles",
+          "refusees",
+          "jeton",
+          "expireLe"
+        ],
+        "properties": {
+          "cles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "id",
+                "cle"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "fichier",
+                    "motdepasse",
+                    "mot",
+                    "volontes"
+                  ]
+                },
+                "id": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "cle": {
+                  "$ref": "#/components/schemas/Octets32"
+                }
+              }
+            }
+          },
+          "refusees": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "type",
+                "id",
+                "erreur"
+              ],
+              "properties": {
+                "type": {
+                  "enum": [
+                    "fichier",
+                    "motdepasse",
+                    "mot",
+                    "volontes"
+                  ]
+                },
+                "id": {
+                  "$ref": "#/components/schemas/Id"
+                },
+                "erreur": {
+                  "enum": [
+                    "enveloppe_refusee"
+                  ]
+                }
+              }
+            }
+          },
+          "jeton": {
+            "$ref": "#/components/schemas/JWS"
+          },
+          "expireLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          }
+        }
+      },
+      "erreurs": [
+        "reessayer_plus_tard",
+        "session_expiree"
+      ]
+    },
+    "session/fermer": {
+      "section": "2.20",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/IdSession"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "fermee"
+        ],
+        "properties": {
+          "fermee": {
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "erreurs": []
+    },
+    "session/refuser-role": {
+      "section": "2.21",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sessionId"
+        ],
+        "properties": {
+          "sessionId": {
+            "$ref": "#/components/schemas/IdSession"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "refuse"
+        ],
+        "properties": {
+          "refuse": {
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "erreurs": [
+        "role_insuffisant",
+        "session_expiree"
       ]
     }
   },

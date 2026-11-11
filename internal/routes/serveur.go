@@ -23,6 +23,7 @@ import (
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/ports"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/primitives"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/registre"
+	"github.com/Fatoom-Heritage-Numerique/sesame/internal/sessions"
 )
 
 // Tailles du canal (API.md §7).
@@ -79,10 +80,16 @@ type Instance struct {
 	reg     *registre.Registre
 	borne   *registre.Borne
 	notif   *passerelle.Client
+	retry   *passerelle.Retrier
+	sess    sessions.Store
+	strikes strikes
 	local   *limiter
 	token   atomic.Pointer[string]
 	refusal string
 	started time.Time
+	last    [5]time.Time // derniers passages des tâches de Tick
+	mu      sync.Mutex
+	rejects map[string]bool // titulaires dont une ligne vient d'être rejetée
 }
 
 // NewInstance démarre une instance de préfixe a, b ou c : tirage de
@@ -109,8 +116,15 @@ func NewInstance(ctx context.Context, cfg *Config, prefix, gceID string) (*Insta
 	in.borne = &registre.Borne{R: in.reg, KMS: cfg.KMS, Stockage: cfg.Stockage, Horloge: cfg.Horloge, Kid: cfg.SessionKid,
 		InstanceID: id, ImageDigest: cfg.ImageDigest, GCEID: gceID, Reprise: cfg.Reprise, Grappe: func() (any, int) { return nil, 0 }}
 	in.reg.Event = in.borne.Signal
-	in.notif = &passerelle.Client{KMS: cfg.KMS, Alea: cfg.Alea, Horloge: cfg.Horloge, Passerelle: cfg.Passerelle, Journal: cfg.Journal,
+	in.reg.OnReject = in.rejected
+	in.retry = &passerelle.Retrier{Horloge: cfg.Horloge}
+	in.sess.End = in.ended
+	in.table.OnClose = func(c *canal.Channel) {
+		in.sess.Close(func(s *sessions.Session) bool { return s.Channel == c.Key }, in.cfg.Horloge.Now(), nil)
+	}
+	in.notif = &passerelle.Client{Retrier: in.retry, KMS: cfg.KMS, Alea: cfg.Alea, Horloge: cfg.Horloge, Passerelle: cfg.Passerelle, Journal: cfg.Journal,
 		Kid: cfg.SessionKid, SessionPub: keys.SessionPub, KemPub: keys.KemPub, Token: in.currentToken}
+	in.last[4] = in.started // tâche horaire : une heure après le démarrage
 	in.refusal = in.start(ctx)
 	if in.refusal != "" {
 		in.log("demarrage_refuse", "", in.refusal)
@@ -163,53 +177,105 @@ func (in *Instance) writeInstance(ctx context.Context) error {
 	})
 }
 
-// Run tient la boucle de fond de l'instance jusqu'à la fin de ctx : jeton
-// du lanceur toutes les 10 min, vuLe toutes les 60 s, borne toutes les
-// 10 min, fermeture des canaux inactifs, réessais des notifications.
+// Run tient la boucle de fond de l'instance jusqu'à la fin de ctx.
 func (in *Instance) Run(ctx context.Context) {
 	if in.refusal != "" {
 		return
 	}
 	tick := time.NewTicker(time.Second)
 	defer tick.Stop()
-	var lastTok, lastVu, lastBorne, lastIdle time.Time
-	lastTok, lastVu = in.cfg.Horloge.Now(), in.cfg.Horloge.Now()
+	in.last[0], in.last[1] = in.cfg.Horloge.Now(), in.cfg.Horloge.Now()
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-tick.C:
 		}
-		in.Tick(ctx, &lastTok, &lastVu, &lastBorne, &lastIdle)
+		in.Tick(ctx, false)
 	}
 }
 
-// Tick fait ce qui est dû à l'heure de l'horloge de l'instance (les tests
-// l'appellent avec une horloge fixe).
-func (in *Instance) Tick(ctx context.Context, lastTok, lastVu, lastBorne, lastIdle *time.Time) {
+// Tick fait ce qui est dû à l'heure de l'horloge de l'instance (tout sauf
+// la tâche horaire, si force : les tests l'appellent avec une horloge fixe) : jeton du lanceur
+// toutes les 10 min, vuLe toutes les 60 s, borne toutes les 10 min, canaux
+// et sessions inactifs chaque minute, tâche horaire, puis les réessais et
+// les alertes de lignes rejetées.
+func (in *Instance) Tick(ctx context.Context, force bool) {
 	now := in.cfg.Horloge.Now()
-	due := func(last *time.Time, p time.Duration) bool {
-		if last.IsZero() || now.Sub(*last) >= p {
-			*last = now
+	due := func(i int, p time.Duration) bool {
+		if force && i < 4 || in.last[i].IsZero() || now.Sub(in.last[i]) >= p {
+			in.last[i] = now
 			return true
 		}
 		return false
 	}
-	if due(lastTok, tokenPeriod) {
+	if due(0, tokenPeriod) {
 		in.refreshToken(ctx)
 	}
-	if due(lastVu, vuLePeriod) {
+	if due(1, vuLePeriod) {
 		_ = in.writeInstance(ctx)
 	}
-	if due(lastBorne, registre.BornePeriod) {
+	if due(2, registre.BornePeriod) {
 		if err := in.borne.Deposit(ctx); err != nil {
 			in.log("borne_non_deposee", "", "registre_indisponible")
 		}
 	}
-	if due(lastIdle, idlePeriod) {
+	if due(3, idlePeriod) {
 		in.table.CloseIdle(now)
+		in.sess.Expire(now)
 	}
-	in.notif.Retry(ctx)
+	if due(4, time.Hour) {
+		in.hourly(ctx)
+	}
+	in.retry.Retry(ctx)
+	in.mu.Lock()
+	uids := in.rejects
+	in.rejects = nil
+	in.mu.Unlock()
+	for uid := range uids {
+		if ok, _ := in.local.hit("ligne_rejetee|"+uid, limit{1, 24 * time.Hour}, now); ok {
+			in.alert(ctx, uid, "alerte_ligne_rejetee", "ligne_rejetee", "date", parisTime(now))
+		}
+	}
+}
+
+// rejected note un titulaire dont la ligne vient d'être rejetée par le
+// contrôle de fraîcheur : alerté au passage suivant de Tick, au plus une
+// fois par jour (docs/technique/sesame/versions-et-alertes.md).
+func (in *Instance) rejected(uid string) {
+	in.mu.Lock()
+	defer in.mu.Unlock()
+	if in.rejects == nil {
+		in.rejects = map[string]bool{}
+	}
+	if len(in.rejects) < maxKeys {
+		in.rejects[uid] = true
+	}
+}
+
+// ended notifie la fin d'une session (sessionTerminee, API.md §5.5), après
+// avoir écrit fermeeLe dans son ouverture si elle a été vérifiée.
+func (in *Instance) ended(s *sessions.Session, now time.Time) {
+	ctx := context.Background()
+	body := jcs.Object{"uid": s.UID, "contactId": s.Contact, "fermeeLe": stamp(now)}
+	if s.Opening != "" {
+		body["ouvertLe"] = s.OuvertLe
+		a := &call{ctx: ctx, in: in, now: now}
+		_ = a.edit(a.path(s.UID, "ouvertures", s.Opening), func(l registre.Line) (jcs.Object, error) {
+			if l.State != registre.Valid || l.Doc["fermeeLe"] != nil {
+				return nil, nil
+			}
+			l.Doc["fermeeLe"] = stamp(now)
+			return l.Doc, nil
+		})
+	}
+	in.notif.Notify(ctx, "sessionTerminee", body)
+}
+
+// closeSessions ferme les sessions de ce titulaire (de ce proche si contact
+// n'est pas vide) que tient l'instance.
+func (in *Instance) closeSessions(uid, contact string, now time.Time, held *sessions.Session) {
+	in.sess.Close(func(s *sessions.Session) bool { return s.UID == uid && (contact == "" || s.Contact == contact) }, now, held)
 }
 
 func (in *Instance) log(event, uid, code string) {
@@ -333,6 +399,10 @@ func (in *Instance) channel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resp := in.dispatch(r, ch, route, corps, err == nil, len(e.Body)-16)
+	if resp["erreur"] == "canal_invalide" { // session présentée depuis un autre canal (§1.3)
+		clearError(w, http.StatusBadRequest, "canal_invalide", nil)
+		return
+	}
 	out, err := canal.SealResponse(ch.KRes, ch.Prefix, e.N, resp)
 	if err != nil {
 		clearError(w, http.StatusBadRequest, "canal_invalide", nil)

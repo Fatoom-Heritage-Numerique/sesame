@@ -214,7 +214,6 @@ func itoa(n int64) string {
 // tick fait passer les tâches de fond de chaque instance à l'heure fixe.
 func tick(e *env) {
 	for _, in := range e.f.Server.Instances {
-		var a, b, c, d time.Time
-		in.Tick(context.Background(), &a, &b, &c, &d)
+		in.Tick(context.Background(), true)
 	}
 }

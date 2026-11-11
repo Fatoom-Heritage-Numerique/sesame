@@ -37,6 +37,8 @@ type Fake struct {
 	Journal   *Journal
 	Gateway   *Gateway
 	Outbox    *Outbox
+	Identity  *Identity
+	Post      *Post
 	Launchers []*Launcher
 	Server    *routes.Server
 	rc        *routes.Config
@@ -52,7 +54,7 @@ func New(ctx context.Context, cfg *Config, opt Options) (*Fake, error) {
 		opt.Clock = &Clock{}
 	}
 	f := &Fake{Config: cfg, Clock: opt.Clock, KMS: NewKMS(cfg.sessionKey, cfg.SessionSign.Kid), Journal: &Journal{},
-		Gateway: &Gateway{}, Outbox: &Outbox{}}
+		Gateway: &Gateway{}, Outbox: &Outbox{}, Identity: &Identity{}, Post: &Post{}}
 	f.Base = &Base{Clock: f.Clock}
 	f.Stockage = &Stockage{Clock: f.Clock}
 	gw := opt.Passerelle
@@ -65,7 +67,7 @@ func New(ctx context.Context, cfg *Config, opt Options) (*Fake, error) {
 	}
 	f.rc = &routes.Config{Ports: routes.Ports{Horloge: f.Clock, Alea: Rand{}, KMS: f.KMS, Base: f.Base, Stockage: f.Stockage,
 		Secrets: Secrets{routes.SecretTextes: cfg.textes}, Journal: f.Journal, Emetteurs: Emetteurs(cfg.issuers), Passerelle: gw,
-		Sms: f.Outbox, Email: f.Outbox}, Env: env, ImageDigest: cfg.imageDigest, SessionKid: cfg.SessionSign.Kid,
+		Sms: f.Outbox, Email: f.Outbox, Identite: f.Identity, Courrier: f.Post}, Env: env, ImageDigest: cfg.imageDigest, SessionKid: cfg.SessionSign.Kid,
 		Reprise: opt.Reprise, BloomBytes: opt.BloomBytes}
 	prefixes := []string{"a", "b", "c"}
 	if cfg.Mode == "instance" {
