@@ -64,6 +64,10 @@ jobs:
         run: go run ./outils/controle-noms
       - name: Dockerfile (images de base épinglées)
         run: go run ./outils/controle-image
+      - name: Dockerfile de sesame-fake (images de base épinglées)
+        run: go run ./outils/controle-image -dockerfile build/sesame-fake.Dockerfile
+      - name: Dockerfile des essais (images de base épinglées, décision 0075)
+        run: go run ./outils/controle-image -dockerfile essais/Dockerfile
 
   # Double construction (RELEASE.md §1.2) : deux jobs, donc deux exécuteurs
   # distincts, puis comparaison des digests.
@@ -130,3 +134,72 @@ jobs:
             echo "Les deux constructions diffèrent : la construction n'est pas reproductible."
             exit 1
           fi
+
+  # Grappe du PIN sur trois conteneurs de sesame-fake et Toxiproxy (décision
+  # 0071) : amorçage, relais, pause, un contre deux, VM recréée admise.
+  grappe-conteneurs:
+    name: Grappe du PIN sur trois conteneurs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: build/grappe.sh
+        run: ./build/grappe.sh
+
+  # Image de sesame-fake publiée sur ghcr.io à chaque fusion sur main
+  # (décision 0063 ; tests.md du client, « Où tourne sesame-fake ») : seul job
+  # à écrire un paquet, par le GITHUB_TOKEN du job, aucun autre secret. Le
+  # client épingle l'empreinte affichée dans le journal et dans le résumé.
+  # Constructeur BuildKit dédié et épinglé (celui de build/reproduire.sh) :
+  # l'empreinte de --metadata-file est alors celle du manifeste poussé.
+  publication-sesame-fake:
+    name: Publication de l'image de sesame-fake
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [controles, grappe-conteneurs]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Construire et publier
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEPOT: ${{ github.repository }}
+          BUILDKIT: moby/buildkit:v0.34.2@sha256:c5f8862f52499773af85bc07695b2379ef08e8002352b0df2c4864c91d78dabe
+        run: |
+          set -euo pipefail
+          image="ghcr.io/${DEPOT,,}-fake"
+          echo "$GITHUB_TOKEN" | docker login ghcr.io -u "$GITHUB_ACTOR" --password-stdin
+          trap 'docker logout ghcr.io > /dev/null 2>&1 || true' EXIT
+          docker buildx create --name publication --driver docker-container --driver-opt "image=$BUILDKIT" > /dev/null
+          docker buildx build --builder publication --platform linux/amd64 -f build/sesame-fake.Dockerfile \
+            --pull --provenance=false --sbom=false --metadata-file "$RUNNER_TEMP/meta.json" \
+            --label "org.opencontainers.image.source=https://github.com/$DEPOT" \
+            --label "org.opencontainers.image.revision=$GITHUB_SHA" \
+            -t "$image:$GITHUB_SHA" -t "$image:main" --push .
+          empreinte=$(jq -r '."containerimage.digest" // empty' "$RUNNER_TEMP/meta.json")
+          if [[ ! "$empreinte" =~ ^sha256:[0-9a-f]{64}$ ]]; then
+            echo "::error::Empreinte de l'image publiée illisible : « $empreinte »"
+            exit 1
+          fi
+          # L'empreinte lue doit être celle que sert le registre.
+          docker buildx imagetools inspect "$image@$empreinte" > /dev/null
+          echo "Image publiée : $image@$empreinte (étiquettes $GITHUB_SHA et main)"
+          {
+            echo "### Image de sesame-fake publiée"
+            echo
+            echo "\`$image@$empreinte\`"
+            echo
+            echo "Étiquettes : \`$GITHUB_SHA\`, \`main\`. Jamais une version de Sésame."
+          } >> "$GITHUB_STEP_SUMMARY"

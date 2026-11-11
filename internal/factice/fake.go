@@ -24,7 +24,24 @@ type Options struct {
 	Reprise    *registre.Reprise
 	BloomBytes int
 	Passerelle ports.Passerelle
+	// Manual : aucune goroutine d'envoi entre VM ni amorçage au démarrage ; le
+	// test fait passer les messages (Pump) et les ticks (TickGrappe).
+	Manual bool
+	// Memoire remplace la mesure de la mémoire (doublure des tests).
+	Memoire func() float64
+	// Decalage décale l'horloge d'une instance (par préfixe) et de son
+	// lanceur : dérive des VM (tests.md, « Grappe du PIN ») ; le registre et
+	// les buckets gardent l'heure de f.Clock.
+	Decalage map[string]time.Duration
 }
+
+// shifted est l'horloge d'une VM décalée de d.
+type shifted struct {
+	c ports.Horloge
+	d time.Duration
+}
+
+func (s shifted) Now() time.Time { return s.c.Now().Add(s.d) }
 
 // Fake est sesame-fake assemblé : ses doubles, partagés par ses instances
 // comme le registre et les buckets le sont par les VM, et son serveur.
@@ -41,7 +58,12 @@ type Fake struct {
 	Post      *Post
 	Launchers []*Launcher
 	Server    *routes.Server
+	Net       *Reseau
 	rc        *routes.Config
+	ctx       context.Context
+	stop      context.CancelFunc
+	manual    bool
+	decalage  map[string]time.Duration
 	mu        sync.Mutex
 	// LauncherDown fait échouer le lanceur des instances démarrées ensuite.
 	LauncherDown bool
@@ -53,7 +75,8 @@ func New(ctx context.Context, cfg *Config, opt Options) (*Fake, error) {
 	if opt.Clock == nil {
 		opt.Clock = &Clock{}
 	}
-	f := &Fake{Config: cfg, Clock: opt.Clock, KMS: NewKMS(cfg.sessionKey, cfg.SessionSign.Kid), Journal: &Journal{},
+	ctx, stop := context.WithCancel(ctx)
+	f := &Fake{Config: cfg, Clock: opt.Clock, Net: NewReseau(1), ctx: ctx, stop: stop, manual: opt.Manual, decalage: opt.Decalage, KMS: NewKMS(cfg.sessionKey, cfg.SessionSign.Kid), Journal: &Journal{},
 		Gateway: &Gateway{Check: &Check{Config: cfg, Clock: opt.Clock}}, Outbox: &Outbox{}, Identity: &Identity{}, Post: &Post{}}
 	f.Base = &Base{Clock: f.Clock}
 	f.Stockage = &Stockage{Clock: f.Clock}
@@ -68,7 +91,7 @@ func New(ctx context.Context, cfg *Config, opt Options) (*Fake, error) {
 	f.rc = &routes.Config{Ports: routes.Ports{Horloge: f.Clock, Alea: Rand{}, KMS: f.KMS, Base: f.Base, Stockage: f.Stockage,
 		Secrets: Secrets{routes.SecretTextes: cfg.textes}, Journal: f.Journal, Emetteurs: &Remote{Static: cfg.issuers, URLs: cfg.EmetteursDistants, Client: &http.Client{Timeout: 10 * time.Second}, Clock: f.Clock}, Passerelle: gw,
 		Sms: f.Outbox, Email: f.Outbox, Identite: f.Identity, Courrier: f.Post}, Env: env, ImageDigest: cfg.imageDigest, SessionKid: cfg.SessionSign.Kid,
-		Reprise: opt.Reprise, BloomBytes: opt.BloomBytes}
+		Reprise: opt.Reprise, BloomBytes: opt.BloomBytes, Racine: cfg.RootSum(), HWModels: []string{cfg.hwmodel}, Memoire: opt.Memoire}
 	prefixes := []string{"a", "b", "c"}
 	if cfg.Mode == "instance" {
 		prefixes = []string{cfg.Prefixe}
@@ -82,20 +105,61 @@ func New(ctx context.Context, cfg *Config, opt Options) (*Fake, error) {
 		f.Server.Instances = append(f.Server.Instances, in)
 		f.Launchers = append(f.Launchers, l)
 	}
+	if cfg.Mode == "grappe-locale" && !opt.Manual { // amorçage commandé au démarrage (tests.md, « Lanceur factice »)
+		if _, code := f.Server.Instances[0].Grappe().Amorcer(ctx, cfg.EnvOverride["COMPTE_EXPLOITATION"]); code != "" {
+			return nil, fmt.Errorf("amorçage de la grappe locale : %s", code)
+		}
+	}
 	return f, nil
+}
+
+// Close arrête les goroutines d'envoi entre VM.
+func (f *Fake) Close() { f.stop() }
+
+// Pump fait passer les messages entre VM en attente, lots retenus compris,
+// jusqu'au calme ou n tours (mode Manual).
+func (f *Fake) Pump(n int) {
+	for range n {
+		f.Net.Release()
+		for _, in := range f.Server.Instances {
+			in.Grappe().Flush(f.ctx)
+		}
+	}
+}
+
+// TickGrappe fait passer un tick de Raft à chaque instance, puis Pump.
+func (f *Fake) TickGrappe() {
+	for _, in := range f.Server.Instances {
+		in.Grappe().Tick(f.ctx)
+	}
+	f.Pump(3)
 }
 
 func (f *Fake) instance(ctx context.Context, prefix string) (*routes.Instance, *Launcher, error) {
 	n, _ := Rand{}.Read(8)
 	gce := new(big.Int).SetBytes(n).String()
-	l, err := NewLauncher(f.Config, f.Clock, Claims{InstanceName: f.Config.NomVM + "-" + prefix, Zone: "europe-west9-" + prefix, InstanceID: gce})
+	clock := shifted{f.Clock, f.decalage[prefix]}
+	l, err := NewLauncher(f.Config, clock, Claims{InstanceName: f.Config.NomVM + "-" + prefix, Zone: "europe-west9-" + prefix, InstanceID: gce})
 	if err != nil {
 		return nil, nil, err
 	}
 	l.Fail = f.LauncherDown
 	rc := *f.rc
-	rc.Lanceur = l
+	rc.Lanceur, rc.Ports.Horloge = l, clock
+	name := f.Config.NomVM + "-" + prefix
+	hr := &HTTPReseau{Pairs: f.Config.Pairs}
+	if rc.Reseau = f.Net.From(name); f.Config.Mode == "instance" {
+		rc.Reseau = hr
+	}
 	in, err := routes.NewInstance(ctx, &rc, prefix, gce)
+	if err != nil {
+		return nil, nil, err
+	}
+	hr.Self = in.Grappe().Cle // la clé n'est connue qu'une fois l'instance tirée
+	f.Net.Add(name, in)
+	if !f.manual {
+		go in.Grappe().Deliver(f.ctx)
+	}
 	return in, l, err
 }
 

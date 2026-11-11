@@ -80,7 +80,7 @@ func TestBorne(t *testing.T) {
 				}
 			}
 		}
-		if sub(b, "registre")["epoque"] == nil || sub(b, "grappe")["grappeId"] != nil {
+		if sub(b, "registre")["epoque"] == nil || sub(b, "grappe")["grappeId"] != e.f.Server.Instances[0].Grappe().ID() || sub(b, "grappe")["votants"] != 3.0 {
 			t.Fatalf("borne : %v", b)
 		}
 	}

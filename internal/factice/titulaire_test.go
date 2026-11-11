@@ -75,12 +75,12 @@ func TestDefi(t *testing.T) { // DEF-01, DEF-02, DEF-03, API.md §2.2
 	before := e.f.Base.Len()
 	o := ok(t, c.call("defi", jcs.Object{"uid": "inconnu"}))
 	d, _ := primitives.B64(str(o, "defi"))
-	if len(d) != 32 || str(o, "expireLe") != "2026-11-11T10:05:00.000Z" || o["grappeId"] != nil || e.f.Base.Len() != before {
+	if len(d) != 32 || str(o, "expireLe") != "2026-11-11T10:05:00.000Z" || o["grappeId"] != e.f.Server.Instances[0].Grappe().ID() || e.f.Base.Len() != before {
 		t.Fatalf("défi : %v", o)
 	}
 	tick(e)
 	objs, _ := e.f.Stockage.List(t.Context(), "audit", "bornes/", 100)
-	if len(objs) != 3 || !strings.Contains(string(objs[0].Content), `"grappe":{"grappeId":null,"votants":0}`) {
+	if len(objs) != 3 || !strings.Contains(string(objs[0].Content), `"grappe":{"grappeId":"`+e.f.Server.Instances[0].Grappe().ID()+`","votants":3}`) {
 		t.Fatalf("bornes : %d", len(objs))
 	}
 }

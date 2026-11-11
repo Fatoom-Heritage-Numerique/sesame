@@ -37,10 +37,10 @@ type Reprise struct {
 	SansSauvegarde bool
 }
 
-// Tailles de la borne (choix de ce dépôt : la spécification ne borne que par
-// le nombre de ressources distinctes) et période de dépôt (§8.1).
+// Période de dépôt de la borne (§8.1) et nombre de bornes relues. Les
+// événements d'une période n'ont pas d'autre plafond que le nombre de
+// ressources distinctes (décision 0060) : en perdre un cacherait un rejet.
 const (
-	MaxEvents   = 10_000
 	BornePeriod = 10 * time.Minute
 	maxListed   = 2_000
 )
@@ -77,7 +77,7 @@ func (b *Borne) Signal(kind, resource string) {
 		b.events = map[[2]string]string{}
 	}
 	k := [2]string{kind, resource}
-	if _, ok := b.events[k]; !ok && len(b.events) < MaxEvents {
+	if _, ok := b.events[k]; !ok {
 		b.events[k] = b.Horloge.Now().UTC().Format(primitives.TimeLayout)
 	}
 }

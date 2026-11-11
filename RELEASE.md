@@ -136,14 +136,15 @@ Les contrôles de l'étape 2 (contrat exécutable) tournent sur chaque PR et sur
 |---|---|---|
 | Format, analyse, tests | `gofmt -l` liste un fichier ; `go vet ./...`, `go test -race ./...`, `go mod verify` ou `govulncheck ./...` échoue | 2 |
 | Double construction | les deux digests diffèrent | 2 |
-| Budget | plus de 6 000 lignes de Go hors tests et hors bibliothèques épinglées ; décompte sur les paquets que lient `cmd/sesame` et `cmd/sesame-fake`, hors `internal/factice/` et hors `cmd/sesame-fake`, lignes non vides hors commentaires (`outils/decompte-lignes`) | 2 |
+| Budget | plus de 8 500 lignes de Go hors tests et hors bibliothèques épinglées (décision 0074) ; décompte sur les paquets que lient `cmd/sesame` et `cmd/sesame-fake`, hors `internal/factice/` et hors `cmd/sesame-fake`, lignes non vides hors commentaires (`outils/decompte-lignes`) | 2 |
 | Vecteurs | l'empreinte SHA-256 d'un fichier de vecteurs recopié diffère de celle que porte `SHA256SUMS`, recopié avec lui depuis le client de référence (`CONTRIBUTING.md`, « Formats et vecteurs ») ; `compteurPin` régénéré par `outils/generer-compteurpin` diffère du fichier commité | 2 |
 | Lanceur factice | `SESAME_FAKE_LAUNCHER` lu hors de `internal/factice/`, ou un paquet de `internal/factice/` lié par `cmd/sesame` (`go list -deps`) | 2 |
 | Image | un shell ; une étiquette `tee.launch_policy.*` d'`ARCHITECTURE.md` §2.1 absente ou différente ; image de base non épinglée par digest | 2 |
 | Dépendances | une dépendance réseau hors de la liste d'`ARCHITECTURE.md` ; un paquet lié par `cmd/sesame` hors de la bibliothèque standard et des modules d'`ARCHITECTURE.md` §2.4, modules transitifs compris | 2 |
 | OpenAPI | `api/openapi.json` diffère des routes que sert `sesame-fake`, une requête ou une réponse des tests des routes sort de son schéma, ou les routes et codes d'`API.md` diffèrent de l'OpenAPI (décision 0064) | 2 |
 | Noms de ressources | un `gs://`, un chemin `-docker.pkg.dev/`, une adresse `.iam.gserviceaccount.com`, un chemin `projects/…`, un hôte `run.app` ou un nombre de 12 chiffres d'un fichier suivi hors de la forme `<…>` de `CONTRIBUTING.md`, hors des copies de vecteurs que nomme `SHA256SUMS` (`outils/controle-noms`, décision 0066) ; les noms réels sont cherchés par la CI du client, copies de vecteurs comprises (décision 0065) | 2 |
-| Image de `sesame-fake` (sur `main`) | la construction ou la publication de l'image échoue (décision 0063) | 2 |
+| Grappe du PIN sur trois conteneurs | `build/grappe.sh` échoue : amorçage, relais au leader, pause sans majorité, un contre deux, retour, VM recréée admise après 2 minutes d'absence (décision 0071) | 2 |
+| Image de `sesame-fake` (sur `main`) | la construction (`build/sesame-fake.Dockerfile`, images de base épinglées) ou la publication sur `ghcr.io` échoue ; l'empreinte publiée n'est pas un `sha256:` que sert le registre ; elle est imprimée dans le journal et dans le résumé du job (décisions 0063, 0071) | 2 |
 | `versions.json` | le fichier n'est pas conforme à son schéma | 6 |
 | `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) | 6 |
 | KMS ⇔ `versions.json` | les couples (empreinte, dictionnaire `env_override`) de la condition, la clause `dbgstat` ou les valeurs de `hwmodel` ne correspondent pas (§7) | 5 |

@@ -36,6 +36,7 @@ type Channel struct {
 	seen       time.Time
 	challenges map[string]challenge
 	fresh      bool
+	evaluation string
 }
 
 type challenge struct {
@@ -194,6 +195,19 @@ func (t *Table) ConsumeChallenge(c *Channel, value, uid string, now time.Time) b
 	d, ok := c.challenges[value]
 	delete(c.challenges, value)
 	return ok && d.uid == uid && now.Before(d.expiry)
+}
+
+// Note garde sur le canal la dernière évaluation (API.md §2.13), qui remplace
+// la précédente ; Noted la consomme (dépôt ouverture, §2.12) et dit si c'était
+// value (jamais vide). Le contrat ne lui donne pas d'autre durée que celle du
+// canal.
+func (t *Table) Note(c *Channel, value string) { t.mu.Lock(); c.evaluation = value; t.mu.Unlock() }
+
+func (t *Table) Noted(c *Channel, value string) (ok bool) {
+	t.mu.Lock()
+	ok, c.evaluation = c.evaluation == value, ""
+	t.mu.Unlock()
+	return ok
 }
 
 // Len rend le nombre de canaux ouverts.

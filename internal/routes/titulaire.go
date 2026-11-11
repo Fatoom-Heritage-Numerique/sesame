@@ -62,6 +62,7 @@ func init() {
 		"session/fermer":       {fields: []field{sidField}, perCh: limit{10, hour}, run: (*call).fermer},
 		"session/refuser-role": {fields: []field{sidField}, perSess: limit{5, hour}, run: (*call).refuserRole},
 	}
+	pinRoutes(table)
 	for k, r := range table {
 		r.max = max(r.max, MaxBody)
 		table[k] = r
@@ -138,7 +139,12 @@ func (a *call) defi() (jcs.Object, error) {
 	return jcs.Object{"defi": b64(d), "expireLe": stamp(a.now.Add(canal.ChallengeLife)), "grappeId": a.in.grappeID()}, nil
 }
 
-func (in *Instance) grappeID() any { return nil }
+func (in *Instance) grappeID() any {
+	if id := in.grappe.ID(); id != "" {
+		return id
+	}
+	return nil
+}
 
 // enroler suit l'ordre des contrôles du §2.3.
 func (a *call) enroler() (jcs.Object, error) {
@@ -229,10 +235,6 @@ func (a *call) enroler() (jcs.Object, error) {
 }
 
 func stampOf(l registre.Line) string { return str(l.Doc, "ecritLe") }
-
-// pinState rend pinPresent, pinBloque et le compteur des évaluations ; une
-// VM sans grappe rend les valeurs neutres (API.md §2.4, §2.5).
-func (a *call) pinState(l registre.Line) (bool, bool, int64) { return true, false, 0 }
 
 func (a *call) vie() (jcs.Object, error) {
 	uid := str(a.body, "uid")
