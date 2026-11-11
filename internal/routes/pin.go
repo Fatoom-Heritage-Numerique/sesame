@@ -125,7 +125,7 @@ func (a *call) deposer() (jcs.Object, error) {
 		return nil, fail("pin_indisponible_temporaire")
 	case str(a.body, "grappeId") != id:
 		return nil, fail("defi_invalide")
-	case str(a.body, "motif") == "ouverture" && !a.in.table.ConsumeChallenge(a.ch, "evaluation|"+digest(raw(a.body, "elementAveugle")), uid, a.now):
+	case str(a.body, "motif") == "ouverture" && !a.in.table.Noted(a.ch, uid+"|"+digest(raw(a.body, "elementAveugle"))):
 		return nil, fail("message_refuse")
 	}
 	return a.toLeader()
@@ -147,7 +147,7 @@ func (a *call) evaluer() (jcs.Object, error) {
 	}
 	out, err := a.toLeader()
 	if r, _ := err.(relayed); err == nil || r["statut"] == 200.0 {
-		a.in.table.DrawChallenge(a.ch, "evaluation|"+digest(raw(a.body, "elementAveugle")), uid, a.now)
+		a.in.table.Note(a.ch, uid+"|"+digest(raw(a.body, "elementAveugle")))
 	}
 	return out, err
 }

@@ -136,6 +136,24 @@ func TestDepotRefus(t *testing.T) { // PDP-02, PDP-04, PDP-06, PDP-09, PDP-10, P
 }
 
 // plafond fait les dix essais du code de h, chacun après son délai.
+func TestDerniereEvaluation(t *testing.T) { // PDP-01, PDP-02 (dernière évaluation notée sur le canal), API.md §2.12, §2.13
+	e := newEnv(t)
+	h, c := enrolled(t, e, "u-der")
+	x, y := element(t), element(t)
+	ok(t, c.depot(h, "nouveau_pin", x))
+	ok(t, c.evaluer(h, x))
+	ok(t, c.evaluer(h, y))                                       // remplace la note de x
+	expect(t, c.depot(h, "ouverture", x), 400, "message_refuse") // évaluation antérieure : ne vaut plus
+	expect(t, c.depot(h, "ouverture", y), 400, "message_refuse") // consommée par le dépôt refusé qui précède
+	ok(t, c.evaluer(h, x))
+	e.advance(10 * time.Minute) // aucune durée au contrat hors de celle du canal
+	ok(t, c.depot(h, "ouverture", x))
+	if r, _ := e.record(h.uid); r.Left != 10 {
+		t.Fatalf("ouverture : %+v", r)
+	}
+	expect(t, c.depot(h, "ouverture", x), 400, "message_refuse") // consommée par le dépôt
+}
+
 func plafond(t *testing.T, e *env, h *titulaire, x []byte) {
 	for i := range 10 {
 		r := e.open("c").evaluer(h, x)

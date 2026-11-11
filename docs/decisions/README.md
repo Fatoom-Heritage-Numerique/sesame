@@ -80,3 +80,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0070](0070-sessions-lettres-et-alertes-de-sesame-fake.md) | Sessions du portail, lettres et alertes : choix d'écriture du code des décisions | 2026-11-11 |
 | [0071](0071-raft-v3-7-0-essaye-puis-epingle.md) | `go.etcd.io/raft/v3` v3.7.0 essayée sur les cas de l'essai jetable, puis épinglée ; grappe de `sesame-fake` | 2026-11-11 |
 | [0072](0072-limites-mesurees-au-contrat-executable.md) | Limites de débit et tailles mesurées sur `sesame-fake` : aucune révision technique | 2026-11-11 |
+| [0073](0073-derniere-evaluation-notee-sur-le-canal.md) | Seule la dernière évaluation notée sur le canal vaut pour un dépôt `ouverture` | 2026-11-11 |
