@@ -207,9 +207,14 @@ func transmission(reports []registre.Line, now time.Time) string {
 }
 
 func (a *call) reports(uid string) ([]registre.Line, error) {
+	return a.list(titulaire(uid)+"/signalements", maxReports)
+}
+
+// list lit une collection du registre, hors écriture.
+func (a *call) list(coll string, max int) ([]registre.Line, error) {
 	var r []registre.Line
 	err := a.in.reg.Write(a.ctx, func(w *registre.Writer) (err error) {
-		r, err = w.List(titulaire(uid)+"/signalements", "", "", maxReports)
+		r, err = w.List(coll, "", "", max)
 		return err
 	})
 	return r, err

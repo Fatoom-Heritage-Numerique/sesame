@@ -182,14 +182,9 @@ func or2(err error, refuse func(string) (jcs.Object, error), motif string) (jcs.
 // chaque envoi est réservé au registre avant d'être fait.
 func (in *Instance) hourly(ctx context.Context) {
 	a := &call{ctx: ctx, in: in, now: in.cfg.Horloge.Now(), name: "tache"}
-	var holders, instances []registre.Line
-	err := in.reg.Write(ctx, func(w *registre.Writer) (err error) {
-		if holders, err = w.List("titulaires", "", "", maxTitulaires); err == nil {
-			instances, err = w.List("instances", "", "", maxTitulaires)
-		}
-		return err
-	})
-	if err != nil {
+	holders, err := a.list("titulaires", maxTitulaires)
+	instances, err2 := a.list("instances", maxTitulaires)
+	if err = or(err, err2); err != nil {
 		in.log("tache_horaire", "", "registre_indisponible")
 		return
 	}
@@ -262,11 +257,7 @@ func (in *Instance) alertReport(ctx context.Context, uid string, s registre.Line
 // l'instance n'a pas écrit vuLe depuis 2 minutes ou n'a pas de document
 // (registre.md, « Autres précisions »), fermeeLe = ce vuLe, écrit une fois.
 func (a *call) lost(uid string, seen map[string]time.Time) {
-	var opened []registre.Line
-	_ = a.in.reg.Write(a.ctx, func(w *registre.Writer) (err error) {
-		opened, err = w.List(titulaire(uid)+"/ouvertures", "", "", maxOpenings)
-		return err
-	})
+	opened, _ := a.list(titulaire(uid)+"/ouvertures", maxOpenings)
 	for _, o := range opened {
 		vu, ok := seen[str(o.Doc, "instanceId")]
 		if o.Doc["fermeeLe"] != nil || ok && a.now.Sub(vu) <= 2*time.Minute {
@@ -285,11 +276,7 @@ func (a *call) lost(uid string, seen map[string]time.Time) {
 // redactions représente chaque suppression refusée par Stripe pendant 7
 // jours, sans réservation, puis l'abandonne (registre.md, identites).
 func (a *call) redactions(uid string) {
-	var docs []registre.Line
-	_ = a.in.reg.Write(a.ctx, func(w *registre.Writer) (err error) {
-		docs, err = w.List(titulaire(uid)+"/identites", "", "", maxContacts)
-		return err
-	})
+	docs, _ := a.list(titulaire(uid)+"/identites", maxContacts)
 	for _, d := range docs {
 		pend, _ := d.Doc["redactionsEnAttente"].(jcs.Array)
 		var keep jcs.Array
@@ -369,11 +356,7 @@ func (a *call) follow(uid string, h registre.Line, report *registre.Line) {
 	if report == nil {
 		return
 	}
-	var docs []registre.Line
-	_ = a.in.reg.Write(a.ctx, func(w *registre.Writer) (err error) {
-		docs, err = w.List(titulaire(uid)+"/lettres", "", "", maxContacts)
-		return err
-	})
+	docs, _ := a.list(titulaire(uid)+"/lettres", maxContacts)
 	for _, l := range docs {
 		contact, d := lastSegment(l.Path), l.Doc
 		renvois, _ := d["renvoyeeLe"].(jcs.Array)
