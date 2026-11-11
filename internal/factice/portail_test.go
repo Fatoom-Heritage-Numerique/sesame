@@ -565,6 +565,12 @@ func TestIdentite(t *testing.T) { // SID-01, SID-03, SID-04, SID-05, SID-06, SID
 	if d["essaisIdentite"] != 0.0 || len(d["redactionsEnAttente"].([]any)) != 1 {
 		t.Fatalf("identites : %v", d)
 	}
+	// Suppression refusée par Stripe : représentée par la tâche horaire.
+	e.f.Identity.Set("Redact", false)
+	e.advance(time.Hour)
+	if d := e.f.Base.Doc("titulaires/" + k.h.uid + "/identites/" + p.contact).Data; len(d["redactionsEnAttente"].([]any)) != 0 {
+		t.Fatalf("redactionsEnAttente : %v", d)
+	}
 	// Une nouvelle session par le code d'accès revient au dernier code (LIM-21).
 	if o := ok(t, e.open("b").openCode(p.code, p.lookup)); o["canal"] != "sms" {
 		t.Fatalf("après une bascule : %v", o)

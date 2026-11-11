@@ -284,6 +284,49 @@ func TestSessionsPerdues(t *testing.T) { // SFE-03, SOU-19, API.md §5.5 ; regis
 	if len(e.notes("sessionTerminee")) != 1 {
 		t.Fatal("seconde notification")
 	}
+	// Canal fermé après 1 h sans requête : sessionTerminee de ses sessions.
+	c := e.open("a")
+	ok(t, c.openCode(g.code, g.lookup))
+	e.advance(time.Hour + time.Minute)
+	if n := e.notes("sessionTerminee"); len(n) != 2 || n[1]["ouvertLe"] != nil {
+		t.Fatalf("canal fermé : %v", n)
+	}
+}
+
+func TestReessaisDesNotifications(t *testing.T) { // PAS-05, API.md §5.5
+	e := newEnv(t)
+	k := newCoffre(t, e, "u-reessais")
+	g := k.add("g", "gardien", "+33600000001", nil)
+	c := e.open("b")
+	id := str(ok(t, c.openCode(g.code, g.lookup)), "sessionId")
+	var tries []time.Time
+	e.f.Gateway.Answer = func(r factice.Request) (int, []byte, error) {
+		if r.PathQuery == "/sessionTerminee" {
+			tries = append(tries, e.now())
+			return 500, nil, nil
+		}
+		return k.serve(r)
+	}
+	ok(t, c.sid("session/fermer", id))
+	for range 25 * 60 {
+		e.f.Clock.Advance(time.Minute)
+		for _, in := range e.f.Server.Instances {
+			in.Tick(t.Context(), false)
+		}
+	}
+	var gaps []time.Duration
+	for i := 1; i < len(tries); i++ {
+		gaps = append(gaps, tries[i].Sub(tries[i-1]))
+	}
+	want := []time.Duration{1, 2, 4, 8, 16, 32, 60}
+	for i, w := range want {
+		if gaps[i] != w*time.Minute {
+			t.Fatalf("délais : %v", gaps)
+		}
+	}
+	if last := tries[len(tries)-1].Sub(tries[0]); last > 24*time.Hour || last < 23*time.Hour {
+		t.Fatalf("dernier essai : %v après le premier (%d essais)", last, len(tries))
+	}
 }
 
 func jcsString(o jcs.Object) string { b, _ := jcs.Marshal(o); return string(b) }
