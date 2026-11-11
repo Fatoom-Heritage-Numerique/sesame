@@ -134,7 +134,7 @@ Le script public `build/verifier-journaux.sh` vérifie aussi le passé. Il lit l
 |---|---|
 | Double construction | les deux digests diffèrent |
 | Budget | plus de 6 000 lignes de Go hors tests et hors bibliothèques épinglées |
-| Vecteurs | l'empreinte SHA-256 d'un fichier de vecteurs recopié diffère de celle du même fichier chez le client de référence (`CONTRIBUTING.md`, « Formats et vecteurs ») |
+| Vecteurs | l'empreinte SHA-256 d'un fichier de vecteurs recopié diffère de celle que porte `SHA256SUMS`, recopié avec lui depuis le client de référence (`CONTRIBUTING.md`, « Formats et vecteurs ») |
 | `versions.json` | le fichier n'est pas conforme à son schéma |
 | `hwmodels` de l'image | la constante `hwmodels` compilée dans l'image diffère des `hwmodels` de sa ligne de `versions.json` (`ARCHITECTURE.md` §3) |
 | KMS ⇔ `versions.json` | les couples (empreinte, dictionnaire `env_override`) de la condition, la clause `dbgstat` ou les valeurs de `hwmodel` ne correspondent pas (§7) |

@@ -27,7 +27,7 @@ La prose est en **français** : documents, commentaires, messages de commit, des
 
 ## Formats et vecteurs
 
-Les formats (`ARCHITECTURE.md` : hiérarchie et formats des clés, canal, borne du registre) sont partagés avec les clients, octet pour octet ; `versions.json` (`RELEASE.md` §2) est compilé dans les clients. Les vecteurs de test sont **générés par le client de référence** et recopiés ici ; la CI échoue s'ils diffèrent.
+Les formats (`ARCHITECTURE.md` : hiérarchie et formats des clés, canal, borne du registre) sont partagés avec les clients, octet pour octet ; `versions.json` (`RELEASE.md` §2) est compilé dans les clients. Les vecteurs de test sont **générés par le client de référence** et recopiés ici octet pour octet, avec un fichier `SHA256SUMS` de leurs empreintes ; la CI échoue si une copie ne correspond pas à `SHA256SUMS`, et la CI du client de référence échoue si ses fichiers diffèrent des copies de ce dépôt.
 
 Fichiers repris de `packages/crypto/vectors/` du dépôt `Fatoom-Heritage-Numerique/Fatoom`, ceux dont Sésame refait les calculs (la liste, et ce que le code Go recalcule pour chaque groupe, sont tenus par le client de référence : `docs/technique/tests.md`, « Vecteurs repris par le dépôt `sesame` ») :
 
