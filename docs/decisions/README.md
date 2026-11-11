@@ -82,3 +82,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0072](0072-limites-mesurees-au-contrat-executable.md) | Limites de débit et tailles mesurées sur `sesame-fake` : aucune révision technique | 2026-11-11 |
 | [0073](0073-derniere-evaluation-notee-sur-le-canal.md) | Seule la dernière évaluation notée sur le canal vaut pour un dépôt `ouverture` | 2026-11-11 |
 | [0074](0074-budget-de-code-8500-lignes.md) | Budget de code porté à 8 500 lignes de Go | 2026-11-11 |
+| [0075](0075-programmes-d-essai-sur-confidential-space.md) | Programmes d'essai publics et jetables pour une séance sur Confidential Space | 2026-11-11 |

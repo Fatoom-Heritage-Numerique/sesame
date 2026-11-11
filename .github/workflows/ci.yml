@@ -66,6 +66,8 @@ jobs:
         run: go run ./outils/controle-image
       - name: Dockerfile de sesame-fake (images de base épinglées)
         run: go run ./outils/controle-image -dockerfile build/sesame-fake.Dockerfile
+      - name: Dockerfile des essais (images de base épinglées, décision 0075)
+        run: go run ./outils/controle-image -dockerfile essais/Dockerfile
 
   # Double construction (RELEASE.md §1.2) : deux jobs, donc deux exécuteurs
   # distincts, puis comparaison des digests.

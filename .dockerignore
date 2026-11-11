@@ -1,6 +1,9 @@
-# Contexte de construction de l'image : le module Go seul (Dockerfile).
+# Contexte de construction des images : le module Go seul (Dockerfile,
+# build/sesame-fake.Dockerfile, essais/Dockerfile). Chaque image ne copie
+# dans son étage final que son binaire.
 *
 !go.mod
 !go.sum
 !cmd/
 !internal/
+!essais/

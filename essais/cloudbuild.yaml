@@ -1,0 +1,8 @@
+# Construction de l'image d'essai par Cloud Build (essais/README.md), depuis
+# la racine d'un clone du dépôt : gcloud builds submit --config
+# essais/cloudbuild.yaml --substitutions=_IMAGE=<chemin de l'image> .
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: ["build", "-f", "essais/Dockerfile", "-t", "${_IMAGE}", "."]
+images:
+  - "${_IMAGE}"
