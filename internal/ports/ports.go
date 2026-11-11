@@ -163,3 +163,20 @@ type Courrier interface {
 	Send(ctx context.Context, organisation string, pdf []byte) (documentID string, err error)
 	Status(ctx context.Context, organisation, documentID string) (string, error)
 }
+
+// Lien est une connexion entre VM de la grappe, ouverte par l'adaptateur
+// (TLS mutuel sur le réseau interne, protocole-pin.md « Transport ») : Cle
+// est la clé publique du certificat que présente le pair (SubjectPublicKeyInfo
+// DER), qui ne vaut que par son jeton de paire ; Call envoie une requête POST
+// sur cette connexion et rend le vrai statut et le corps de la réponse.
+type Lien interface {
+	Cle() []byte
+	Call(ctx context.Context, path string, body []byte) (int, []byte, error)
+}
+
+// Reseau ouvre une connexion vers la VM de ce nom, à son adresse DNS interne
+// zonale, en essayant les zones de la région dans l'ordre ; une erreur est un
+// pair injoignable.
+type Reseau interface {
+	Dial(ctx context.Context, vm string) (Lien, error)
+}

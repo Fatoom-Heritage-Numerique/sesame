@@ -78,3 +78,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0068](0068-normalisation-nfc-par-x-text.md) | Contrôle NFC par `golang.org/x/text/unicode/norm` v0.44.0, épinglée | 2026-11-11 |
 | [0069](0069-budget-compte-sur-sesame-fake.md) | Budget de code compté sur ce que lient `cmd/sesame` et `cmd/sesame-fake`, hors doubles | 2026-11-11 |
 | [0070](0070-sessions-lettres-et-alertes-de-sesame-fake.md) | Sessions du portail, lettres et alertes : choix d'écriture du code des décisions | 2026-11-11 |
+| [0071](0071-raft-v3-7-0-essaye-puis-epingle.md) | `go.etcd.io/raft/v3` v3.7.0 essayée sur les cas de l'essai jetable, puis épinglée ; grappe de `sesame-fake` | 2026-11-11 |

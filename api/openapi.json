@@ -1483,6 +1483,227 @@
         "role_insuffisant",
         "session_expiree"
       ]
+    },
+    "pin/deposer": {
+      "section": "2.12",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "idToken",
+          "grappeId",
+          "elementAveugle",
+          "defi",
+          "motif",
+          "signature"
+        ],
+        "properties": {
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "idToken": {
+            "$ref": "#/components/schemas/Jeton"
+          },
+          "grappeId": {
+            "$ref": "#/components/schemas/Hex64"
+          },
+          "elementAveugle": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "defi": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "motif": {
+            "enum": [
+              "nouveau_pin",
+              "ouverture",
+              "redepot"
+            ]
+          },
+          "signature": {
+            "$ref": "#/components/schemas/Octets64"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evaluation",
+          "grappeId"
+        ],
+        "properties": {
+          "evaluation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Octets32"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "grappeId": {
+            "$ref": "#/components/schemas/Hex64"
+          }
+        }
+      },
+      "erreurs": [
+        "jeton_invalide",
+        "message_refuse",
+        "defi_invalide",
+        "pin_bloque",
+        "grappe_recente",
+        "pin_indisponible",
+        "pin_indisponible_temporaire",
+        "reessayer_plus_tard"
+      ]
+    },
+    "pin/evaluer": {
+      "section": "2.13",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "idToken",
+          "elementAveugle"
+        ],
+        "properties": {
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "idToken": {
+            "$ref": "#/components/schemas/Jeton"
+          },
+          "elementAveugle": {
+            "$ref": "#/components/schemas/Octets32"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "evaluation"
+        ],
+        "properties": {
+          "evaluation": {
+            "$ref": "#/components/schemas/Octets32"
+          }
+        }
+      },
+      "erreurs": [
+        "jeton_invalide",
+        "pin_indisponible",
+        "pin_indisponible_temporaire",
+        "pin_bloque",
+        "trop_d_essais"
+      ]
+    },
+    "grappe/membres": {
+      "section": "4.2",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jetonExploitation",
+          "grappeId",
+          "membres"
+        ],
+        "properties": {
+          "jetonExploitation": {
+            "$ref": "#/components/schemas/Jeton"
+          },
+          "grappeId": {
+            "$ref": "#/components/schemas/Hex64"
+          },
+          "membres": {
+            "type": "array",
+            "maxItems": 3,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "vm",
+                "zone"
+              ],
+              "properties": {
+                "vm": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9-]{0,26}-[abc]$"
+                },
+                "zone": {
+                  "type": "string",
+                  "pattern": "^[a-z]+-[a-z]+[0-9]+-[a-z]$"
+                }
+              }
+            }
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "grappeId",
+          "inscrite"
+        ],
+        "properties": {
+          "grappeId": {
+            "$ref": "#/components/schemas/Hex64"
+          },
+          "inscrite": {
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "erreurs": [
+        "jeton_invalide",
+        "membres_refuses",
+        "pin_indisponible_temporaire"
+      ]
+    },
+    "grappe/amorcer": {
+      "section": "4.3",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jetonExploitation"
+        ],
+        "properties": {
+          "jetonExploitation": {
+            "$ref": "#/components/schemas/Jeton"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "grappeId",
+          "votants"
+        ],
+        "properties": {
+          "grappeId": {
+            "$ref": "#/components/schemas/Hex64"
+          },
+          "votants": {
+            "enum": [
+              3
+            ]
+          }
+        }
+      },
+      "erreurs": [
+        "jeton_invalide",
+        "amorcage_refuse",
+        "pin_indisponible_temporaire"
+      ]
     }
   },
   "x-sesame-erreurs": {
@@ -1522,5 +1743,353 @@
     "passerelle_indisponible": 503,
     "fournisseur_indisponible": 503,
     "enveloppe_refusee": null
+  },
+  "x-sesame-entre-vm": {
+    "/grappe/rejoindre": {
+      "section": "4.1",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jwt",
+          "nodeId"
+        ],
+        "properties": {
+          "jwt": {
+            "$ref": "#/components/schemas/JWS"
+          },
+          "nodeId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$",
+            "description": "identifiant de nœud, 16 octets en base64url"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "admise",
+          "role"
+        ],
+        "properties": {
+          "admise": {
+            "enum": [
+              true
+            ]
+          },
+          "role": {
+            "enum": [
+              "apprenant"
+            ]
+          }
+        }
+      },
+      "erreurs": [
+        "refusee",
+        "pin_indisponible_temporaire",
+        "message_refuse",
+        "trop_d_appels"
+      ]
+    },
+    "/grappe/preparer": {
+      "section": "4.3",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "configuration"
+        ],
+        "properties": {
+          "configuration": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "v",
+              "imageDigest",
+              "membres"
+            ],
+            "properties": {
+              "v": {
+                "enum": [
+                  1
+                ]
+              },
+              "imageDigest": {
+                "type": "string",
+                "pattern": "^sha256:[0-9a-f]{64}$"
+              },
+              "membres": {
+                "type": "array",
+                "maxItems": 3,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "nodeId",
+                    "vm",
+                    "zone",
+                    "cle"
+                  ],
+                  "properties": {
+                    "nodeId": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_-]{22}$",
+                      "description": "identifiant de nœud, 16 octets en base64url"
+                    },
+                    "vm": {
+                      "type": "string"
+                    },
+                    "zone": {
+                      "type": "string"
+                    },
+                    "cle": {
+                      "$ref": "#/components/schemas/Base64"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "reservee",
+          "grappeId"
+        ],
+        "properties": {
+          "reservee": {
+            "enum": [
+              true
+            ]
+          },
+          "grappeId": {
+            "$ref": "#/components/schemas/Hex64"
+          }
+        }
+      },
+      "erreurs": [
+        "amorcage_refuse",
+        "message_refuse",
+        "trop_d_appels"
+      ]
+    },
+    "/grappe/demarrer": {
+      "section": "4.3",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "grappeId"
+        ],
+        "properties": {
+          "grappeId": {
+            "$ref": "#/components/schemas/Hex64"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "demarree"
+        ],
+        "properties": {
+          "demarree": {
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "erreurs": [
+        "amorcage_refuse",
+        "message_refuse",
+        "trop_d_appels"
+      ]
+    },
+    "/interne/attestation": {
+      "section": "3",
+      "requete": {
+        "anyOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "noncePaire"
+            ],
+            "properties": {
+              "noncePaire": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{43}$",
+                "description": "32 octets en base64url sans remplissage"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "jwt",
+              "nodeId"
+            ],
+            "properties": {
+              "jwt": {
+                "$ref": "#/components/schemas/JWS"
+              },
+              "nodeId": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{22}$",
+                "description": "identifiant de nœud, 16 octets en base64url"
+              }
+            }
+          }
+        ]
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jwt",
+          "nodeId",
+          "noncePaire"
+        ],
+        "properties": {
+          "jwt": {
+            "$ref": "#/components/schemas/JWS"
+          },
+          "nodeId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{22}$",
+            "description": "identifiant de nœud, 16 octets en base64url"
+          },
+          "noncePaire": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{43}$",
+            "description": "32 octets en base64url sans remplissage"
+          }
+        }
+      },
+      "erreurs": [
+        "pair_refuse",
+        "message_refuse"
+      ]
+    },
+    "/interne/raft": {
+      "section": "3",
+      "requete": {
+        "type": "string",
+        "description": "lot de messages raftpb.Message (go.etcd.io/raft/v3), chacun précédé de sa longueur en varint ; réponse 204"
+      },
+      "reponse": {
+        "type": "null"
+      },
+      "erreurs": [
+        "pair_refuse",
+        "message_refuse"
+      ]
+    },
+    "/interne/relais": {
+      "section": "3",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "route",
+          "corps",
+          "canal"
+        ],
+        "properties": {
+          "route": {
+            "enum": [
+              "pin/deposer",
+              "pin/evaluer",
+              "grappe/membres"
+            ]
+          },
+          "corps": {
+            "type": "object"
+          },
+          "canal": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "instanceId",
+              "cliPub"
+            ],
+            "properties": {
+              "instanceId": {
+                "$ref": "#/components/schemas/InstanceId"
+              },
+              "cliPub": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "reponse": {
+        "$ref": "#/components/schemas/StatutChiffre"
+      },
+      "erreurs": [
+        "pas_leader",
+        "pin_indisponible_temporaire",
+        "pair_refuse"
+      ]
+    },
+    "/interne/decompte": {
+      "section": "3",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "route"
+        ],
+        "properties": {
+          "route": {
+            "type": "string"
+          },
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "contactId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "compte": {
+            "type": "string"
+          },
+          "instanceId": {
+            "$ref": "#/components/schemas/InstanceId"
+          },
+          "fin": {
+            "enum": [
+              true
+            ]
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "admis"
+        ],
+        "properties": {
+          "admis": {
+            "type": "boolean"
+          },
+          "reessayerLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          }
+        }
+      },
+      "erreurs": [
+        "pas_leader",
+        "pair_refuse"
+      ]
+    }
   }
 }

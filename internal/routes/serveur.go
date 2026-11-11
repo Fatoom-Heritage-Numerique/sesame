@@ -11,6 +11,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/attestation"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/canal"
+	"github.com/Fatoom-Heritage-Numerique/sesame/internal/grappe"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/jcs"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/passerelle"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/ports"
@@ -53,6 +55,7 @@ type Ports struct {
 	Email      ports.Email
 	Identite   ports.Identite
 	Courrier   ports.Courrier
+	Reseau     ports.Reseau
 }
 
 // Config est ce que le binaire assemble : ports, variables attestées
@@ -66,6 +69,10 @@ type Config struct {
 	SessionKid  string
 	Reprise     *registre.Reprise
 	BloomBytes  int
+	Racine      []byte   // empreinte de la racine des jetons d'attestation
+	HWModels    []string // constante hwmodels de l'image (API.md §3)
+	Attente     time.Duration
+	Memoire     func() float64 // part de la mémoire du conteneur (nil : mesurée)
 	reglages    Reglages
 }
 
@@ -90,6 +97,8 @@ type Instance struct {
 	last    [5]time.Time // derniers passages des tâches de Tick
 	mu      sync.Mutex
 	rejects map[string]bool // titulaires dont une ligne vient d'être rejetée
+	grappe  *grappe.Grappe
+	counted map[string][]string // au leader : sessions simultanées par proche, instanceId de la VM qui les tient
 }
 
 // NewInstance démarre une instance de préfixe a, b ou c : tirage de
@@ -115,6 +124,16 @@ func NewInstance(ctx context.Context, cfg *Config, prefix, gceID string) (*Insta
 	in.reg = &registre.Registre{Base: cfg.Base, KMS: cfg.KMS, Stockage: cfg.Stockage, Horloge: cfg.Horloge}
 	in.borne = &registre.Borne{R: in.reg, KMS: cfg.KMS, Stockage: cfg.Stockage, Horloge: cfg.Horloge, Kid: cfg.SessionKid,
 		InstanceID: id, ImageDigest: cfg.ImageDigest, GCEID: gceID, Reprise: cfg.Reprise, Grappe: func() (any, int) { return nil, 0 }}
+	in.grappe, err = grappe.New(grappe.Config{Horloge: cfg.Horloge, Alea: cfg.Alea, Lanceur: cfg.Lanceur, Reseau: cfg.Reseau,
+		Racine: cfg.Racine, HWModels: cfg.HWModels, Journal: in.event, Relay: in.Relay, Count: in.decompte, Attente: cfg.Attente, Memoire: cfg.Memoire,
+		Limit: func(k string, n int, per time.Duration) (bool, time.Time) {
+			return in.local.hit(k, limit{n, per}, in.cfg.Horloge.Now())
+		}})
+	if err != nil {
+		return nil, err
+	}
+	in.borne.Grappe = in.grappe.Borne
+	in.counted = map[string][]string{}
 	in.reg.Event = in.borne.Signal
 	in.reg.OnReject = in.rejected
 	in.retry = &passerelle.Retrier{Horloge: cfg.Horloge}
@@ -182,16 +201,19 @@ func (in *Instance) Run(ctx context.Context) {
 	if in.refusal != "" {
 		return
 	}
-	tick := time.NewTicker(time.Second)
+	tick := time.NewTicker(grappe.Tick)
 	defer tick.Stop()
+	go in.grappe.Deliver(ctx)
 	in.last[0], in.last[1] = in.cfg.Horloge.Now(), in.cfg.Horloge.Now()
-	for {
+	for i := 1; ; i++ {
 		select {
 		case <-ctx.Done():
 			return
 		case <-tick.C:
 		}
-		in.Tick(ctx, false)
+		if in.grappe.Tick(ctx); i%10 == 0 {
+			in.Tick(ctx, false)
+		}
 	}
 }
 
@@ -224,7 +246,7 @@ func (in *Instance) Tick(ctx context.Context, force bool) {
 		in.table.CloseIdle(now)
 		in.sess.Expire(now)
 	}
-	if due(4, time.Hour) {
+	if due(4, time.Hour) && in.grappe.Runs() { // tâche horaire : au leader seul, ou à chaque VM sans leader
 		in.hourly(ctx)
 	}
 	in.retry.Retry(ctx)
@@ -233,7 +255,7 @@ func (in *Instance) Tick(ctx context.Context, force bool) {
 	in.rejects = nil
 	in.mu.Unlock()
 	for uid := range uids {
-		if ok, _ := in.local.hit("ligne_rejetee|"+uid, limit{1, 24 * time.Hour}, now); ok {
+		if in.count(ctx, jcs.Object{"route": "ligne_rejetee", "uid": uid})["admis"] == true {
 			in.alert(ctx, uid, "alerte_ligne_rejetee", "ligne_rejetee", "date", parisTime(now))
 		}
 	}
@@ -270,7 +292,65 @@ func (in *Instance) ended(s *sessions.Session, now time.Time) {
 		})
 	}
 	in.notif.Notify(ctx, "sessionTerminee", body)
+	in.count(ctx, jcs.Object{"route": "session/ouvrir", "uid": s.UID, "contactId": s.Contact, "instanceId": in.ID, "fin": true})
 }
+
+// count décompte une limite par uid, par proche ou par compte de service au
+// leader, pour les trois VM (POST /interne/decompte) ; sans leader joignable,
+// cette VM décompte elle-même (API.md §7). Une fin de session se retire aussi
+// du compte de cette VM.
+func (in *Instance) count(ctx context.Context, req jcs.Object) jcs.Object {
+	if req["fin"] == true && !in.grappe.Leader() {
+		in.decompte(req)
+	}
+	if in.grappe.Leader() {
+		return in.decompte(req)
+	}
+	if r, ok := in.grappe.Relay(ctx, "/interne/decompte", req); ok {
+		return r
+	}
+	return in.decompte(req)
+}
+
+// decompte tient un décompte en mémoire : sessions simultanées par proche
+// (3, avec l'instanceId de la VM qui tient chacune), ligne_rejetee une fois
+// par jour, sinon la limite par uid ou par compte de la route.
+func (in *Instance) decompte(req jcs.Object) jcs.Object {
+	now, route := in.cfg.Horloge.Now(), str(req, "route")
+	ok, retry := true, now.Add(sessions.Idle)
+	if c := str(req, "contactId"); c != "" {
+		k, inst := str(req, "uid")+"|"+c, str(req, "instanceId")
+		in.mu.Lock()
+		l := in.counted[k]
+		if i := slices.Index(l, inst); req["fin"] == true && i >= 0 {
+			in.counted[k] = slices.Delete(l, i, i+1)
+		} else if ok = len(l) < 3 && len(in.counted) < maxKeys; ok && req["fin"] != true {
+			in.counted[k] = append(l, inst)
+		}
+		in.mu.Unlock()
+	} else {
+		lim := table[route].uid
+		if route == "ligne_rejetee" {
+			lim = limit{1, 24 * time.Hour}
+		}
+		ok, retry = in.local.hit(route+"|uid|"+str(req, "uid")+str(req, "compte"), lim, now)
+	}
+	if req["fin"] == true {
+		return nil
+	}
+	if ok {
+		return jcs.Object{"admis": true}
+	}
+	return jcs.Object{"admis": false, "reessayerLe": stamp(retry)}
+}
+
+// event journalise un événement de la grappe, sans donnée de titulaire.
+func (in *Instance) event(event, res string) {
+	in.cfg.Journal.Write(ports.Event{Event: event, InstanceID: in.ID, ImageDigest: in.cfg.ImageDigest, Resultat: res})
+}
+
+// Grappe rend la part de cette VM dans la grappe du PIN.
+func (in *Instance) Grappe() *grappe.Grappe { return in.grappe }
 
 // closeSessions ferme les sessions de ce titulaire (de ce proche si contact
 // n'est pas vide) que tient l'instance.

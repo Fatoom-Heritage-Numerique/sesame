@@ -38,6 +38,7 @@ const (
 // contrôle entre VM comparent ensuite.
 type Claims struct {
 	ImageDigest, ImageReference, HWModel string
+	Name, Zone                           string // submods.gce.instance_name et zone
 	ProjectNumber                        any
 	EnvOverride                          any
 	Exp                                  int64
@@ -128,7 +129,10 @@ func Verify(jwt string, root []byte, now time.Time, nonces []string) (*Claims, e
 	digest, _ := container["image_digest"].(string)
 	ref, _ := container["image_reference"].(string)
 	hw, _ := c["hwmodel"].(string)
-	return &Claims{ImageDigest: digest, ImageReference: ref, HWModel: hw,
+	gce := obj(submods["gce"])
+	name, _ := gce["instance_name"].(string)
+	zone, _ := gce["zone"].(string)
+	return &Claims{ImageDigest: digest, ImageReference: ref, HWModel: hw, Name: name, Zone: zone,
 		ProjectNumber: obj(submods["gce"])["project_number"], EnvOverride: container["env_override"], Exp: exp}, nil
 }
 

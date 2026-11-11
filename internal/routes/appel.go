@@ -100,8 +100,12 @@ func (a *call) limitKey(key string) error {
 	if a.r.uid.n == 0 {
 		return nil
 	}
-	if ok, retry := a.in.local.hit(a.name+"|uid|"+key, a.r.uid, a.now); !ok {
-		return failAt("trop_d_appels", "reessayerLe", retry)
+	field := "uid"
+	if key == "compte" {
+		field, key = "compte", a.in.cfg.reglages.CompteDeces
+	}
+	if r := a.in.count(a.ctx, jcs.Object{"route": a.name, field: key}); r["admis"] != true {
+		return &refusal{"trop_d_appels", jcs.Object{"reessayerLe": r["reessayerLe"]}}
 	}
 	return nil
 }
@@ -137,6 +141,8 @@ func response(corps jcs.Object, err error) jcs.Object {
 	case err == nil:
 		return jcs.Object{"statut": 200, "corps": corps}
 	case errors.As(err, &ref):
+	case errors.As(err, new(relayed)):
+		return jcs.Object(err.(relayed))
 	case errors.Is(err, registre.ErrUnavailable):
 		ref = &refusal{code: "registre_indisponible"}
 	default:

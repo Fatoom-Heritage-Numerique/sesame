@@ -61,6 +61,10 @@ type Config struct {
 	// quand ce n'est pas PASSERELLE_URL (émulateur local) ; vide et
 	// PASSERELLE_URL injoignable, la passerelle de test en mémoire répond.
 	PasserelleReelle string `json:"passerelleReelle"`
+	// Mode instance : écoute des routes entre VM et adresses des autres
+	// conteneurs, par nom de VM (grappe sur trois conteneurs).
+	EcouteGrappe string            `json:"ecouteGrappe"`
+	Pairs        map[string]string `json:"pairs"`
 
 	root, inter []byte
 	rootSum     []byte

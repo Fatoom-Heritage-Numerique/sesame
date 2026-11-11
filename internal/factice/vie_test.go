@@ -26,7 +26,8 @@ func TestVieNominale(t *testing.T) { // VIE-01, API.md §2.4
 	e.advance(time.Hour)
 	c = e.open("a")
 	o := ok(t, c.life(h))
-	if str(o, "vivantLe") != "2026-11-11T11:00:00.000Z" || o["signalement"] != nil || o["transmis"] != false || o["pinPresent"] != true ||
+	if str(o, "vivantLe") != "2026-11-11T11:00:00.000Z" || o["signalement"] != nil || o["transmis"] != false || o["pinPresent"] != false || // aucun dépôt dans la grappe en service
+
 		o["pinBloque"] != false || len(o["ouvertures"].(jcs.Array)) != 0 || e.line(h.uid)["vivantLe"] != "2026-11-11T11:00:00.000Z" {
 		t.Fatalf("vie : %v", o)
 	}
@@ -156,7 +157,7 @@ func TestEtat(t *testing.T) { // ETA-01, ETA-02, ETA-06, API.md §2.5
 	o := ok(t, c.etat(h, "2026-11-11T09:00:00.000Z", 5))
 	p := e.payload(str(o, "etat"), false)
 	op := p["ouvertures"].(jcs.Array)
-	if p["typ"] != "etat" || p["uid"] != h.uid || len(op) != 1 || op[0].(jcs.Object)["contactId"] != "p2" || p["pinPresent"] != true ||
+	if p["typ"] != "etat" || p["uid"] != h.uid || len(op) != 1 || op[0].(jcs.Object)["contactId"] != "p2" || p["pinPresent"] != false ||
 		p["pinBloque"] != false || p["evaluationsDepuis"] != 0.0 || sub(p, "repere")["ouvertures"] != "2026-11-11T09:30:00.000Z" || e.f.Base.Len() != n {
 		t.Fatalf("etat : %v", p)
 	}

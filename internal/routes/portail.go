@@ -401,7 +401,7 @@ func (a *call) admit(code, lookup string, who *[2]string) (*sessions.Session, er
 			return nil, err
 		}
 	}
-	if a.in.sess.Count(s.UID, s.Contact) >= 3 {
+	if r := a.in.count(a.ctx, jcs.Object{"route": a.name, "uid": s.UID, "contactId": s.Contact, "instanceId": a.in.ID}); r["admis"] != true {
 		clear(kts)
 		return nil, failAt("trop_d_appels", "reessayerLe", a.now.Add(sessions.Idle))
 	}

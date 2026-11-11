@@ -21,9 +21,7 @@ import (
 // encore : chacune en sort avec son code, sa description dans l'OpenAPI et
 // ses tests (décision 0064). Une route servie absente de l'OpenAPI, ou
 // décrite et non servie, fait échouer TestOpenAPIRoutes.
-var aVenir = []string{
-	"pin/deposer", "pin/evaluer", "grappe/rejoindre", "grappe/membres", "grappe/amorcer", "grappe/preparer", "grappe/demarrer",
-}
+var aVenir = []string{}
 
 // communes sont les erreurs que toute route du canal peut rendre (API.md §2).
 var communes = []string{"message_refuse", "trop_d_appels", "registre_indisponible"}
@@ -39,6 +37,12 @@ type spec struct {
 		Erreurs []string `json:"erreurs"`
 	} `json:"x-sesame-routes"`
 	Erreurs map[string]*int `json:"x-sesame-erreurs"`
+	EntreVM map[string]struct {
+		Section string   `json:"section"`
+		Requete any      `json:"requete"`
+		Reponse any      `json:"reponse"`
+		Erreurs []string `json:"erreurs"`
+	} `json:"x-sesame-entre-vm"`
 }
 
 var (
@@ -251,6 +255,16 @@ func TestOpenAPIRoutes(t *testing.T) {
 		names = append(names, m[1])
 	}
 	want := append(append([]string{}, served...), aVenir...)
+	for k, r := range sp.EntreVM { // routes entre VM (§4) et messages de protocole-pin.md, « Transport »
+		for _, s := range []any{r.Requete, r.Reponse} {
+			if f := sp.walk(s, k); f != "" {
+				t.Error(f)
+			}
+		}
+		if g, ok := strings.CutPrefix(k, "/grappe/"); ok {
+			want = append(want, "grappe/"+g)
+		}
+	}
 	sort.Strings(names)
 	sort.Strings(want)
 	if !slices.Equal(names, want) {

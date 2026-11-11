@@ -70,6 +70,7 @@ func newEnv(t *testing.T, opts ...option) *env {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(f.Close)
 	e := &env{t: t, f: f, cfg: cfg, issuers: map[string]*rsa.PrivateKey{}}
 	var priv struct{ Emetteurs map[string]map[string]string }
 	b, err := os.ReadFile("../../testdata/factice/emetteurs-prives.json")

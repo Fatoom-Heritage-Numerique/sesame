@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"slices"
 	"strings"
 	"time"
 
@@ -194,6 +195,11 @@ func (in *Instance) hourly(ctx context.Context) {
 			seen[lastSegment(i.Path)] = at(i.Doc, "vuLe")
 		}
 	}
+	in.mu.Lock() // sessions comptées des instances au vuLe de plus de 2 minutes (API.md §7)
+	for k, l := range in.counted {
+		in.counted[k] = slices.DeleteFunc(l, func(i string) bool { return a.now.Sub(seen[i]) > 2*time.Minute })
+	}
+	in.mu.Unlock()
 	for _, h := range holders {
 		uid := lastSegment(h.Path)
 		reports, err := a.reports(uid)

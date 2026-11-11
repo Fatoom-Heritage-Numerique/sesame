@@ -36,3 +36,13 @@ func Evaluate(cleOprf, element []byte) ([]byte, error) {
 	}
 	return out, nil
 }
+
+// NewKey rend une cleOprf de 32 octets dérivée (DeriveKeyPair de la RFC 9497,
+// §3.2.1) de graine, 32 octets de la primitive d'aléa.
+func NewKey(graine []byte) ([]byte, error) {
+	key, err := oprf.DeriveKey(Suite, oprf.BaseMode, graine, []byte("sesame-cle-oprf"))
+	if err != nil || len(graine) != 32 {
+		return nil, primitives.ErrInvalid
+	}
+	return key.MarshalBinary()
+}
