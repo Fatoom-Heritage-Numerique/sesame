@@ -21,7 +21,6 @@ import (
 // Track ; le test ci-dessous échoue s'il est à la fois réclamé et en attente.
 var pending = map[string][]string{
 	"attestation.json": {"attestation", "listeVersions"},
-	"json.json":        {"jsonCanonique", "nombre"},
 	"primitives.json": {
 		"aesGcmChiffrer", "aesGcmDechiffrer", "aleatoire", "argon2id",
 		"ecdsaP256Verifier", "ed25519Publique", "ed25519Signer", "ed25519Verifier",
