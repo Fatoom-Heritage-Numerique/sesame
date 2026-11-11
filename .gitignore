@@ -1,0 +1,4 @@
+# Binaires construits à la racine (go build ./cmd/...), jamais suivis.
+/sesame
+/sesame-fake
+/essai
