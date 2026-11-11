@@ -42,6 +42,7 @@ go run ./outils/controle-dependances        # paquets liés par cmd/sesame : lis
 go run ./outils/controle-noms               # noms de ressources sous la forme <…> (décision 0066)
 go run ./outils/controle-image              # images de base du Dockerfile épinglées par digest
 go run ./outils/controle-image -dockerfile build/sesame-fake.Dockerfile   # idem, image de sesame-fake
+go run ./outils/controle-image -dockerfile essais/Dockerfile               # idem, image jetable des essais (décision 0075)
 go run ./outils/generer-compteurpin -verifier   # vecteur compteurPin recalculé, égal au fichier (sans -verifier : le réécrit)
 ./build/reproduire.sh                        # image de cmd/sesame, sha256:<empreinte>
 SORTIE_OCI=image.tar ./build/reproduire.sh && go run ./outils/controle-image -oci image.tar   # image sans shell, étiquettes
@@ -54,6 +55,7 @@ Mesures, hors CI : `go test -tags mesures -run Mesure -v ./internal/grappe` (tas
 - `govulncheck` se lance avec le Go de `go.mod` (`GOTOOLCHAIN=go<version de go.mod>` si le Go local est plus ancien) : construit avec un Go plus ancien, il refuse les paquets du module.
 - `build/reproduire.sh` demande `docker` avec `buildx`, et `git` ; il construit le commit courant, pas les fichiers modifiés.
 - `build/grappe.sh` demande `docker compose`, `curl` et `go` (environ 3 minutes : la remplaçante n'entre qu'après 2 minutes d'absence de son votant) ; `SANS_CONSTRUCTION=1` reprend l'image `sesame-fake:grappe` déjà construite, `GARDER=1` laisse les conteneurs. En mode instance, chaque conteneur a son registre en mémoire : un titulaire n'y est servi hors du PIN que par l'instance où il est enrôlé.
+- `essais/` porte le programme jetable de la séance d'essais sur Confidential Space (décision 0075) : il est testé par `go test ./...` sans Google, lié par aucun binaire publié, hors budget ; sa marche à suivre (`essais/README.md`) se joue dans Cloud Shell, jamais dans la CI.
 - Les tests de la grappe (`internal/factice/grappe_test.go`, `internal/grappe`) tournent sur le réseau entre VM simulé en mémoire, horloge fixe, ticks et messages passés par le test : aucune attente réelle.
 - La CI (`.github/workflows/ci.yml`) lance ces commandes sur chaque PR et sur `main`, plus la double construction sur deux exécuteurs et le contrôle de l'image construite (`RELEASE.md` §8) ; ses actions GitHub sont épinglées par l'empreinte de leur commit, la version en commentaire (décision 0065).
 - Un test qui rejoue des vecteurs réclame ses groupes par `vecteurs.Track` (`internal/vecteurs`), dans le paquet qui porte leur format (`ARCHITECTURE.md` §2.4), et retire ces groupes de la liste `pending` de `internal/vecteurs/couverture_test.go` ; un groupe qu'aucun test ne réclame et qui n'est pas dans cette liste fait échouer la suite. Tous les groupes des quatre copies sont réclamés : un groupe nouveau d'une recopie entre dans `pending` jusqu'à son test.
