@@ -58,7 +58,14 @@ func (e *env) walkTo(t time.Time) {
 	tick(e)
 }
 
+// record lit l'enregistrement chez le leader, qui a appliqué l'entrée avant de
+// répondre ; une autre VM de la majorité peut encore retarder d'un battement.
 func (e *env) record(uid string) (pin.Record, bool) {
+	for _, in := range e.f.Server.Instances {
+		if in.Grappe().Leader() {
+			return in.Grappe().Record(uid)
+		}
+	}
 	return e.f.Server.Instances[1].Grappe().Record(uid)
 }
 
