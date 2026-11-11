@@ -56,8 +56,9 @@ go run ./cmd/sesame-fake -config <fichier>   # sesame-fake en local, mode grappe
 - `govulncheck` se lance avec le Go de `go.mod` (`GOTOOLCHAIN=go<version de go.mod>` si le Go local est plus ancien) : construit avec un Go plus ancien, il refuse les paquets du module.
 - `build/reproduire.sh` demande `docker` avec `buildx`, et `git` ; il construit le commit courant, pas les fichiers modifiés.
 - La CI (`.github/workflows/ci.yml`) lance ces commandes sur chaque PR et sur `main`, plus la double construction sur deux exécuteurs et le contrôle de l'image construite (`RELEASE.md` §8) ; ses actions GitHub sont épinglées par l'empreinte de leur commit, la version en commentaire (décision 0065).
-- Un test qui rejoue des vecteurs réclame ses groupes par `vecteurs.Track` (`internal/vecteurs`) et retire ces groupes de la liste `pending` de `internal/vecteurs/couverture_test.go` ; un groupe qu'aucun test ne réclame et qui n'est pas dans cette liste fait échouer la suite.
+- Un test qui rejoue des vecteurs réclame ses groupes par `vecteurs.Track` (`internal/vecteurs`), dans le paquet qui porte leur format (`ARCHITECTURE.md` §2.4), et retire ces groupes de la liste `pending` de `internal/vecteurs/couverture_test.go` ; un groupe qu'aucun test ne réclame et qui n'est pas dans cette liste fait échouer la suite. Tous les groupes des quatre copies sont réclamés : un groupe nouveau d'une recopie entre dans `pending` jusqu'à son test.
 - `compteurPin.json` ne s'écrit que par `go run ./outils/generer-compteurpin` ; les copies de `testdata/vecteurs/` que par une recopie depuis le client (« Formats et vecteurs »).
+- Les tables NFC de `internal/jcs/nfc_tables.go` ne s'écrivent que par `go run ./outils/generer-nfc -ucd <dossier> > internal/jcs/nfc_tables.go`, `<dossier>` tenant `UnicodeData.txt` et `DerivedNormalizationProps.txt` de la version Unicode de la bibliothèque standard (`unicode.Version`, `https://www.unicode.org/Public/<version>/ucd/`) ; le test de `internal/jcs` échoue si les tables sont d'une autre version que Go.
 
 ## Formats et vecteurs
 
