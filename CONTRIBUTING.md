@@ -32,7 +32,7 @@ Go est celui de la ligne `go` de `go.mod` (dernière version stable ; Go refuse 
 ```bash
 gofmt -l .                                   # n'affiche rien
 go vet ./...
-go test -race ./...                          # vecteurs (forme, SHA256SUMS, couverture), outils
+go test -race ./...                          # vecteurs (forme, SHA256SUMS, couverture), contrat (internal/factice, OpenAPI), outils
 go mod verify
 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...   # version épinglée par la CI
 (cd testdata/vecteurs && sha256sum -c SHA256SUMS)
@@ -42,8 +42,8 @@ go run ./outils/controle-dependances        # paquets liés par cmd/sesame : lis
 go run ./outils/controle-noms               # noms de ressources sous la forme <…> (décision 0066)
 go run ./outils/controle-image              # images de base du Dockerfile épinglées par digest
 ./build/reproduire.sh                        # image de cmd/sesame, sha256:<empreinte>
-go run ./cmd/sesame-fake -config testdata/factice/configuration.json   # sesame-fake en local (variable du lanceur factice à 1, décision 0063)
 SORTIE_OCI=image.tar ./build/reproduire.sh && go run ./outils/controle-image -oci image.tar   # image sans shell, étiquettes
+SESAME_FAKE_LAUNCHER=1 go run ./cmd/sesame-fake -config testdata/factice/configuration.json   # sesame-fake en local, grappe locale (décision 0063)
 ```
 
 Arrivent avec leur code, à la même étape :
