@@ -69,7 +69,7 @@ Les formats (`ARCHITECTURE.md` : hiérarchie et formats des clés, canal, borne 
 
 Fichiers repris de `packages/crypto/vectors/` du dépôt `Fatoom-Heritage-Numerique/Fatoom`, ceux dont Sésame refait les calculs (la liste, et ce que le code Go recalcule pour chaque groupe, sont tenus par le client de référence : `docs/technique/tests.md`, « Vecteurs repris par le dépôt `sesame` ») :
 
-- `sesame.json` : canal, `instanceId`, jetons de paire, reçus, jeton de session et requêtes à la passerelle, KTS et dérivations, enveloppes, charte, code d'accès et son index, messages signés par `cleVie`, dépôts du PIN, fiche d'alerte, scellés, registre et borne ;
+- `sesame.json` : canal, `instanceId`, jetons de paire, reçus, jeton de session et requêtes à la passerelle, KTS et dérivations, enveloppes, forme de l'email, charte, code d'accès et son index, messages signés par `cleVie`, dépôts du PIN, fiche d'alerte, scellés, registre et borne ;
 - `primitives.json` : vecteurs publiés de chaque primitive, avec les refus de bord (secret X25519 nul, signature Ed25519 `S + ℓ`, clé ML-KEM-768 hors module) ;
 - `json.json` : JSON canonique RFC 8785 et refus d'une chaîne hors NFC ;
 - `attestation.json` : vérification d'un jeton PKI fabriqué sous une racine de test, et format de `versions.json` (`listeVersions`).

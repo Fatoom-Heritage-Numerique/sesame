@@ -590,7 +590,105 @@
     },
     {
       "entrees": {
-        "charte": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQAuI9M4arOQ7dTe7q+MhkNjfTHI+x4DeODEYSy9s6q9XcWKJUmiCrYV+4mxN5CARKsgB4q+15NCuQianhARnGeAHrvyoD+7GSz0uqPB9S9iJzCQvTNMxVNRelE6cB/pT2HeqCzdBPpQP0NP3H4HIQ2st4bRSaM0h6cvVJMWNfmqfisOqikY2SfEL9dA+G4WlZZn6gMbxuQRJBA8c4RazYxChyWPPL0H/rKbVWaBAMeS+JgKiUa9qWNw8wVoGzVmWMkKDhAY0oNvVMSTkB+deag==",
+        "saisie": "İnes@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/i-majuscule-pointe"
+    },
+    {
+      "entrees": {
+        "saisie": "ΝΙΚΟΣ@exemple.gr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/sigma-final"
+    },
+    {
+      "entrees": {
+        "saisie": "Kim@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/signe-kelvin"
+    },
+    {
+      "entrees": {
+        "saisie": "Léa@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/accent"
+    },
+    {
+      "entrees": {
+        "saisie": "Léa@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/accent-nfd"
+    },
+    {
+      "entrees": {
+        "saisie": " lea@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/espace-insecable-de-bord"
+    },
+    {
+      "entrees": {
+        "saisie": "lea@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/u0085-de-bord"
+    },
+    {
+      "entrees": {
+        "saisie": "﻿lea@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/ufeff-de-bord"
+    },
+    {
+      "entrees": {
+        "saisie": "lea\u0001@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/caractere-de-controle"
+    },
+    {
+      "entrees": {
+        "saisie": "lea@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/caractere-7f"
+    },
+    {
+      "entrees": {
+        "saisie": "lea martin@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/espace-interieur"
+    },
+    {
+      "entrees": {
+        "saisie": "lea\tmartin@exemple.fr"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/tabulation-interieure"
+    },
+    {
+      "entrees": {
+        "saisie": ""
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/chaine-vide"
+    },
+    {
+      "entrees": {
+        "saisie": " \t\r\n"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "normaliserEmail/espaces-seuls"
+    },
+    {
+      "entrees": {
+        "charte": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQK1Au40Wv+Imchmetv4pjcTWBzoql47QfTMTQDh//7JRcC6RWXWM4YR8rXRViwwCLNUGrqG7ttK5SSelyxx/d29tZr+mAb7bSDRpsOg4TcufwSgkAN0/AsVXnVuEAPtYn2+yAi9BO5MM0dT2HIDHWWUjt6lPadQs4dDCAOKNcWCUh4Sykiy9IzSknhY1XuGUYor1ioD/t1NVCUkE+WCOfhG4xGvUOHLMqrHESacCMeS+JgKiUa9rS9IylQ4exhWxhwspvTlBxX0SzOa87VhK",
         "charteIv": "j3LVyGQnt0pjJamP",
         "contactId": "ProcheVecteur0001",
         "generation": 2,
@@ -603,7 +701,7 @@
     },
     {
       "entrees": {
-        "charte": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQAuI9M4arOQ7dTe7q+MhkNjfTHI+x4DeODEYSy9s6q9XcWKJUmiCrYV+4mxN5CARKsgB4q+15NCuQianhARnGeAHrvyoD+7GSz0uqPB9S9iJzCQvTNMxVNRelE6cB/pT2HeqCzdBPpQP0NP3H4HIQ2st4bRSaM0h6cvVJMWNfmqfisOqikY2SfEL9dA+G4WlZZn6gMbxuQRJBA8c4RazYxChyWPPL0H/rKbVWaBAMeS+JgKiUa9qWNw8wVoGzVmWMkKDhAY0oNvVMSTkB+deag==",
+        "charte": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQK1Au40Wv+Imchmetv4pjcTWBzoql47QfTMTQDh//7JRcC6RWXWM4YR8rXRViwwCLNUGrqG7ttK5SSelyxx/d29tZr+mAb7bSDRpsOg4TcufwSgkAN0/AsVXnVuEAPtYn2+yAi9BO5MM0dT2HIDHWWUjt6lPadQs4dDCAOKNcWCUh4Sykiy9IzSknhY1XuGUYor1ioD/t1NVCUkE+WCOfhG4xGvUOHLMqrHESacCMeS+JgKiUa9rS9IylQ4exhWxhwspvTlBxX0SzOa87VhK",
         "charteIv": "j3LVyGQnt0pjJamP",
         "contactId": "ProcheVecteur0001",
         "generation": 1,
@@ -616,7 +714,7 @@
     },
     {
       "entrees": {
-        "charte": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQAuI9M4arOQ7dTe7q+MhkNjfTHI+x4DeODEYSy9s6q9XcWKJUmiCrYV+4mxN5CARKsgB4q+15NCuQianhARnGeAHrvyoD+7GSz0uqPB9S9iJzCQvTNMxVNRelE6cB/pT2HeqCzdBPpQP0NP3H4HIQ2st4bRSaM0h6cvVJMWNfmqfisOqikY2SfEL9dA+G4WlZZn6gMbxuQRJBA8c4RazYxChyWPPL0H/rKbVWaBAMeS+JgKiUa9qWNw8wVoGzVmWMkKDhAY0oNvVMSTkB+deag==",
+        "charte": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQK1Au40Wv+Imchmetv4pjcTWBzoql47QfTMTQDh//7JRcC6RWXWM4YR8rXRViwwCLNUGrqG7ttK5SSelyxx/d29tZr+mAb7bSDRpsOg4TcufwSgkAN0/AsVXnVuEAPtYn2+yAi9BO5MM0dT2HIDHWWUjt6lPadQs4dDCAOKNcWCUh4Sykiy9IzSknhY1XuGUYor1ioD/t1NVCUkE+WCOfhG4xGvUOHLMqrHESacCMeS+JgKiUa9rS9IylQ4exhWxhwspvTlBxX0SzOa87VhK",
         "charteIv": "j3LVyGQnt0pjJamP",
         "contactId": "ProcheVecteur0002",
         "generation": 1,
@@ -629,7 +727,7 @@
     },
     {
       "entrees": {
-        "charte": "ZF9BCpQBJjN9OOEp3fD8gEShRgxr8IiAQO4y/qWzPwSIbzcf6HlHzCm7aUWGTh0oJTSaV1/o035My87HIUAvgoXHi9KuC96YJbwKBodWQtIIM9dRw/kGik3M+HExFaUzM5QSprxVRF3ro5QUQ1ecrG8Kj6qmmOIYUEu7UIqq6ZIplrk4ArMPwpE2FCy+TRtRIUkrBWj75aQ8EP0kwCP1n6dd5Hn1WhAIKQYLjhb+ycN+ETVNR76nG8yZge6KHubBnx6oCNPxIRKvDuMSptZG/6V7KW/M9rlo94iRTDE53M7QIHZfSYm36vVTf37fATfu6pN04j4bo0MWKp5Ehq27ttK5SSelyxx9GeAHrvyoD8aUBj8k5+hlDJu2yT8+S58/Wqob2k+NG/Bz3DzjWn0cbscc2MDhG47GS2Qx9+0KLpphgoKFIOCZfXCPh4SykAoL5jRLPFhyCsyVZYf6h9C21EBaBAhWvhbdKkacZqvKnozHrOXlSadTb7CsOjiyQ/w1HIxiiklW1VLLQLF+0TVtS/sHyQgt5tyiLmMw9EzLfS7f8WAL7Vm9nSWkpnaVt2HTcv3fG/0LfzM39GlyOjoTmforpjfDTQ8=",
+        "charte": "ZF9BCpQBJjN9OOEp3fD8gEShRgxr8IiAQO4y/qWzPwSIbzcf6HlHzCm7aUWGTh0oJTSaV1/o035My87HIUAvgoXHi9KuC96YJbwKBodWQtIIM9dRw/kGik3M+HExFaUzM5QSprxVRF3ro5QUQ1ecrG8Kj6qmmOIYUEu7UIqq6ZIplrk4ArMPwpE2FCy+TRtRIUkrBWj75aQ8EP0kwCP1n6dd5Hn1WhAIKQYLjhb+ycN+ETVNR76nG8yZge6KHubBnx6oCNPxIRKvDuMSptZG/6V7KW/M9rlo94iRTDE53M7QIHZfSS9/pbZfbHjCBhnL9458/yIS6AsCepBirK/ptMWySCXq0wZ/d29tZr+mKeyWSj4mqPB/DvSa2jkjTNMxfIAZnEqYCttc1CbjSHIRaIAEwsLyE47PVnk17vEJPpRHqIDGJfaOa3CZwJyo3hES5nRtFlokF9GUfIrynMeS80BVDgNb+Q7HKCwXDG5l9UrM6YHUTrRcZfaiHBKwAvAvG4x5hl4GzUiNR7xhx3xLYflG2B8tz/XlNnky5E7JeTXD8H0X7j/YmCuupX+ft3/Ncv21Y9V8ndBoqVxGJrGwZkUpKkO0Bw==",
         "charteIv": "j3LVyGQnt0pjJamP",
         "contactId": "ProcheVecteur0001",
         "generation": 1,
@@ -642,7 +740,7 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"Léa.Martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"Lea.Martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -650,6 +748,28 @@
       },
       "erreur": "parametres_invalides",
       "nom": "charte/email-en-majuscules"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\" lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-espace-de-bord"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-accent"
     },
     {
       "entrees": {
@@ -664,18 +784,117 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\" léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"İnes@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
         "uid": "TitulaireVecteur0000000001"
       },
       "erreur": "parametres_invalides",
-      "nom": "charte/email-espace-de-bord"
+      "nom": "charte/email-i-majuscule-pointe"
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":null,\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"i̇nes@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-i-point-suscrit"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"νικος@exemple.gr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-sigma-final"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-u0085-de-bord"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\" lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-espace-insecable-de-bord"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"﻿lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-ufeff-de-bord"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"lea\\u0001martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-caractere-de-controle"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"leamartin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-caractere-7f"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"lea martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-espace-interieur"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "iv": "8f72d5c86427b74a6325a98f",
+        "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
+        "ktsGeneration": 1,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "charte/email-chaine-vide"
+    },
+    {
+      "entrees": {
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":null,\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -686,7 +905,7 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"0612345678\",\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"0612345678\",\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -741,7 +960,7 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-02-30\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-02-30\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -752,7 +971,7 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -763,7 +982,7 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":0,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":0,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -774,7 +993,7 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"titulaire\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"titulaire\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -785,7 +1004,7 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\",\"lien\":\"fille\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"telephone\":\"+33612345678\",\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\",\"lien\":\"fille\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -796,7 +1015,7 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -807,7 +1026,7 @@
     },
     {
       "entrees": {
-        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"cRZCtyawRAFifKn7rDL1yFMPsZA8xNsCJYcXkhpIgQ==\",\"telephone\":\"+33612345678\",\"email\":\"léa.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
+        "charte": "{\"v\":1,\"uid\":\"TitulaireVecteur0000000001\",\"contactId\":\"ProcheVecteur0001\",\"generation\":1,\"role\":\"gardien\",\"codeVerifier\":\"cRZCtyawRAFifKn7rDL1yFMPsZA8xNsCJYcXkhpIgQ==\",\"telephone\":\"+33612345678\",\"email\":\"lea.martin@exemple.fr\",\"prenom\":\"Léa\",\"nom\":\"Martin\",\"dateNaissance\":\"1990-04-12\",\"adresse\":null,\"titulaireAffiche\":\"Hélène Durand\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\"}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -951,7 +1170,7 @@
     {
       "entrees": {
         "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
-        "email": "hélène@exemple.fr",
+        "email": "Lea.Martin@exemple.fr",
         "generation": 1,
         "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
         "iv": "566d399b90d35f9b71a45ea6",
@@ -959,12 +1178,181 @@
         "uid": "TitulaireVecteur0000000001"
       },
       "erreur": "parametres_invalides",
-      "nom": "ficheAlerte/email-nfd"
+      "nom": "ficheAlerte/email-en-majuscules"
     },
     {
       "entrees": {
         "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
-        "email": "hélène@exemple.fr",
+        "email": " lea.martin@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-espace-de-bord"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "léa.martin@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-accent"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "léa.martin@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-en-nfd"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "İnes@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-i-majuscule-pointe"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "i̇nes@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-i-point-suscrit"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "νικος@exemple.gr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-sigma-final"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "lea.martin@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-u0085-de-bord"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": " lea.martin@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-espace-insecable-de-bord"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "﻿lea.martin@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-ufeff-de-bord"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "lea\u0001martin@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-caractere-de-controle"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "leamartin@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-caractere-7f"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "lea martin@exemple.fr",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-espace-interieur"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "",
+        "generation": 1,
+        "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
+        "iv": "566d399b90d35f9b71a45ea6",
+        "telephone": null,
+        "uid": "TitulaireVecteur0000000001"
+      },
+      "erreur": "parametres_invalides",
+      "nom": "ficheAlerte/email-chaine-vide"
+    },
+    {
+      "entrees": {
+        "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
+        "email": "helene.durand@exemple.fr",
         "generation": 1,
         "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
         "iv": "566d399b90d35f9b71a45ea6",
@@ -976,7 +1364,7 @@
     {
       "entrees": {
         "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
-        "email": "hélène@exemple.fr",
+        "email": "helene.durand@exemple.fr",
         "generation": 1,
         "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
         "iv": "566d399b90d35f9b71a45ea6",
@@ -989,7 +1377,7 @@
     {
       "entrees": {
         "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
-        "ficheScellee": "566d399b90d35f9b71a45ea66d0c3bde0bcdaeba463ab71b301b64c50eadebd9e8572b4a2b92345c1115f35b2b2b5a7ca45e39ecf2f6db4dfb3d20d7155e1481ae89fbc72fd18485095b880139abc1d24318c036309572eb874ab0fcf876447d619c45629d22be40974cde4b4826f07ca7a177b04233af2ea0af88b41ae96e460355b376f327bc9babf51669101b",
+        "ficheScellee": "566d399b90d35f9b71a45ea66d0c3bde0bcdaeba463ab7bdf512c9084eacdecef15c227a228f7f57135bba572a3c1635f45828ebf8ea9803a37e6c814a035dd3b283f9c77d83c9c05f4a841220abc6d1441dcb20298130bac144a8abc57b12322fa945648d18ba4a914cfd5c1b62a539e5a177b04232bd32b2e99bac07b60f93a700c76c13d71e081b335b9f7a8a296f8672f1",
         "generation": 2,
         "uid": "TitulaireVecteur0000000001"
       },
@@ -999,7 +1387,7 @@
     {
       "entrees": {
         "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
-        "ficheScellee": "566d399b90d35f9b71a45ea66d0c3bde0bcdaeba463ab71b301b64c50eadebd9e8572b4a2b92345c1115f35b2b2b5a7ca45e39ecf2f6db4dfb3d20d7155e1481ae89fbc72fd18485095b880139abc1d24318c036309572eb874ab0fcf876447d619c45629d22be40974cde4b4826f07ca7a177b04233af2ea0af88b41ae96e460355b376f327bc9babf51669101b",
+        "ficheScellee": "566d399b90d35f9b71a45ea66d0c3bde0bcdaeba463ab7bdf512c9084eacdecef15c227a228f7f57135bba572a3c1635f45828ebf8ea9803a37e6c814a035dd3b283f9c77d83c9c05f4a841220abc6d1441dcb20298130bac144a8abc57b12322fa945648d18ba4a914cfd5c1b62a539e5a177b04232bd32b2e99bac07b60f93a700c76c13d71e081b335b9f7a8a296f8672f1",
         "generation": 1,
         "uid": "TitulaireVecteur0000000002"
       },
@@ -1999,7 +2387,34 @@
     },
     {
       "entrees": {
-        "charte": "{\"adresse\":null,\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"contactId\":\"ProcheVecteur0001\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\",\"dateNaissance\":\"1990-04-12\",\"email\":\"léa.martin@exemple.fr\",\"generation\":1,\"nom\":\"Martin\",\"prenom\":\"Léa\",\"role\":\"gardien\",\"telephone\":\"+33612345678\",\"titulaireAffiche\":\"Hélène Durand\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
+        "saisie": " \t Marie.Dupont@Exemple.FR\r\n"
+      },
+      "nom": "normaliserEmail/majuscules-et-espaces-de-bord",
+      "sorties": {
+        "email": "marie.dupont@exemple.fr"
+      }
+    },
+    {
+      "entrees": {
+        "saisie": "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+      },
+      "nom": "normaliserEmail/toute-la-plage",
+      "sorties": {
+        "email": "!\"#$%&'()*+,-./0123456789:;<=>?@abcdefghijklmnopqrstuvwxyz[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+      }
+    },
+    {
+      "entrees": {
+        "saisie": "lea.martin@exemple.fr"
+      },
+      "nom": "normaliserEmail/deja-normalise",
+      "sorties": {
+        "email": "lea.martin@exemple.fr"
+      }
+    },
+    {
+      "entrees": {
+        "charte": "{\"adresse\":null,\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"contactId\":\"ProcheVecteur0001\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\",\"dateNaissance\":\"1990-04-12\",\"email\":\"lea.martin@exemple.fr\",\"generation\":1,\"nom\":\"Martin\",\"prenom\":\"Léa\",\"role\":\"gardien\",\"telephone\":\"+33612345678\",\"titulaireAffiche\":\"Hélène Durand\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
         "iv": "8f72d5c86427b74a6325a98f",
         "kts": "2f7d1f09c105ec6910267d3c595c54f8d02011f41544f629581f0a891b09b909",
         "ktsGeneration": 1,
@@ -2008,16 +2423,16 @@
       "nom": "charte/gardien",
       "sorties": {
         "aad": "fatoom-sesame-charte|1|TitulaireVecteur0000000001|ProcheVecteur0001|1|1",
-        "charte": "6477004c90466f602936d1678ae9f9c844f8094a5acf998745e932e9b2c76045ad5d745de03c5ccd48d23e2dcc470e736056f45c7ad7cb571ec6d4ee3a1337e7ecef8fe39721e9af729c0c4ed74a5081567f8f3a80af288b0193a8403713a93574f857f4e43a110da9fcc84043419eed671e8fbca698fe184627fa1e9aa0a1d51c81ae3428bf488a913e043cd9371c51340d32600896b8cc7512fc63a15189c7b72ea413a04237205e0e5aba5cc5ccf24a7c6e3d42d3fd16c385bfe39958a181d80bad06d4f82112ad400b88f4ce1aace43b7537bbabe32190d8df4c723ec780de3831184b2f6ceaaf57716289526882ad857ee26c4de420112ac801e2afb5e4d0ae4226a784046719e007aefca80feec64b3d2ea8f07d4bd889cc242f4cd33154d45e944e9c07fa53d877aa0b37413e940fd0d3f71f81c8436b2de1b45268cd21e9cbd524c58d7e6a9f8ac3aa8a463649f10bf5d03e1b85a56599fa80c6f1b90449040f1ce116b36310a1c963cf2f41ffaca6d559a04031e4be2602a251af6a58dc3cc15a06cd5996324283840634a0dbd53124e407e75e6a",
-        "charteBase64": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQAuI9M4arOQ7dTe7q+MhkNjfTHI+x4DeODEYSy9s6q9XcWKJUmiCrYV+4mxN5CARKsgB4q+15NCuQianhARnGeAHrvyoD+7GSz0uqPB9S9iJzCQvTNMxVNRelE6cB/pT2HeqCzdBPpQP0NP3H4HIQ2st4bRSaM0h6cvVJMWNfmqfisOqikY2SfEL9dA+G4WlZZn6gMbxuQRJBA8c4RazYxChyWPPL0H/rKbVWaBAMeS+JgKiUa9qWNw8wVoGzVmWMkKDhAY0oNvVMSTkB+deag==",
+        "charte": "6477004c90466f602936d1678ae9f9c844f8094a5acf998745e932e9b2c76045ad5d745de03c5ccd48d23e2dcc470e736056f45c7ad7cb571ec6d4ee3a1337e7ecef8fe39721e9af729c0c4ed74a5081567f8f3a80af288b0193a8403713a93574f857f4e43a110da9fcc84043419eed671e8fbca698fe184627fa1e9aa0a1d51c81ae3428bf488a913e043cd9371c51340d32600896b8cc7512fc63a15189c7b72ea413a04237205e0e5aba5cc5ccf24a7c6e3d42d3fd16c385bfe39958a181d80bad06d4f82112ad40ad40bb8d16bfe22672199eb6fe298dc4d6073a2a978ed07d331340387fffb251702e9159758ce1847cad74558b0c022cd506aea1bbb6d2b94927a5cb1c7f776f6d66bfa601bedb483469b0e8384dcb9fc1282400dd3f02c5579d5b8400fb589f6fb2022f413b930cd1d4f61c80c7596523b7a94f69d42ce1d0c200e28d7160948784b2922cbd2334a49e16355ee194628af58a80ffb75355094904f9608e7e11b8c46bd43872ccaab1c449a70231e4be2602a251af6b4bd232950e1ec615b1870b29bd3941c57d12cce6bced584a",
+        "charteBase64": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQK1Au40Wv+Imchmetv4pjcTWBzoql47QfTMTQDh//7JRcC6RWXWM4YR8rXRViwwCLNUGrqG7ttK5SSelyxx/d29tZr+mAb7bSDRpsOg4TcufwSgkAN0/AsVXnVuEAPtYn2+yAi9BO5MM0dT2HIDHWWUjt6lPadQs4dDCAOKNcWCUh4Sykiy9IzSknhY1XuGUYor1ioD/t1NVCUkE+WCOfhG4xGvUOHLMqrHESacCMeS+JgKiUa9rS9IylQ4exhWxhwspvTlBxX0SzOa87VhK",
         "charteIv": "j3LVyGQnt0pjJamP",
-        "charteJson": "{\"adresse\":null,\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"contactId\":\"ProcheVecteur0001\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\",\"dateNaissance\":\"1990-04-12\",\"email\":\"léa.martin@exemple.fr\",\"generation\":1,\"nom\":\"Martin\",\"prenom\":\"Léa\",\"role\":\"gardien\",\"telephone\":\"+33612345678\",\"titulaireAffiche\":\"Hélène Durand\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
+        "charteJson": "{\"adresse\":null,\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"contactId\":\"ProcheVecteur0001\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\",\"dateNaissance\":\"1990-04-12\",\"email\":\"lea.martin@exemple.fr\",\"generation\":1,\"nom\":\"Martin\",\"prenom\":\"Léa\",\"role\":\"gardien\",\"telephone\":\"+33612345678\",\"titulaireAffiche\":\"Hélène Durand\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
         "ktsAuth": "70f169613e0cef29bd32ad2256f692f6ebe28384ec61062ab5bf0752f1f0f290"
       }
     },
     {
       "entrees": {
-        "charte": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQAuI9M4arOQ7dTe7q+MhkNjfTHI+x4DeODEYSy9s6q9XcWKJUmiCrYV+4mxN5CARKsgB4q+15NCuQianhARnGeAHrvyoD+7GSz0uqPB9S9iJzCQvTNMxVNRelE6cB/pT2HeqCzdBPpQP0NP3H4HIQ2st4bRSaM0h6cvVJMWNfmqfisOqikY2SfEL9dA+G4WlZZn6gMbxuQRJBA8c4RazYxChyWPPL0H/rKbVWaBAMeS+JgKiUa9qWNw8wVoGzVmWMkKDhAY0oNvVMSTkB+deag==",
+        "charte": "ZHcATJBGb2ApNtFniun5yET4CUpaz5mHReky6bLHYEWtXXRd4DxczUjSPi3MRw5zYFb0XHrXy1cextTuOhM35+zvj+OXIemvcpwMTtdKUIFWf486gK8oiwGTqEA3E6k1dPhX9OQ6EQ2p/MhAQ0Ge7Wcej7ymmP4YRif6HpqgodUcga40KL9IipE+BDzZNxxRNA0yYAiWuMx1EvxjoVGJx7cupBOgQjcgXg5aulzFzPJKfG49QtP9FsOFv+OZWKGB2AutBtT4IRKtQK1Au40Wv+Imchmetv4pjcTWBzoql47QfTMTQDh//7JRcC6RWXWM4YR8rXRViwwCLNUGrqG7ttK5SSelyxx/d29tZr+mAb7bSDRpsOg4TcufwSgkAN0/AsVXnVuEAPtYn2+yAi9BO5MM0dT2HIDHWWUjt6lPadQs4dDCAOKNcWCUh4Sykiy9IzSknhY1XuGUYor1ioD/t1NVCUkE+WCOfhG4xGvUOHLMqrHESacCMeS+JgKiUa9rS9IylQ4exhWxhwspvTlBxX0SzOa87VhK",
         "charteIv": "j3LVyGQnt0pjJamP",
         "contactId": "ProcheVecteur0001",
         "generation": 1,
@@ -2027,7 +2442,7 @@
       },
       "nom": "ouvrirCharte/gardien",
       "sorties": {
-        "charteJson": "{\"adresse\":null,\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"contactId\":\"ProcheVecteur0001\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\",\"dateNaissance\":\"1990-04-12\",\"email\":\"léa.martin@exemple.fr\",\"generation\":1,\"nom\":\"Martin\",\"prenom\":\"Léa\",\"role\":\"gardien\",\"telephone\":\"+33612345678\",\"titulaireAffiche\":\"Hélène Durand\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}"
+        "charteJson": "{\"adresse\":null,\"codeVerifier\":\"QW608u+1QYgXz81wOBLhJQlH1ySM9i8G9ZkRQOaR4Tc=\",\"contactId\":\"ProcheVecteur0001\",\"courrier\":false,\"creeLe\":\"2026-10-12T14:03:00.000Z\",\"dateNaissance\":\"1990-04-12\",\"email\":\"lea.martin@exemple.fr\",\"generation\":1,\"nom\":\"Martin\",\"prenom\":\"Léa\",\"role\":\"gardien\",\"telephone\":\"+33612345678\",\"titulaireAffiche\":\"Hélène Durand\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}"
       }
     },
     {
@@ -2695,7 +3110,7 @@
     {
       "entrees": {
         "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
-        "email": "hélène@exemple.fr",
+        "email": "helene.durand@exemple.fr",
         "generation": 1,
         "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
         "iv": "566d399b90d35f9b71a45ea6",
@@ -2706,18 +3121,18 @@
       "sorties": {
         "aad": "fatoom-sesame-alerte|1|TitulaireVecteur0000000001|1",
         "cleViePub": "b8785294aa888cca013877fbc908f2436bd707498208c9e6c98e12e020bfd2ad",
-        "ficheScellee": "566d399b90d35f9b71a45ea66d0c3bde0bcdaeba463ab71b301b64c50eadebd9e8572b4a2b92345c1115f35b2b2b5a7ca45e39ecf2f6db4dfb3d20d7155e1481ae89fbc72fd18485095b880139abc1d24318c036309572eb874ab0fcf876447d619c45629d22be40974cde4b4826f07ca7a177b04233af2ea0af88b41ae96e460355b376f327bc9babf51669101b",
-        "ficheScelleeBase64": "Vm05m5DTX5txpF6mbQw73gvNrrpGOrcbMBtkxQ6t69noVytKK5I0XBEV81srK1p8pF457PL22037PSDXFV4Uga6J+8cv0YSFCVuIATmrwdJDGMA2MJVy64dKsPz4dkR9YZxFYp0ivkCXTN5LSCbwfKehd7BCM68uoK+ItBrpbkYDVbN28ye8m6v1FmkQGw==",
-        "json": "{\"email\":\"hélène@exemple.fr\",\"generation\":1,\"telephone\":\"+33612345678\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
-        "message": "fatoom-sesame-alerte|1|TitulaireVecteur0000000001|1{\"email\":\"hélène@exemple.fr\",\"generation\":1,\"telephone\":\"+33612345678\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
-        "signature": "6b3279c86cf59a0e5ca56865e87de22979053f6ba018bbd090c3e20cb5c48c348ae43fafd5ab1263f598f63245d5d576af9d465255d596e26993baf5c6010c05",
-        "signatureBase64": "azJ5yGz1mg5cpWhl6H3iKXkFP2ugGLvQkMPiDLXEjDSK5D+v1asSY/WY9jJF1dV2r51GUlXVluJpk7r1xgEMBQ=="
+        "ficheScellee": "566d399b90d35f9b71a45ea66d0c3bde0bcdaeba463ab7bdf512c9084eacdecef15c227a228f7f57135bba572a3c1635f45828ebf8ea9803a37e6c814a035dd3b283f9c77d83c9c05f4a841220abc6d1441dcb20298130bac144a8abc57b12322fa945648d18ba4a914cfd5c1b62a539e5a177b04232bd32b2e99bac07b60f93a700c76c13d71e081b335b9f7a8a296f8672f1",
+        "ficheScelleeBase64": "Vm05m5DTX5txpF6mbQw73gvNrrpGOre99RLJCE6s3s7xXCJ6Io9/VxNbulcqPBY19Fgo6/jqmAOjfmyBSgNd07KD+cd9g8nAX0qEEiCrxtFEHcsgKYEwusFEqKvFexIyL6lFZI0YukqRTP1cG2KlOeWhd7BCMr0ysumbrAe2D5OnAMdsE9ceCBszW596iilvhnLx",
+        "json": "{\"email\":\"helene.durand@exemple.fr\",\"generation\":1,\"telephone\":\"+33612345678\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
+        "message": "fatoom-sesame-alerte|1|TitulaireVecteur0000000001|1{\"email\":\"helene.durand@exemple.fr\",\"generation\":1,\"telephone\":\"+33612345678\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
+        "signature": "323677900b408a352be5148613b9532d5f876f8aeadcc2a6ced520869a411644d82b93979719902ec78b2f8d3facc428419e7cd427121d86dbb4112599706006",
+        "signatureBase64": "MjZ3kAtAijUr5RSGE7lTLV+Hb4rq3MKmztUghppBFkTYK5OXlxmQLseLL40/rMQoQZ581CcSHYbbtBElmXBgBg=="
       }
     },
     {
       "entrees": {
         "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
-        "email": "hélène@exemple.fr",
+        "email": "helene.durand@exemple.fr",
         "generation": 2,
         "graineVie": "62a2f82ea6754c555f68d914e2498ac844f4f55c41973d9324716a6fb7888b0e",
         "iv": "b484c85ffc150e2519e578c0",
@@ -2728,20 +3143,20 @@
       "sorties": {
         "aad": "fatoom-sesame-alerte|1|TitulaireVecteur0000000001|2",
         "cleViePub": "b8785294aa888cca013877fbc908f2436bd707498208c9e6c98e12e020bfd2ad",
-        "ficheScellee": "b484c85ffc150e2519e578c0bd745d711a1758f8771cf87725b432b37c6ed3a92ba832101922a0e242d4bb5f0927476b48bf5d75ca55c8ae030bfc95530abf7c87eea65725a1293c6b1322883bd28d9e1c7f1a26671c7e80f6faa28af20f64ef43892ebade2e58e93057127fdfecebc2a5eead9d7073342eb29e6a698be855ed4738b943",
-        "ficheScelleeBase64": "tITIX/wVDiUZ5XjAvXRdcRoXWPh3HPh3JbQys3xu06krqDIQGSKg4kLUu18JJ0drSL9ddcpVyK4DC/yVUwq/fIfuplcloSk8axMiiDvSjZ4cfxomZxx+gPb6ooryD2TvQ4kuut4uWOkwVxJ/3+zrwqXurZ1wczQusp5qaYvoVe1HOLlD",
-        "json": "{\"email\":\"hélène@exemple.fr\",\"generation\":2,\"telephone\":null,\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
-        "message": "fatoom-sesame-alerte|1|TitulaireVecteur0000000001|2{\"email\":\"hélène@exemple.fr\",\"generation\":2,\"telephone\":null,\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
-        "signature": "c0b68e226b2982fa93bb6fadb0b9d63d2d9b40f16412b705ffa8993da36d07c13731aa630d40f3faf52e428c71242373f0335c569a852fc0c17ac12a0f6bfe0c",
-        "signatureBase64": "wLaOImspgvqTu2+tsLnWPS2bQPFkErcF/6iZPaNtB8E3MapjDUDz+vUuQoxxJCNz8DNcVpqFL8DBesEqD2v+DA=="
+        "ficheScellee": "b484c85ffc150e2519e578c0bd745d711a1758f8771cf8d1e0bd9f7e3c6fe6be32a33b20103febe9409af25308300b2218b94c72c0498be05848b0c30c54f62e9be4a45777f32827625d34c43bd785900428272b315330b5f6fcb2b0f60562ef609e7dfe8b6b1ae93057127ecdf0f984b6f6b0c2119e3d1e9041b81a14425ab9d3d40f208ea2da8d42",
+        "ficheScelleeBase64": "tITIX/wVDiUZ5XjAvXRdcRoXWPh3HPjR4L2ffjxv5r4yozsgED/r6UCa8lMIMAsiGLlMcsBJi+BYSLDDDFT2LpvkpFd38ygnYl00xDvXhZAEKCcrMVMwtfb8srD2BWLvYJ59/otrGukwVxJ+zfD5hLb2sMIRnj0ekEG4GhRCWrnT1A8gjqLajUI=",
+        "json": "{\"email\":\"helene.durand@exemple.fr\",\"generation\":2,\"telephone\":null,\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
+        "message": "fatoom-sesame-alerte|1|TitulaireVecteur0000000001|2{\"email\":\"helene.durand@exemple.fr\",\"generation\":2,\"telephone\":null,\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}",
+        "signature": "01b70f95cb2e1e39171b2586ff87298c97f005c64c57f8a50c2d51702fe10dd59a8be1a6def985025e0cefd4446852cc4ab39bf56beb75ec575724f75a232e02",
+        "signatureBase64": "AbcPlcsuHjkXGyWG/4cpjJfwBcZMV/ilDC1RcC/hDdWai+Gm3vmFAl4M79REaFLMSrOb9WvrdexXVyT3WiMuAg=="
       }
     },
     {
       "entrees": {
         "cleViePub": "b8785294aa888cca013877fbc908f2436bd707498208c9e6c98e12e020bfd2ad",
-        "email": "hélène@exemple.fr",
+        "email": "helene.durand@exemple.fr",
         "generation": 1,
-        "signature": "azJ5yGz1mg5cpWhl6H3iKXkFP2ugGLvQkMPiDLXEjDSK5D+v1asSY/WY9jJF1dV2r51GUlXVluJpk7r1xgEMBQ==",
+        "signature": "MjZ3kAtAijUr5RSGE7lTLV+Hb4rq3MKmztUghppBFkTYK5OXlxmQLseLL40/rMQoQZ581CcSHYbbtBElmXBgBg==",
         "telephone": "+33612345678",
         "uid": "TitulaireVecteur0000000001"
       },
@@ -2753,9 +3168,9 @@
     {
       "entrees": {
         "cleViePub": "b8785294aa888cca013877fbc908f2436bd707498208c9e6c98e12e020bfd2ad",
-        "email": "hélène@exemple.fr",
+        "email": "helene.durand@exemple.fr",
         "generation": 2,
-        "signature": "azJ5yGz1mg5cpWhl6H3iKXkFP2ugGLvQkMPiDLXEjDSK5D+v1asSY/WY9jJF1dV2r51GUlXVluJpk7r1xgEMBQ==",
+        "signature": "MjZ3kAtAijUr5RSGE7lTLV+Hb4rq3MKmztUghppBFkTYK5OXlxmQLseLL40/rMQoQZ581CcSHYbbtBElmXBgBg==",
         "telephone": "+33612345678",
         "uid": "TitulaireVecteur0000000001"
       },
@@ -2767,9 +3182,9 @@
     {
       "entrees": {
         "cleViePub": "c705ce738c1301c67fd978ea0a1b930dc1dc49cecc30e824b7bc01a04c3b1cf5",
-        "email": "hélène@exemple.fr",
+        "email": "helene.durand@exemple.fr",
         "generation": 1,
-        "signature": "azJ5yGz1mg5cpWhl6H3iKXkFP2ugGLvQkMPiDLXEjDSK5D+v1asSY/WY9jJF1dV2r51GUlXVluJpk7r1xgEMBQ==",
+        "signature": "MjZ3kAtAijUr5RSGE7lTLV+Hb4rq3MKmztUghppBFkTYK5OXlxmQLseLL40/rMQoQZ581CcSHYbbtBElmXBgBg==",
         "telephone": "+33612345678",
         "uid": "TitulaireVecteur0000000001"
       },
@@ -2781,9 +3196,9 @@
     {
       "entrees": {
         "cleViePub": "b8785294aa888cca013877fbc908f2436bd707498208c9e6c98e12e020bfd2ad",
-        "email": "hélène@exemple.fr",
+        "email": "helene.durand@exemple.fr",
         "generation": 1,
-        "signature": "azJ5yGz1mg5cpWhl6H3iKXkFP2ugGLvQkMPiDLXEjDSK5D+v1asSY/WY9jJF1dV2r51GUlXVluJpk7r1xgEMBQ==",
+        "signature": "MjZ3kAtAijUr5RSGE7lTLV+Hb4rq3MKmztUghppBFkTYK5OXlxmQLseLL40/rMQoQZ581CcSHYbbtBElmXBgBg==",
         "telephone": "+33612345679",
         "uid": "TitulaireVecteur0000000001"
       },
@@ -2795,13 +3210,13 @@
     {
       "entrees": {
         "cleAlerte": "c5685ba2ec0bed7cb8262e72dfdcb060a2073e831b0a071002e5143244da3307",
-        "ficheScellee": "566d399b90d35f9b71a45ea66d0c3bde0bcdaeba463ab71b301b64c50eadebd9e8572b4a2b92345c1115f35b2b2b5a7ca45e39ecf2f6db4dfb3d20d7155e1481ae89fbc72fd18485095b880139abc1d24318c036309572eb874ab0fcf876447d619c45629d22be40974cde4b4826f07ca7a177b04233af2ea0af88b41ae96e460355b376f327bc9babf51669101b",
+        "ficheScellee": "566d399b90d35f9b71a45ea66d0c3bde0bcdaeba463ab7bdf512c9084eacdecef15c227a228f7f57135bba572a3c1635f45828ebf8ea9803a37e6c814a035dd3b283f9c77d83c9c05f4a841220abc6d1441dcb20298130bac144a8abc57b12322fa945648d18ba4a914cfd5c1b62a539e5a177b04232bd32b2e99bac07b60f93a700c76c13d71e081b335b9f7a8a296f8672f1",
         "generation": 1,
         "uid": "TitulaireVecteur0000000001"
       },
       "nom": "descellerFiche/base",
       "sorties": {
-        "json": "{\"email\":\"hélène@exemple.fr\",\"generation\":1,\"telephone\":\"+33612345678\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}"
+        "json": "{\"email\":\"helene.durand@exemple.fr\",\"generation\":1,\"telephone\":\"+33612345678\",\"uid\":\"TitulaireVecteur0000000001\",\"v\":1}"
       }
     },
     {

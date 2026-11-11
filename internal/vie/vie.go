@@ -125,7 +125,7 @@ func AlertAAD(uid string, gen int64) ([]byte, error) {
 }
 
 // JSON rend le JSON canonique de la fiche {"email","generation","telephone",
-// "uid","v":1}, après contrôle : email non vide et normalisé, téléphone E.164
+// "uid","v":1}, après contrôle : email normalisé (cles.EmailNormalized), téléphone E.164
 // ou null.
 func (a Alert) JSON() ([]byte, error) {
 	var phone any
@@ -135,7 +135,7 @@ func (a Alert) JSON() ([]byte, error) {
 		}
 		phone = *a.Telephone
 	}
-	if _, err := AlertAAD(a.UID, a.Generation); err != nil || a.Email == "" || !cles.EmailNormalized(a.Email) {
+	if _, err := AlertAAD(a.UID, a.Generation); err != nil || !cles.EmailNormalized(a.Email) {
 		return nil, errInvalid
 	}
 	return jcs.Marshal(jcs.Object{"email": a.Email, "generation": a.Generation, "telephone": phone, "uid": a.UID, "v": 1})
