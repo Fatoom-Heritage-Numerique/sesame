@@ -289,6 +289,8 @@ func (c *ch) call(route string, corps jcs.Object) jcs.Object {
 	validateRequest(c.e.t, route, corps)
 	r := c.openResponse(c.n, c.post(c.envelope(c.n, route, corps)))
 	validateResponse(c.e.t, route, r)
+	uid, _ := corps["uid"].(string)
+	compte(c.e.t, c, route, uid, r)
 	return r
 }
 
