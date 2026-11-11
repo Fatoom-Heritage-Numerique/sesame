@@ -40,7 +40,7 @@ Ils se lisent tels quels en Go (`encoding/json`, `encoding/hex`) : JSON en UTF-8
 
 Un changement de format :
 
-1. se décrit d'abord (menace, décision, alternatives écartées) dans une issue, puis dans un fichier de `docs/decisions/` ;
+1. se décrit d'abord (menace, décision, alternatives écartées) dans un fichier de `docs/decisions/`, précédé d'une issue dès qu'une version est en service ;
 2. est validé par l'opérateur avant tout code ;
 3. change les documents de ce dépôt, le code et les vecteurs dans la même PR ;
 4. est livré des deux côtés (Sésame et clients) dans la même série de PR.
@@ -54,7 +54,7 @@ On ne modifie jamais un vecteur à la main.
 - Les documents mis à jour si le changement les rend faux, et un fichier `docs/decisions/` si une décision est prise ou revue (une décision revue est un **nouveau** fichier, jamais une réécriture).
 - La CI verte : build reproductible (double construction), budget, vecteurs, schéma de `versions.json`, cohérence KMS ⇔ `versions.json`, dépendances, image sans shell, borne du registre (`RELEASE.md` §8).
 
-Une PR qui touche l'attestation, le canal, KMS, le registre, le protocole de PIN, les protocoles ou `versions.json` est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Tant qu'il n'y a qu'un administrateur, une telle PR cite une décision écrite (`docs/decisions/`) et reste publique au moins 7 jours avant sa fusion ; dès qu'une seconde personne de confiance existe, elle approuve aussi. L'équipe des propriétaires (`CODEOWNERS`) n'a aujourd'hui qu'un membre : l'auteur d'une telle PR en est aussi l'approbateur, et la décision écrite et les 7 jours de publicité tiennent lieu de second regard.
+Une PR qui touche l'attestation, le canal, KMS, le registre, le protocole de PIN, les protocoles ou `versions.json` est revue par les propriétaires du dépôt (`CODEOWNERS`) et n'est fusionnée qu'avec leur accord explicite. Tant qu'aucune version n'est en service (aucune ligne `en_service` dans `versions.json`), elle se fusionne sans délai, dès que sa CI est verte (décision 0062). À partir de la première mise en service, et tant qu'il n'y a qu'un administrateur, une telle PR cite une décision écrite (`docs/decisions/`) et reste publique au moins 7 jours avant sa fusion ; dès qu'une seconde personne de confiance existe, elle approuve aussi. L'équipe des propriétaires (`CODEOWNERS`) n'a aujourd'hui qu'un membre : l'auteur d'une telle PR en est aussi l'approbateur, et la décision écrite et les 7 jours de publicité tiennent lieu de second regard.
 
 ## Vérifier et signaler
 
