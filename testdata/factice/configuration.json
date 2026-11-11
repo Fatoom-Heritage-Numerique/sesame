@@ -1,0 +1,88 @@
+{
+  "attention": "Configuration de test du dépôt sesame : clés de test publiques, sans valeur hors des tests.",
+  "attestation": {
+    "empreinteRacine": "ea0cc0ff11a8fcf3e27dcd1b56cdf711b096c27f3c3fa8479eff2a199044278b",
+    "intermediaire": "MIIDRDCCAiygAwIBAgIBAjANBgkqhkiG9w0BAQsFADBAMRYwFAYDVQQKEw1TZXNhbWUgKHRlc3QpMSYwJAYDVQQDEx1SYWNpbmUgZGUgdGVzdCBkZSBzZXNhbWUtZmFrZTAeFw0yNjAxMDEwMDAwMDBaFw0zNjAxMDEwMDAwMDBaMEcxFjAUBgNVBAoTDVNlc2FtZSAodGVzdCkxLTArBgNVBAMTJEludGVybWVkaWFpcmUgZGUgdGVzdCBkZSBzZXNhbWUtZmFrZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOKgBGK7HhZY0tJe89FtykAjf6V1UxVp7NYatLZor4e551JHj2t9O1497Z4+X9GrxhipmLHiwhLi1k+tw9ZVTCz0Yvs7TGnXpTMOWy36LoBeOLmw34M3kZiU7Y/YlSent+ke7O5yBTnn/DdeOtjlMqwU6AF7GE1yXjDpQ2HQYVf5j5BJGLpoUJABzK0GSx5zkFD4A1iky7PMZha0tMqHHYi6KVGR7MMO5+IFlcqjyt573uZm81CfmBKicwn52AGNTNyCFQALZghP9qYhGgsZUqG1GxBoJN6wgHdUMvr4rYP2DY/ygtSeLwNIZjGxGMFUVKaJTxXMVPB8JKAmyYxpV5ECAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFFDru6ebwFcM8Qs0CL43AlKDQhRvMA0GCSqGSIb3DQEBCwUAA4IBAQBDCYiC2/omk+/qbMl42eM6dFviMoFi5EqDqePNmIWTWRoBTdsrIod/J76GPSXnNLoAZ2dKmTT15G9B7uDuIN1TL7rHd6dXZq1gu1wGqHVIFCyTeGnDw7MGFWMWuH9wI63/67c5CjiG88gbSR4+854Nn15M9gHSFCea0wXeeX/2Rx8EJes8YyACVISp+suega8k0cKYwOibcyDDUWtImxAf2Mw/RoK+RMp0MtyriK0WmocgWCPHgYO8hsGM3LmHxcAErIzZJmlAX6jbvyIj6HICvNylP9UoL5klc3QKM2IVNZbJ2TQaGVbPYyKZ5udX+L81FxNvH8KUIl8cfhH2oN1W",
+    "intermediairePrivee": "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDioARiux4WWNLSXvPRbcpAI3+ldVMVaezWGrS2aK+HuedSR49rfTtePe2ePl/Rq8YYqZix4sIS4tZPrcPWVUws9GL7O0xp16UzDlst+i6AXji5sN+DN5GYlO2P2JUnp7fpHuzucgU55/w3XjrY5TKsFOgBexhNcl4w6UNh0GFX+Y+QSRi6aFCQAcytBksec5BQ+ANYpMuzzGYWtLTKhx2IuilRkezDDufiBZXKo8ree97mZvNQn5gSonMJ+dgBjUzcghUAC2YIT/amIRoLGVKhtRsQaCTesIB3VDL6+K2D9g2P8oLUni8DSGYxsRjBVFSmiU8VzFTwfCSgJsmMaVeRAgMBAAECggEAASf3KG3InIKS02yVP9dDNd/jJyaZvZKPGRSFIX0X5XsG+WjQttKqZTOvAk9Se9EC2giwymTcFUPqUKO+oQRJttz++EXNgP4O+LC1Dwn8shOeTyGI3QmBM6Rm2y9Wq3TJP7uJp+RrBGhGOsi/R3CmjobYxtEoRuozcs/DKTzqkjallfVSIeO3mC0qTUUyKg241TkwGuZZyd6kW4zWN5bUX0xX68/5NKgb0u83Rt4csOIEw/ibzR+MlKUif5sK5b8RDvgXVkWLVNzub92hc7GfzPtLFreqjxu2Hj9/tj667PGZbuXyWB+4x9Xsn4L+fvvZXloWpRyNtYXKnk0jOK00BQKBgQD04fee3Ih1QdWSb9WWXCBbFTA73H4+NCO5syneufJt1Pfh1kAwy5GRHz4N8xh6uQsTmtC7m30K68F5UChoHDGu8cLUxXBB7XkRhxCpFVy227q8cguTnPAAi6p6BwEIt6HqzN3C572GZpO/FjbBqlCOVsyLIpzgjQ6oIf4VlVOjzwKBgQDs6dv/tCGXfpiXUj+v+UmYj7yNesfYHRBhM+t+MXhihgjPqFI7GfXzsmnz/1F1KLnOHFZT/RkURwBCaUKhkrCBDFLMEyK4FYiQSJ2ZCdeKNXGCmTB0lom0yP02+saCFKsjJZDc981VfUhWX+sl2LqCAo/YudxiuAmU7Jtp1ZRGnwKBgHw4yKEIpBw/SjTfkEyW7T7nD7G+Fzg8wMap0RqP3x/CAgDI64UVLwGcBKGU6J0Qk0LdrPcOWC8bCukcNXMioj1pnHjMszZuXZT7nAL5uC92ZVLE04SM/t53+wGt3eNrK7LtO61sWyL7lAVCIoK5f+XEuDv4UfZC9+VoYPjX6DbXAoGBANAoEcIzlKg09QFPpOGK2J0Q/YwZaul5b+DX63tvH+UA+1DpBYckIjPCeNGHbRzRcZ+kyjz1TknAsHupXH/2ENrx5vWjgofXc6vCAaZrPVQT7O3ghvCJK+kKB2F9KVk1q8Avy346w9DvSNWLZWJVcFm2woiblQWvycttsIdmvublAoGBAOaakky5rjPgvhQSnUIO3tXK01nRDB1ErSbUTDW0GoVNmzWv60dBmil0UJl/V4HMvqv8Ju/UZWPJ3JUAcr43uuvwMKotQpSdjSp2ImLbCahsUFfapOFMjcspnMAgJCUlGcgBfBDcCcX6U6uoZxIVqOqj1gr5B5aUdMPvRQXSf5wK",
+    "racine": "MIIDPTCCAiWgAwIBAgIBATANBgkqhkiG9w0BAQsFADBAMRYwFAYDVQQKEw1TZXNhbWUgKHRlc3QpMSYwJAYDVQQDEx1SYWNpbmUgZGUgdGVzdCBkZSBzZXNhbWUtZmFrZTAeFw0yNjAxMDEwMDAwMDBaFw0zNjAxMDEwMDAwMDBaMEAxFjAUBgNVBAoTDVNlc2FtZSAodGVzdCkxJjAkBgNVBAMTHVJhY2luZSBkZSB0ZXN0IGRlIHNlc2FtZS1mYWtlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsxcBifNyyoI8gHWN+vXIioEtnlurRJ7lQcDJY3P98jhWLJtwkuyua+3ADGAcW37Q4WQmV25TA2ai/5Y36YChfmdsaTXqKvrYNRXZOYnXH+2e8Q9aJwxjJaKihyjlo6FnyHn7J/OimE476R9ZScVtdcPjzdgYGDHEATQ32QuDXMwNz5moWU7y8cw7wRjKz4xRRqtxw5ZGWuE2YQJIkeBsU5DZ6pafml0L6PtFb3Ot0n9fwLKRtgzui3oxtbgj2R8yj5oMqeRejTkgyBprklISIMf4qlns5HHNjzaLOKBIR8bha+VW2zJdXTK9U46glTqPOssoV33eGZPURPaLJp2WQQIDAQABo0IwQDAOBgNVHQ8BAf8EBAMCAgQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUbHWgAOf9457C5N9/1oprB774EVkwDQYJKoZIhvcNAQELBQADggEBAAy4sbr4qV/Qy3weR6oz+78fjOEla7N9+ogCqfeNl50sSqKrgLS20mmlF1YcK2/Oexn6urMkCvsBPeVXB+eTRvUO1VnWIUxDNrl9VSmBxc8k/5SpWpIOdykc8Ed8azjrWIRdYnJyLvUnyXb8ZFqDOIzkkWVX4phKRe8mkkVtrQv24vOGNm3eJNGwI1xj2xuO2WbLNHRn4M31heOizcciZmcYu0+KN8ozzqqADPiIn2inzSNYrOF0fKp0kDS+6d95fjwdkwXehw27HBjPt/Ua+NgmqxL1BWS9sogXmor0KNM0uG7dQZg0Y14RnoDwhmbkA5vbBm6E7IhAAeJo117zamA="
+  },
+  "ecoute": "127.0.0.1:8090",
+  "emetteurs": {
+    "google": {
+      "google-test-1": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3cXEL2U7oEaqGYxVHOUdxjEzE5r0iQtmWkjL3bcdF2Ja8SNmnA18HT0qu1RD1lGECjJwQcQLB7R0Q+2s3NepWS9vMV7Aqu4giMXounDcmmXvYz7R1aGpl7UIX8bN1+bY0+yvfOnneDpw1mouaExyUEfRw5Lkcv7LvUKaapAX8IG17zmep6Y8/QMqymtjlJchbxBrgRuD9+HviGRgfKklWSpZXCxfFeSjZtzS8lhsU5w0mvIUIrvBev6T0xy8vnj8rDckasT51AlH9HhY/L7US/5ONugdEYiJmSOVwSKTnlWLl6AOgRPbSgSrv11LD/ZVqPxerWgMBIxPj4KBzzCuqQIDAQAB"
+    },
+    "idToken": {
+      "idToken-test-1": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4jXBi8i7Ilo8I0NJwB31fjcxT014Zunzerqkst9p62AKuMpX9hDntRR8UsXgASZumdsTS0Fx6jqU6VowDoPp4frbqmlnKU5nCH3oGqwSkMHUF9XzKS/J5Cw/IY+Z5BeR2CBglU3BC+5VVINwCnR641hj7tUWFr2Z4gVu3rzUeUY8mQ71Uo/VKWEJUJiNNHUVMe89zKPFavtokv4J6tToLNqrMPdjTUyDcl3PeN8icaf2FD+/6Kxzwtd5AO5dsiljzP/PPRgTkNwlVbZ/5em0Kk4ub0BlYY9wzNMlzMMa6+r6sDtw3Zl3hzrOFsYDhJ+xrWIfe0LtTs9OaPDyEd26gQIDAQAB"
+    }
+  },
+  "envOverride": {
+    "COMPTE_DECES": "deces@comptes.exemple.test",
+    "COMPTE_EXPLOITATION": "exploitation@comptes.exemple.test",
+    "COURRIER_ORGANISATION": "organisation-de-test",
+    "EMAIL_EXPEDITEUR": "Sesame de test \u003csesame@exemple.test\u003e",
+    "IDTOKEN_PROJET": "projet-de-test",
+    "PASSERELLE_URL": "https://passerelle.exemple.test",
+    "SESAME_AUDIENCE": "https://sesame.exemple.test",
+    "SESAME_TEXTES": "sha256:e4f6a41aed89fc35ef06b2f8627353d1cea6de41b03ba2a5fcb01d24a13bfc8a",
+    "SMS_EXPEDITEUR": "SesameTest",
+    "VERIFICATION_SERVICE": "VA-service-de-test"
+  },
+  "mode": "grappe-locale",
+  "nomVm": "sesame-test",
+  "projet": "1234567",
+  "registreImages": "registre.exemple.test/projet-de-test/sesame/",
+  "sessionSign": {
+    "kid": "session-sign/1",
+    "privee": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgYVKmddRp81p1B4n3wNAi0vS1ztwz7H0HpiF9zvLZQyyhRANCAAQQ/XRHANfMnU7ifMDry9Ple7rs7ScsWd3xzl7abSk/48ynh+KegH4DXDAY3AdIOOwRCDII0Sv/aAqZt4RWApnq",
+    "publique": "BBD9dEcA18ydTuJ8wOvL0+V7uuztJyxZ3fHOXtptKT/jzKeH4p6AfgNcMBjcB0g47BEIMgjRK/9oCpm3hFYCmeo="
+  },
+  "textes": {
+    "textes": {
+      "alerte_confiance_email": "Texte de test alerte_confiance_email.",
+      "alerte_confiance_sms": "Texte de test alerte_confiance_sms.",
+      "alerte_ligne_rejetee_email": "Texte de test alerte_ligne_rejetee_email.",
+      "alerte_ligne_rejetee_sms": "Texte de test alerte_ligne_rejetee_sms.",
+      "alerte_pin_email": "Texte de test alerte_pin_email.",
+      "alerte_pin_sms": "Texte de test alerte_pin_sms.",
+      "alerte_signalement_acte_email": "Texte de test alerte_signalement_acte_email.",
+      "alerte_signalement_acte_rappel_email": "Texte de test alerte_signalement_acte_rappel_email.",
+      "alerte_signalement_acte_sms": "Texte de test alerte_signalement_acte_sms.",
+      "alerte_signalement_inactivite_email": "Texte de test alerte_signalement_inactivite_email.",
+      "alerte_signalement_inactivite_rappel_email": "Texte de test alerte_signalement_inactivite_rappel_email.",
+      "alerte_signalement_inactivite_sms": "Texte de test alerte_signalement_inactivite_sms.",
+      "alerte_signalement_insee_email": "Texte de test alerte_signalement_insee_email.",
+      "alerte_signalement_insee_rappel_email": "Texte de test alerte_signalement_insee_rappel_email.",
+      "alerte_signalement_insee_sms": "Texte de test alerte_signalement_insee_sms.",
+      "dernier_code_email": "Texte de test dernier_code_email.",
+      "lettre_deces": "Texte de test lettre_deces.",
+      "lettre_inactivite": "Texte de test lettre_inactivite."
+    },
+    "v": 1
+  },
+  "versions": {
+    "clesSession": {
+      "session-sign/1": {
+        "cle": "BBD9dEcA18ydTuJ8wOvL0+V7uuztJyxZ3fHOXtptKT/jzKeH4p6AfgNcMBjcB0g47BEIMgjRK/9oCpm3hFYCmeo=",
+        "depuis": "2026-01-01T00:00:00.000Z"
+      }
+    },
+    "v": 1,
+    "versions": [
+      {
+        "commit": "0000000000000000000000000000000000000001",
+        "envDigest": "sha256:003f260c93102cbcff245f703467d736e371ff0aaa6ca038e8fdd9d9f73a71b8",
+        "hwmodels": [
+          "GCP_AMD_SEV",
+          "GCP_INTEL_TDX"
+        ],
+        "imageDigest": "sha256:67c4cceba93f07405894fcb88ad965fb8b755caa6a3973fe4fe08fe650f8247d",
+        "notes": "Version de test de sesame-fake.",
+        "publieLe": "2026-01-01T00:00:00.000Z",
+        "retireLe": null,
+        "statut": "en_service",
+        "tag": "v0.0.1",
+        "version": "0.0.1"
+      }
+    ]
+  }
+}

@@ -1,0 +1,977 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Sésame",
+    "version": "contrat",
+    "description": "Contrat HTTP de Sésame (API.md, qui fait foi). Toute route autre que GET /attestation passe par le canal chiffré POST /n/{a|b|c}/canal : le nom de la route et son corps sont dans le corps chiffré, décrits sous x-sesame-routes (requête, réponse 200, codes d'erreur propres à la route ; message_refuse, trop_d_appels et registre_indisponible valent pour toute route du canal, API.md §2). Statuts des codes : x-sesame-erreurs (API.md §6). Les routes d'API.md pas encore servies par sesame-fake sont nommées par le test de concordance (internal/factice)."
+  },
+  "paths": {
+    "/attestation": {
+      "get": {
+        "summary": "Jeton d'attestation et clés de session de l'instance (API.md §2.1)",
+        "responses": {
+          "200": {
+            "description": "en clair",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Attestation"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ErreurClaire"
+          },
+          "503": {
+            "$ref": "#/components/responses/ErreurClaire"
+          }
+        }
+      },
+      "options": {
+        "description": "Pré-vol CORS : 204, Access-Control-Allow-Methods GET, POST, Access-Control-Allow-Headers Content-Type, Access-Control-Max-Age 86400 (API.md §1.1)",
+        "responses": {
+          "204": {
+            "description": "sans corps"
+          }
+        }
+      }
+    },
+    "/n/{prefixe}/canal": {
+      "parameters": [
+        {
+          "name": "prefixe",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "enum": [
+              "a",
+              "b",
+              "c"
+            ]
+          }
+        }
+      ],
+      "post": {
+        "summary": "Canal chiffré (API.md §1.2, §1.3)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Enveloppe"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "réponse chiffrée sous K_res : StatutChiffre",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EnveloppeReponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/ErreurClaire"
+          },
+          "410": {
+            "$ref": "#/components/responses/ErreurClaire"
+          },
+          "503": {
+            "$ref": "#/components/responses/ErreurClaire"
+          }
+        }
+      },
+      "options": {
+        "description": "Pré-vol CORS : 204, Access-Control-Allow-Methods GET, POST, Access-Control-Allow-Headers Content-Type, Access-Control-Max-Age 86400 (API.md §1.1)",
+        "responses": {
+          "204": {
+            "description": "sans corps"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Id": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{1,128}$",
+        "description": "uid, contactId, id d'un contenu (API.md §1.7)"
+      },
+      "IdTire": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]{22}$",
+        "description": "16 octets de la primitive d'aléa en base64url (signalementId, id d'une ouverture)"
+      },
+      "Octets4": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9+/]{6}==$"
+      },
+      "Octets32": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9+/]{43}=$",
+        "description": "32 octets en base64 standard"
+      },
+      "Octets64": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9+/]{86}==$",
+        "description": "64 octets en base64 standard"
+      },
+      "Octets1088": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9+/]{1451}=$"
+      },
+      "Octets1184": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9+/]{1578}==$"
+      },
+      "Base64": {
+        "type": "string",
+        "pattern": "^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$"
+      },
+      "Horodatage": {
+        "type": "string",
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+      },
+      "Hex64": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      },
+      "Entier": {
+        "type": "integer",
+        "minimum": -9007199254740991,
+        "maximum": 9007199254740991
+      },
+      "Generation": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9007199254740991
+      },
+      "InstanceId": {
+        "type": "string",
+        "pattern": "^[abc]-[A-Za-z0-9_-]{22}$"
+      },
+      "JWS": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]{86}$",
+        "description": "JWS compact ES256 de session-sign (API.md §1.6)"
+      },
+      "Jeton": {
+        "type": "string",
+        "minLength": 1,
+        "description": "jeton d'identité ou OIDC, vérifié par Sésame (API.md §1.4)"
+      },
+      "Preuve": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "defi",
+          "signature"
+        ],
+        "properties": {
+          "defi": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "signature": {
+            "$ref": "#/components/schemas/Octets64"
+          }
+        }
+      },
+      "Signalement": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "signalementId",
+          "source",
+          "signaleLe",
+          "transmissibleLe",
+          "annuleLe",
+          "closLe"
+        ],
+        "properties": {
+          "signalementId": {
+            "$ref": "#/components/schemas/IdTire"
+          },
+          "source": {
+            "enum": [
+              "insee",
+              "acte",
+              "inactivite"
+            ]
+          },
+          "signaleLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          },
+          "transmissibleLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          },
+          "annuleLe": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+          },
+          "closLe": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+          }
+        }
+      },
+      "Ouverture": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contactId",
+          "role",
+          "ouvertLe"
+        ],
+        "properties": {
+          "contactId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "role": {
+            "enum": [
+              "proche",
+              "gardien"
+            ]
+          },
+          "ouvertLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          }
+        }
+      },
+      "Attestation": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jwt",
+          "sessionPub",
+          "kemPub",
+          "instanceId"
+        ],
+        "properties": {
+          "jwt": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sessionPub": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "kemPub": {
+            "$ref": "#/components/schemas/Octets1184"
+          },
+          "instanceId": {
+            "$ref": "#/components/schemas/InstanceId"
+          }
+        }
+      },
+      "Enveloppe": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "instanceId",
+          "cliPub",
+          "kemCt",
+          "ivPrefixe",
+          "n",
+          "body"
+        ],
+        "properties": {
+          "instanceId": {
+            "$ref": "#/components/schemas/InstanceId"
+          },
+          "cliPub": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "kemCt": {
+            "$ref": "#/components/schemas/Octets1088"
+          },
+          "ivPrefixe": {
+            "$ref": "#/components/schemas/Octets4"
+          },
+          "n": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "body": {
+            "$ref": "#/components/schemas/Base64"
+          }
+        }
+      },
+      "EnveloppeReponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "n",
+          "body"
+        ],
+        "properties": {
+          "n": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4294967295
+          },
+          "body": {
+            "$ref": "#/components/schemas/Base64"
+          }
+        }
+      },
+      "ErreurClaire": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "erreur",
+          "message"
+        ],
+        "properties": {
+          "erreur": {
+            "enum": [
+              "canal_invalide",
+              "instance_inconnue",
+              "attestation_indisponible",
+              "trop_d_appels"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reessayerLe"
+            ],
+            "properties": {
+              "reessayerLe": {
+                "$ref": "#/components/schemas/Horodatage"
+              }
+            }
+          }
+        }
+      },
+      "CorpsDechiffre": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "route",
+          "corps"
+        ],
+        "properties": {
+          "route": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+(/[a-z0-9-]+)*$"
+          },
+          "corps": {
+            "type": "object"
+          }
+        }
+      },
+      "StatutChiffre": {
+        "type": "object",
+        "description": "{statut: 200, corps} ou {statut, erreur, message, details?} (API.md §1.3) ; corps et codes par route sous x-sesame-routes"
+      }
+    },
+    "responses": {
+      "ErreurClaire": {
+        "description": "erreur en clair (API.md §1.3)",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErreurClaire"
+            }
+          }
+        }
+      }
+    }
+  },
+  "x-sesame-routes": {
+    "defi": {
+      "section": "2.2",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid"
+        ],
+        "properties": {
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "defi",
+          "expireLe",
+          "grappeId"
+        ],
+        "properties": {
+          "defi": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "expireLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          },
+          "grappeId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      },
+      "erreurs": []
+    },
+    "enroler": {
+      "section": "2.3",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "idToken",
+          "ktsGeneration",
+          "kts",
+          "cleViePub"
+        ],
+        "properties": {
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "idToken": {
+            "$ref": "#/components/schemas/Jeton"
+          },
+          "ktsGeneration": {
+            "$ref": "#/components/schemas/Generation"
+          },
+          "kts": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "cleViePub": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "preuve": {
+            "$ref": "#/components/schemas/Preuve"
+          },
+          "cleViePubAttendue": {
+            "$ref": "#/components/schemas/Octets32"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "sealedKts",
+          "ktsGeneration",
+          "imageDigest",
+          "cleViePub",
+          "enroleLe"
+        ],
+        "properties": {
+          "sealedKts": {
+            "$ref": "#/components/schemas/Base64"
+          },
+          "ktsGeneration": {
+            "$ref": "#/components/schemas/Generation"
+          },
+          "imageDigest": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$"
+          },
+          "cleViePub": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "enroleLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          }
+        }
+      },
+      "erreurs": [
+        "jeton_invalide",
+        "preuve_requise",
+        "defi_invalide",
+        "generation_non_croissante",
+        "reprise_absente",
+        "message_refuse",
+        "titulaire_indisponible",
+        "registre_indisponible"
+      ]
+    },
+    "vie": {
+      "section": "2.4",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "defi",
+          "signature"
+        ],
+        "properties": {
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "defi": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "signature": {
+            "$ref": "#/components/schemas/Octets64"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "vivantLe",
+          "ktsGeneration",
+          "signalement",
+          "transmis",
+          "pinPresent",
+          "pinBloque",
+          "ouvertures"
+        ],
+        "properties": {
+          "vivantLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          },
+          "ktsGeneration": {
+            "$ref": "#/components/schemas/Generation"
+          },
+          "transmis": {
+            "type": "boolean"
+          },
+          "pinPresent": {
+            "type": "boolean"
+          },
+          "pinBloque": {
+            "type": "boolean"
+          },
+          "ouvertures": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ouverture"
+            }
+          },
+          "signalement": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Signalement"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      "erreurs": [
+        "defi_invalide",
+        "message_refuse",
+        "titulaire_indisponible"
+      ]
+    },
+    "etat": {
+      "section": "2.5",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "idToken",
+          "repere"
+        ],
+        "properties": {
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "idToken": {
+            "$ref": "#/components/schemas/Jeton"
+          },
+          "repere": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "ouvertures",
+              "evaluations"
+            ],
+            "properties": {
+              "ouvertures": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{3}Z$"
+              },
+              "evaluations": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              }
+            }
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "etat"
+        ],
+        "properties": {
+          "etat": {
+            "$ref": "#/components/schemas/JWS"
+          }
+        }
+      },
+      "erreurs": [
+        "jeton_invalide",
+        "titulaire_indisponible"
+      ]
+    },
+    "charte/generation": {
+      "section": "2.6",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "contactId",
+          "generation",
+          "signature"
+        ],
+        "properties": {
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "contactId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 9007199254740991
+          },
+          "signature": {
+            "$ref": "#/components/schemas/Octets64"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "contactId",
+          "generation",
+          "recu"
+        ],
+        "properties": {
+          "contactId": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "generation": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 9007199254740991
+          },
+          "recu": {
+            "$ref": "#/components/schemas/JWS"
+          }
+        }
+      },
+      "erreurs": [
+        "generation_non_croissante",
+        "message_refuse",
+        "titulaire_indisponible"
+      ]
+    },
+    "alerte/fiche": {
+      "section": "2.7",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "generation",
+          "telephone",
+          "email",
+          "signature"
+        ],
+        "properties": {
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "generation": {
+            "$ref": "#/components/schemas/Generation"
+          },
+          "telephone": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "pattern": "^\\+[1-9][0-9]{1,14}$"
+          },
+          "email": {
+            "type": "string",
+            "minLength": 1
+          },
+          "signature": {
+            "$ref": "#/components/schemas/Octets64"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "ficheGeneration"
+        ],
+        "properties": {
+          "ficheGeneration": {
+            "$ref": "#/components/schemas/Generation"
+          }
+        }
+      },
+      "erreurs": [
+        "generation_non_croissante",
+        "message_refuse",
+        "titulaire_indisponible"
+      ]
+    },
+    "deces/signaler": {
+      "section": "2.8",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jetonFatoom",
+          "uid",
+          "source"
+        ],
+        "properties": {
+          "jetonFatoom": {
+            "$ref": "#/components/schemas/Jeton"
+          },
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "source": {
+            "enum": [
+              "insee",
+              "acte",
+              "inactivite"
+            ]
+          },
+          "dateDeces": {
+            "type": "string",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+          },
+          "preuve": {
+            "$ref": "#/components/schemas/Hex64"
+          },
+          "preuveNom": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9._-]{1,128}$"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "signalementId",
+          "signaleLe",
+          "transmissibleLe",
+          "recu"
+        ],
+        "properties": {
+          "signalementId": {
+            "$ref": "#/components/schemas/IdTire"
+          },
+          "signaleLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          },
+          "transmissibleLe": {
+            "$ref": "#/components/schemas/Horodatage"
+          },
+          "recu": {
+            "$ref": "#/components/schemas/JWS"
+          }
+        }
+      },
+      "erreurs": [
+        "jeton_invalide",
+        "message_refuse",
+        "inactivite_trop_recente",
+        "titulaire_indisponible"
+      ]
+    },
+    "deces/annuler": {
+      "section": "2.9",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "uid",
+          "signalementId",
+          "defi",
+          "signature"
+        ],
+        "properties": {
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          },
+          "signalementId": {
+            "$ref": "#/components/schemas/IdTire"
+          },
+          "defi": {
+            "$ref": "#/components/schemas/Octets32"
+          },
+          "signature": {
+            "$ref": "#/components/schemas/Octets64"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "signalement",
+          "recu"
+        ],
+        "properties": {
+          "signalement": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "signalementId",
+              "source",
+              "signaleLe",
+              "transmissibleLe",
+              "annuleLe"
+            ],
+            "properties": {
+              "signalementId": {
+                "$ref": "#/components/schemas/IdTire"
+              },
+              "source": {
+                "enum": [
+                  "insee",
+                  "acte"
+                ]
+              },
+              "signaleLe": {
+                "$ref": "#/components/schemas/Horodatage"
+              },
+              "transmissibleLe": {
+                "$ref": "#/components/schemas/Horodatage"
+              },
+              "annuleLe": {
+                "$ref": "#/components/schemas/Horodatage"
+              }
+            }
+          },
+          "recu": {
+            "$ref": "#/components/schemas/JWS"
+          }
+        }
+      },
+      "erreurs": [
+        "deja_transmis",
+        "defi_invalide",
+        "message_refuse",
+        "titulaire_indisponible"
+      ]
+    },
+    "titulaire/supprimer": {
+      "section": "2.11",
+      "requete": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "jetonFatoom",
+          "uid"
+        ],
+        "properties": {
+          "jetonFatoom": {
+            "$ref": "#/components/schemas/Jeton"
+          },
+          "uid": {
+            "$ref": "#/components/schemas/Id"
+          }
+        }
+      },
+      "reponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "etat"
+        ],
+        "properties": {
+          "etat": {
+            "enum": [
+              "supprime",
+              "absent"
+            ]
+          }
+        }
+      },
+      "erreurs": [
+        "jeton_invalide",
+        "titulaire_indisponible"
+      ]
+    }
+  },
+  "x-sesame-erreurs": {
+    "canal_invalide": 400,
+    "instance_inconnue": 410,
+    "attestation_indisponible": 503,
+    "message_refuse": 400,
+    "jeton_invalide": 401,
+    "code_refuse": 403,
+    "otp_refuse": 403,
+    "role_insuffisant": 403,
+    "pair_refuse": 403,
+    "preuve_requise": 403,
+    "identite_non_confirmee": 403,
+    "bascule_impossible": 403,
+    "deja_transmis": 409,
+    "generation_non_croissante": 409,
+    "reprise_absente": 409,
+    "defi_invalide": 409,
+    "inactivite_trop_recente": 409,
+    "grappe_recente": 409,
+    "pin_bloque": 409,
+    "pin_indisponible": 409,
+    "identite_en_attente": 409,
+    "titulaire_indisponible": 409,
+    "refusee": 409,
+    "amorcage_refuse": 409,
+    "membres_refuses": 409,
+    "pas_leader": 409,
+    "session_expiree": 410,
+    "identite_bloquee": 423,
+    "trop_d_essais": 429,
+    "trop_d_appels": 429,
+    "pin_indisponible_temporaire": 503,
+    "reessayer_plus_tard": 503,
+    "registre_indisponible": 503,
+    "passerelle_indisponible": 503,
+    "fournisseur_indisponible": 503,
+    "enveloppe_refusee": null
+  }
+}
