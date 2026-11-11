@@ -22,7 +22,8 @@ type in struct {
 	Longueur                         int
 	Aad, Clair, Chiffre, IV          hex
 	Prive, Publique, Graine, Message hex
-	Signature                        hex
+	Signature, MotDePasse            hex
+	Parametres                       struct{ M, T, P int }
 }
 
 type out struct {
@@ -35,6 +36,7 @@ type out struct {
 	PubliqueRecalculee                                    bool
 	LongueurChiffre, LongueurSecret                       int
 	SecretDecapsule                                       bool
+	Cle                                                   hex
 }
 
 // ops rejoue chaque groupe sur la primitive de ce paquet (ou de la
@@ -104,6 +106,10 @@ var ops = map[string]func(e in) (out, error){
 		ok, err := RSAVerify(e.Publique, e.Message, e.Signature)
 		return out{Valide: &ok}, err
 	},
+	"argon2id": func(e in) (out, error) {
+		k, err := Argon2id(e.MotDePasse, e.Sel, e.Parametres.M, e.Parametres.T, e.Parametres.P, e.Longueur)
+		return out{Cle: k}, err
+	},
 	"mlKem768Decapsuler": func(e in) (out, error) {
 		s, err := MLKEMDecapsulate(e.Graine, e.Chiffre)
 		return out{Secret: s}, err
@@ -124,7 +130,7 @@ var ops = map[string]func(e in) (out, error){
 
 func TestVectors(t *testing.T) {
 	tr := vecteurs.Track(t, "primitives.json",
-		"aesGcmChiffrer", "aesGcmDechiffrer", "aleatoire",
+		"aesGcmChiffrer", "aesGcmDechiffrer", "aleatoire", "argon2id",
 		"ecdsaP256Verifier", "ed25519Publique", "ed25519Signer", "ed25519Verifier",
 		"hkdfSha256", "hmacSha256", "mlKem768Decapsuler", "mlKem768Encapsuler",
 		"rsaPkcs1Sha256Verifier", "sha256", "x25519", "x25519Paire", "x25519Publique")

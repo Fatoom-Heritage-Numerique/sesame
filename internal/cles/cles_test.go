@@ -227,7 +227,17 @@ func TestCharter(t *testing.T) {
 
 func TestCodesAndSeals(t *testing.T) {
 	tr := vecteurs.Track(t, "sesame.json", "codeAcces", "codeInvitation", "codeVerifier", "descellerInvitation",
-		"descellerKts", "scelle", "tirerCodeAcces")
+		"descellerKts", "indexAcces", "scelle", "tirerCodeAcces")
+	tr.Vectors(t, "indexAcces", func(t *testing.T, v vecteurs.Vector) {
+		var e in
+		var want struct{ IndexAcces string }
+		vecteurs.Load(t, v.Inputs, &e)
+		vecteurs.Load(t, v.Outputs, &want)
+		if e.Argon2M != 65536 || e.Argon2T != 3 || e.Argon2P != 1 || e.Sel != "fatoom-lookup-v1" {
+			t.Fatal("paramètres d'Argon2id du vecteur différents de ceux de l'index")
+		}
+		vecteurs.Same(t, struct{ IndexAcces string }{IndexAcces(must(NormalizeCode(e.Saisie)))}, want)
+	})
 	tr.Vectors(t, "tirerCodeAcces", func(t *testing.T, v vecteurs.Vector) {
 		var e in
 		var want struct{ Affiche, Code string }

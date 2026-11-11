@@ -7,6 +7,7 @@ package cles
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"regexp"
 	"strconv"
 	"strings"
@@ -223,6 +224,14 @@ func NormalizeCode(input string) (string, error) {
 // CodeVerifier rend base64(SHA-256("fatoom-code|" ‖ code normalisé)).
 func CodeVerifier(code string) string {
 	return base64.StdEncoding.EncodeToString(primitives.SHA256([]byte("fatoom-code|" + code)))
+}
+
+// IndexAcces rend hex(Argon2id(code normalisé, "fatoom-lookup-v1", m = 65 536
+// Kio, t = 3, p = 1, 32 octets)) : l'index d'un code d'accès et le lookup
+// d'un code d'invitation (§10.4).
+func IndexAcces(code string) string {
+	k, _ := primitives.Argon2id([]byte(code), []byte("fatoom-lookup-v1"), 65536, 3, 1, 32) // paramètres valides
+	return hex.EncodeToString(k)
 }
 
 // CheckCode dit, en temps constant, si un code normalisé correspond au

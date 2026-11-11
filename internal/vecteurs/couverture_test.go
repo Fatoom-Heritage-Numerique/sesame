@@ -20,12 +20,9 @@ import (
 // sort de cette liste dans le commit qui écrit le test qui le réclame par
 // Track ; le test ci-dessous échoue s'il est à la fois réclamé et en attente.
 var pending = map[string][]string{
-	"primitives.json": {
-		"argon2id",
-	},
 	"sesame.json": {
-		"antiRetour", "borne", "chaineRegistre", "depotPin", "empreinteRegistre", "indexAcces",
-		"ligneRegistre", "verifierBorne", "verifierDepotPin",
+		"antiRetour", "borne", "chaineRegistre", "empreinteRegistre", "ligneRegistre",
+		"verifierBorne",
 	},
 }
 

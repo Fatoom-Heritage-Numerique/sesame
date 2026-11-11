@@ -26,6 +26,8 @@ import (
 	"math/big"
 	"regexp"
 	"time"
+
+	"golang.org/x/crypto/argon2"
 )
 
 // Error est un refus typé ; son texte est le code d'ErreurCrypto des vecteurs.
@@ -256,3 +258,17 @@ var reID = regexp.MustCompile(`^[A-Za-z0-9_-]{1,128}$`)
 // signalementId…) : 1 à 128 caractères de [A-Za-z0-9_-] (ARCHITECTURE.md
 // §10 ; API.md §1).
 func ID(s string) bool { return reID.MatchString(s) }
+
+// B64Encode rend le base64 standard avec remplissage.
+func B64Encode(b []byte) string { return base64.StdEncoding.EncodeToString(b) }
+
+// Argon2id rend n octets d'Argon2id (version 0x13) : m Kio de mémoire, t
+// passes, p voies. Refuse ce que golang.org/x/crypto/argon2 ajusterait ou
+// refuserait en paniquant : p hors de 1 à 255, t nul, m < 8p, n < 4, sel de
+// moins de 8 octets.
+func Argon2id(password, salt []byte, m, t, p, n int) ([]byte, error) {
+	if p < 1 || p > 255 || t < 1 || m < 8*p || m > 1<<32-1 || t > 1<<32-1 || n < 4 || n > 1<<32-1 || len(salt) < 8 {
+		return nil, ErrInvalid
+	}
+	return argon2.IDKey(password, salt, uint32(t), uint32(m), uint8(p), uint32(n)), nil
+}
