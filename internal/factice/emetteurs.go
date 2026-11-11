@@ -48,11 +48,11 @@ type fetched struct {
 
 func (r *Remote) Keys(ctx context.Context, issuer string) (map[string][]byte, error) {
 	out := map[string][]byte{}
-	for k, v := range r.Static[issuer] {
-		out[k] = v
-	}
 	u, ok := r.URLs[issuer]
-	if !ok {
+	if !ok { // clés statiques ou relues à distance, jamais les deux (ParseConfig)
+		for k, v := range r.Static[issuer] {
+			out[k] = v
+		}
 		return out, nil
 	}
 	r.mu.Lock()
