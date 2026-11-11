@@ -52,6 +52,7 @@ func TestSelected(t *testing.T) {
 		{ImportPath: m + "/internal/factice", Module: &golist.Module{Path: m}},
 		{ImportPath: m + "/internal/factice/kms", Module: &golist.Module{Path: m}},
 		{ImportPath: m + "/internal/facticeux", Module: &golist.Module{Path: m}},
+		{ImportPath: m + "/cmd/sesame-fake", Module: &golist.Module{Path: m}},
 		{ImportPath: "go.etcd.io/raft/v3", Module: &golist.Module{Path: "go.etcd.io/raft/v3"}},
 	}
 	var names []string
@@ -64,8 +65,10 @@ func TestSelected(t *testing.T) {
 	}
 }
 
-// Module de test : cmd/sesame lie internal/a et internal/factice ; les tests,
-// le factice et un paquet non lié ne comptent pas.
+// Module de test : cmd/sesame lie internal/a et internal/factice ;
+// cmd/sesame-fake lie internal/c (décisions) et internal/factice ; les tests,
+// le factice, l'assemblage de sesame-fake et un paquet non lié ne comptent
+// pas.
 func testModule(t *testing.T) string {
 	return fixture.Module(t, "exemple.test/m", map[string]string{
 		"cmd/sesame/main.go":          "// Commande.\npackage main\n\nimport (\n\t\"exemple.test/m/internal/a\"\n\t\"exemple.test/m/internal/factice\"\n)\n\nfunc main() {\n\ta.F()\n\tfactice.F()\n}\n",
@@ -73,23 +76,26 @@ func testModule(t *testing.T) string {
 		"internal/a/a.go":             "package a\n\n// F ne fait rien.\nfunc F() {}\n",
 		"internal/factice/factice.go": "package factice\n\nfunc F() {}\n\nvar x = 1\nvar y = 2\n",
 		"internal/b/b.go":             "package b\n\nfunc G() {}\n",
+		"cmd/sesame-fake/main.go":     "package main\n\nimport (\n\t\"exemple.test/m/internal/c\"\n\t\"exemple.test/m/internal/factice\"\n)\n\nfunc main() {\n\tc.H()\n\tfactice.F()\n}\n",
+		"internal/c/c.go":             "package c\n\nfunc H() {}\n\nvar z = 3\n",
 	})
 }
 
 func TestRunOnModule(t *testing.T) {
 	root := testModule(t)
-	// cmd/sesame : 9 lignes ; internal/a : 2 lignes.
-	if err := run(root, 11, false, io.Discard); err != nil {
-		t.Fatalf("11 lignes pour un plafond de 11 : %v", err)
+	// cmd/sesame : 9 lignes ; internal/a : 2 lignes ; internal/c, lié par
+	// cmd/sesame-fake : 3 lignes.
+	if err := run(root, 14, false, io.Discard); err != nil {
+		t.Fatalf("14 lignes pour un plafond de 14 : %v", err)
 	}
 }
 
 // Contrôle positif : le budget dépassé fait échouer la commande.
 func TestRunFailsAboveLimit(t *testing.T) {
 	root := testModule(t)
-	err := run(root, 10, false, io.Discard)
-	if err == nil || !strings.Contains(err.Error(), "budget dépassé : 11 lignes") {
-		t.Fatalf("11 lignes pour un plafond de 10 : erreur attendue, obtenu %v", err)
+	err := run(root, 13, false, io.Discard)
+	if err == nil || !strings.Contains(err.Error(), "budget dépassé : 14 lignes") {
+		t.Fatalf("14 lignes pour un plafond de 13 : erreur attendue, obtenu %v", err)
 	}
 }
 

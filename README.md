@@ -141,7 +141,7 @@ Toutes les limites, adversaire par adversaire : `THREAT_MODEL.md` §2.
 
 ## État du projet
 
-Sésame est **en construction**. Ce dépôt contient sa documentation et le début du contrat exécutable : vecteurs de test recopiés depuis le client et le code Go des formats qu'ils vérifient (JSON canonique, primitives, attestation, canal, jetons, clés, messages signés par la clé de vie, OPRF du PIN, registre et borne), `Dockerfile`, `build/reproduire.sh`, et la CI de ses contrôles. Il ne contient encore ni les routes de Sésame, ni `sesame-fake`, ni `versions.json` ; aucune version n'est publiée et aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
+Sésame est **en construction**. Ce dépôt contient sa documentation et une partie du contrat exécutable : vecteurs de test recopiés depuis le client et le code Go des formats qu'ils vérifient (JSON canonique, primitives, attestation, canal, jetons, clés, messages signés par la clé de vie, OPRF du PIN, registre et borne), `Dockerfile`, `build/reproduire.sh`, la CI de ses contrôles, et les débuts de `sesame-fake` : serveur, canal chiffré, registre signé et borne sur des doubles, routes du titulaire et du serveur du client hors PIN et lettres (`defi`, `enroler`, `vie`, `etat`, `charte/generation`, `alerte/fiche`, `deces/signaler`, `deces/annuler`, `titulaire/supprimer`), et l'OpenAPI de ces routes (`api/openapi.json`). Il ne contient encore ni les routes du portail, des lettres et du PIN, ni la grappe, ni `versions.json` ; aucune version n'est publiée et aucune enclave ne tourne. L'app Fatoom ne promet Sésame qu'une fois livré.
 
 Ordre de construction :
 
