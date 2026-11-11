@@ -52,6 +52,8 @@ jobs:
       - name: Vecteurs (SHA256SUMS)
         working-directory: testdata/vecteurs
         run: sha256sum -c SHA256SUMS
+      - name: Vecteur compteurPin (régénéré et comparé)
+        run: go run ./outils/generer-compteurpin -verifier
       - name: Budget de code
         run: go run ./outils/decompte-lignes -detail
       - name: Lanceur factice hors de l'image

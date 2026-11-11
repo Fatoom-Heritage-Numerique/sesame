@@ -153,6 +153,9 @@ func ParseConfig(b []byte) (*Config, error) {
 		if (iss != "idToken" && iss != "google") || !strings.HasPrefix(u, "https://") {
 			return bad("emetteursDistants")
 		}
+		if len(c.Emetteurs[iss]) > 0 { // clés de test publiques à côté de clés réelles : jetons forgeables
+			return bad("emetteurs et emetteursDistants pour le même émetteur " + iss + " : un seul des deux modes")
+		}
 	}
 	switch {
 	case c.Mode == "":

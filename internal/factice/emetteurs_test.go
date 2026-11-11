@@ -6,10 +6,13 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/base64"
+	"encoding/json"
 	"encoding/pem"
 	"math/big"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -69,4 +72,28 @@ func jsonString(s string) string {
 		out = append(out, c)
 	}
 	return string(append(out, '"'))
+}
+
+// TestEmetteursExclusifs : clés statiques et clés relues à distance pour le
+// même émetteur sont refusées au démarrage (des clés de test publiques
+// permettraient de forger des jetons sur un projet réel).
+func TestEmetteursExclusifs(t *testing.T) {
+	b, err := os.ReadFile("../../testdata/factice/configuration.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var cfg map[string]any
+	if err := json.Unmarshal(b, &cfg); err != nil {
+		t.Fatal(err)
+	}
+	cfg["emetteursDistants"] = map[string]string{"google": "https://exemple.test/jwks"}
+	both, _ := json.Marshal(cfg)
+	if _, err := factice.ParseConfig(both); err == nil || !strings.Contains(err.Error(), "un seul des deux modes") {
+		t.Fatalf("configuration aux deux modes admise : %v", err)
+	}
+	delete(cfg["emetteurs"].(map[string]any), "google")
+	one, _ := json.Marshal(cfg)
+	if _, err := factice.ParseConfig(one); err != nil {
+		t.Fatalf("un mode par émetteur refusé : %v", err)
+	}
 }

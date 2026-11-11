@@ -84,7 +84,7 @@ func (k *coffre) sealed(p *proche) (string, string) {
 func (k *coffre) bundle(p *proche) jcs.Object {
 	ct, iv := k.sealed(p)
 	return jcs.Object{"uid": k.h.uid, "contactId": p.contact, "charte": ct, "charteIv": iv, "charteGeneration": p.gen,
-		"sealedKts": k.sealedKts, "ktsGeneration": k.ktsGen, "isUnlocked": p.unlocked, "titulaireAffiche": "Jean Dupont"}
+		"sealedKts": k.sealedKts, "ktsGeneration": k.ktsGen, "isUnlocked": p.unlocked, "titulaireAffiche": "Nom servi par la passerelle"} // le nom imprimé et affiché vient de la charte scellée, jamais de la passerelle (ARCHITECTURE.md §2.3)
 }
 
 // serve est la passerelle de test : GET /bundle aux trois formes, 200 {}
@@ -103,7 +103,7 @@ func (k *coffre) serve(r factice.Request) (int, []byte, error) {
 		}
 	}
 	if q.Get("courrier") == "1" {
-		out = jcs.Object{"uid": k.h.uid, "sealedKts": k.sealedKts, "ktsGeneration": k.ktsGen, "titulaireAffiche": "Jean Dupont", "chartes": jcs.Array{}}
+		out = jcs.Object{"uid": k.h.uid, "sealedKts": k.sealedKts, "ktsGeneration": k.ktsGen, "titulaireAffiche": "Nom servi par la passerelle", "chartes": jcs.Array{}}
 		for _, p := range k.proches {
 			if p.charte["telephone"] == nil && p.charte["email"] == nil {
 				b := k.bundle(p)

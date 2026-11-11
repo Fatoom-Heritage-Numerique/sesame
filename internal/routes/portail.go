@@ -362,13 +362,13 @@ func (a *call) admit(code, lookup string, who *[2]string) (*sessions.Session, er
 		}
 		ch = b
 	}
-	s.UID, s.Contact, s.Titulaire = who[0], who[1], str(b, "titulaireAffiche")
+	s.UID, s.Contact = who[0], who[1]
 	c, kts, err := a.charter(b, ch, l)
 	if err != nil {
 		return nil, err
 	}
 	s.KTS, s.KTSGen, s.Gen = kts, num(b, "ktsGeneration"), num(ch, "charteGeneration")
-	s.Prenom, s.Nom, s.Naissance, s.Role = str(c, "prenom"), str(c, "nom"), str(c, "dateNaissance"), str(c, "role")
+	s.Prenom, s.Nom, s.Naissance, s.Role, s.Titulaire = str(c, "prenom"), str(c, "nom"), str(c, "dateNaissance"), str(c, "role"), str(c, "titulaireAffiche")
 	s.Phone, s.Email = str(c, "telephone"), str(c, "email")
 	if !s.Courrier {
 		reports, err := a.reports(s.UID)
