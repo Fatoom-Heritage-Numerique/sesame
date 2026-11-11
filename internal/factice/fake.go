@@ -29,7 +29,19 @@ type Options struct {
 	Manual bool
 	// Memoire remplace la mesure de la mémoire (doublure des tests).
 	Memoire func() float64
+	// Decalage décale l'horloge d'une instance (par préfixe) et de son
+	// lanceur : dérive des VM (tests.md, « Grappe du PIN ») ; le registre et
+	// les buckets gardent l'heure de f.Clock.
+	Decalage map[string]time.Duration
 }
+
+// shifted est l'horloge d'une VM décalée de d.
+type shifted struct {
+	c ports.Horloge
+	d time.Duration
+}
+
+func (s shifted) Now() time.Time { return s.c.Now().Add(s.d) }
 
 // Fake est sesame-fake assemblé : ses doubles, partagés par ses instances
 // comme le registre et les buckets le sont par les VM, et son serveur.
@@ -51,6 +63,7 @@ type Fake struct {
 	ctx       context.Context
 	stop      context.CancelFunc
 	manual    bool
+	decalage  map[string]time.Duration
 	mu        sync.Mutex
 	// LauncherDown fait échouer le lanceur des instances démarrées ensuite.
 	LauncherDown bool
@@ -63,7 +76,7 @@ func New(ctx context.Context, cfg *Config, opt Options) (*Fake, error) {
 		opt.Clock = &Clock{}
 	}
 	ctx, stop := context.WithCancel(ctx)
-	f := &Fake{Config: cfg, Clock: opt.Clock, Net: NewReseau(1), ctx: ctx, stop: stop, manual: opt.Manual, KMS: NewKMS(cfg.sessionKey, cfg.SessionSign.Kid), Journal: &Journal{},
+	f := &Fake{Config: cfg, Clock: opt.Clock, Net: NewReseau(1), ctx: ctx, stop: stop, manual: opt.Manual, decalage: opt.Decalage, KMS: NewKMS(cfg.sessionKey, cfg.SessionSign.Kid), Journal: &Journal{},
 		Gateway: &Gateway{Check: &Check{Config: cfg, Clock: opt.Clock}}, Outbox: &Outbox{}, Identity: &Identity{}, Post: &Post{}}
 	f.Base = &Base{Clock: f.Clock}
 	f.Stockage = &Stockage{Clock: f.Clock}
@@ -125,13 +138,14 @@ func (f *Fake) TickGrappe() {
 func (f *Fake) instance(ctx context.Context, prefix string) (*routes.Instance, *Launcher, error) {
 	n, _ := Rand{}.Read(8)
 	gce := new(big.Int).SetBytes(n).String()
-	l, err := NewLauncher(f.Config, f.Clock, Claims{InstanceName: f.Config.NomVM + "-" + prefix, Zone: "europe-west9-" + prefix, InstanceID: gce})
+	clock := shifted{f.Clock, f.decalage[prefix]}
+	l, err := NewLauncher(f.Config, clock, Claims{InstanceName: f.Config.NomVM + "-" + prefix, Zone: "europe-west9-" + prefix, InstanceID: gce})
 	if err != nil {
 		return nil, nil, err
 	}
 	l.Fail = f.LauncherDown
 	rc := *f.rc
-	rc.Lanceur = l
+	rc.Lanceur, rc.Ports.Horloge = l, clock
 	name := f.Config.NomVM + "-" + prefix
 	hr := &HTTPReseau{Pairs: f.Config.Pairs}
 	if rc.Reseau = f.Net.From(name); f.Config.Mode == "instance" {
