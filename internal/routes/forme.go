@@ -37,11 +37,13 @@ func valid(o jcs.Object, fields []field) bool {
 }
 
 var (
-	reHex64 = regexp.MustCompile(`^[0-9a-f]{64}$`)
-	rePhone = regexp.MustCompile(`^\+[1-9][0-9]{1,14}$`)
-	reDate  = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}$`)
-	reFile  = regexp.MustCompile(`^[A-Za-z0-9._-]{1,128}$`)
-	reDrawn = regexp.MustCompile(`^[A-Za-z0-9_-]{22}$`)
+	reHex64   = regexp.MustCompile(`^[0-9a-f]{64}$`)
+	rePhone   = regexp.MustCompile(`^\+[1-9][0-9]{1,14}$`)
+	reDate    = regexp.MustCompile(`^[0-9]{4}-[0-9]{2}-[0-9]{2}$`)
+	reFile    = regexp.MustCompile(`^[A-Za-z0-9._-]{1,128}$`)
+	reDrawn   = regexp.MustCompile(`^[A-Za-z0-9_-]{22}$`)
+	reDigits  = regexp.MustCompile(`^[0-9]{4,10}$`)
+	isSession = matches(regexp.MustCompile(`^[A-Za-z0-9_-]{43}$`))
 )
 
 func isID(v any) bool { s, ok := v.(string); return ok && primitives.ID(s) }
@@ -77,6 +79,17 @@ func oneOf(vals ...string) func(any) bool {
 			}
 		}
 		return false
+	}
+}
+
+// arrayOf contrôle un tableau d'au plus n éléments, chacun contrôlé par ok.
+func arrayOf(n int, ok func(any) bool) func(any) bool {
+	return func(v any) bool {
+		l, is := v.(jcs.Array)
+		for _, e := range l {
+			is = is && ok(e)
+		}
+		return is && len(l) <= n
 	}
 }
 

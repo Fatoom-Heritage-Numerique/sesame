@@ -23,6 +23,7 @@ var (
 	sigField  = req("signature", bytesN(64))
 	uidField  = req("uid", isID)
 	tokField  = req("idToken", isText)
+	sidField  = req("sessionId", isSession)
 )
 
 // table est la table des routes du canal servies (API.md §2) ; Routes en
@@ -48,9 +49,21 @@ func init() {
 			uid: limit{100, time.Minute}, run: (*call).signaler},
 		"deces/annuler": {fields: []field{uidField, req("signalementId", matches(reDrawn)), defiField, sigField},
 			uid: limit{10, day}, run: (*call).annuler},
+		"lettre/secours": {fields: []field{req("jetonFatoom", isText), uidField, req("contactId", isID)}, uid: limit{100, time.Minute}, run: (*call).secours},
+		"session/ouvrir": {fields: []field{opt("code", isText), opt("lookup", matches(reHex64)), opt("sessionId", isSession)},
+			ip: limit{20, 15 * time.Minute}, run: (*call).ouvrir},
+		"session/verifier":          {fields: []field{sidField, req("otp", matches(reDigits))}, perSess: limit{20, 15 * time.Minute}, run: (*call).verifier},
+		"session/identite/demarrer": {fields: []field{sidField}, perSess: limit{5, hour}, run: (*call).demarrer},
+		"session/identite/verifier": {fields: []field{sidField}, perSess: limit{5, hour}, run: (*call).identiteVerifier},
+		"session/identite/bascule":  {fields: []field{sidField}, perSess: limit{5, hour}, run: (*call).bascule},
+		"session/ouvrir-cles": {fields: []field{sidField, req("enveloppes", arrayOf(500, object(req("type", oneOf("fichier", "motdepasse", "mot", "volontes")),
+			req("id", isID), req("contactId", isID), req("enveloppe", bytesN(48)), req("iv", bytesN(12)))))},
+			max: MaxBodyCles, perSess: limit{60, hour}, run: (*call).ouvrirCles},
+		"session/fermer":       {fields: []field{sidField}, perCh: limit{10, hour}, run: (*call).fermer},
+		"session/refuser-role": {fields: []field{sidField}, perSess: limit{5, hour}, run: (*call).refuserRole},
 	}
 	for k, r := range table {
-		r.max = MaxBody
+		r.max = max(r.max, MaxBody)
 		table[k] = r
 	}
 }
@@ -209,6 +222,9 @@ func (a *call) enroler() (jcs.Object, error) {
 	if err != nil {
 		return nil, err
 	}
+	if l.State == registre.Valid && gen > current { // rotation : sessions des proches fermées (§2.3)
+		a.in.closeSessions(uid, "", a.now, nil)
+	}
 	return jcs.Object{"sealedKts": b64(sealed), "ktsGeneration": gen, "imageDigest": a.in.cfg.ImageDigest, "cleViePub": b64(pub), "enroleLe": enroleLe}, nil
 }
 
@@ -239,6 +255,7 @@ func (a *call) vie() (jcs.Object, error) {
 	}
 	var out jcs.Object
 	var notes []note
+	retour := false
 	if l.State == registre.Rejected {
 		reports, opened, err := a.history(uid, str(l.Doc, "vivantLe"))
 		return a.lifeAnswer(l.Doc, reports, opened, false), err
@@ -275,7 +292,7 @@ func (a *call) vie() (jcs.Object, error) {
 		}
 		cur.Doc["vivantLe"] = stamp(w.Now)
 		w.Put(cur.Path, cur.Doc)
-		out = a.lifeAnswer(cur.Doc, reports, opened, closed)
+		out, retour = a.lifeAnswer(cur.Doc, reports, opened, closed), closed
 		return nil
 	})
 	if err != nil {
@@ -283,6 +300,9 @@ func (a *call) vie() (jcs.Object, error) {
 	}
 	for _, n := range notes {
 		a.in.notif.Notify(a.ctx, n.name, n.body)
+	}
+	if retour { // retour du titulaire : sessions de ses proches fermées (§2.4)
+		a.in.closeSessions(uid, "", a.now, nil)
 	}
 	return out, nil
 }

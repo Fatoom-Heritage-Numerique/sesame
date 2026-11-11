@@ -49,6 +49,7 @@ type Registre struct {
 	Stockage ports.Stockage
 	Horloge  ports.Horloge
 	Event    func(kind, resource string)
+	OnReject func(uid string) // ligne titulaires/{uid} rejetée
 	keys     [][]byte
 	last     lastEpoch
 }
@@ -86,6 +87,9 @@ func (r *Registre) verify(d ports.Doc) Line {
 			coll = parts[2]
 		}
 		r.Event("ligne_rejetee", Masque(parts[1])+"/"+coll)
+		if len(parts) == 2 && r.OnReject != nil {
+			r.OnReject(parts[1])
+		}
 	}
 	return l
 }

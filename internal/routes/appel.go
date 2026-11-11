@@ -9,6 +9,7 @@ import (
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/canal"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/jcs"
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/registre"
+	"github.com/Fatoom-Heritage-Numerique/sesame/internal/sessions"
 )
 
 // statuses et messages : codes d'erreur du corps chiffré et des erreurs en
@@ -58,14 +59,15 @@ type limit struct {
 }
 
 // route est une route du canal : forme de son corps, taille, limites par IP
-// et par canal (décomptées à l'entrée, refusées à l'étape 3 du §6), limite
-// par uid ou par compte, et sa décision.
+// et par canal (décomptées à l'entrée, refusées à l'étape 3 du §6), par
+// session (décomptée après l'authentification de la session), limite par uid
+// ou par compte, et sa décision.
 type route struct {
-	fields    []field
-	max       int
-	ip, perCh limit
-	uid       limit
-	run       func(a *call) (jcs.Object, error)
+	fields             []field
+	max                int
+	ip, perCh, perSess limit
+	uid                limit
+	run                func(a *call) (jcs.Object, error)
 }
 
 // call est une requête du canal en cours de décision.
@@ -77,8 +79,10 @@ type call struct {
 	r        *route
 	body     jcs.Object
 	now      time.Time
-	ua       string
-	overflow time.Time // fin de fenêtre d'une limite IP ou canal dépassée
+	ip       string
+	ua       any               // User-Agent tronqué à 256 caractères, nil s'il manque (API.md §5.5)
+	held     *sessions.Session // session verrouillée par l'appel
+	overflow time.Time         // fin de fenêtre d'une limite IP ou canal dépassée
 }
 
 // limits rend trop_d_appels si une limite par IP ou par canal est dépassée
@@ -103,22 +107,28 @@ func (a *call) limitKey(key string) error {
 }
 
 func (in *Instance) dispatch(r *http.Request, ch *canal.Channel, name string, corps jcs.Object, formOK bool, size int) jcs.Object {
-	a := &call{ctx: r.Context(), in: in, ch: ch, name: name, body: corps, now: in.cfg.Horloge.Now(), ua: r.Header.Get("User-Agent")}
+	a := &call{ctx: r.Context(), in: in, ch: ch, name: name, body: corps, now: in.cfg.Horloge.Now(), ip: ClientIP(r)}
+	if ua := []rune(r.Header.Get("User-Agent")); len(r.Header.Values("User-Agent")) > 0 {
+		a.ua = string(ua[:min(len(ua), 256)])
+	}
 	rt, known := table[name]
 	if !formOK || !known || size > rt.max || !valid(corps, rt.fields) {
 		return response(nil, fail("message_refuse"))
 	}
 	a.r = &rt
-	ip := ClientIP(r)
 	for _, l := range []struct {
 		key string
 		lim limit
-	}{{"|ip|" + ip, rt.ip}, {"|canal|" + ch.Key, rt.perCh}} {
+	}{{"|ip|" + a.ip, rt.ip}, {"|canal|" + ch.Key, rt.perCh}} {
 		if ok, retry := in.local.hit(name+l.key, l.lim, a.now); l.lim.n > 0 && !ok && a.overflow.IsZero() {
 			a.overflow = retry
 		}
 	}
-	return response(rt.run(a))
+	out := response(rt.run(a))
+	if a.held != nil {
+		a.held.Unlock()
+	}
+	return out
 }
 
 func response(corps jcs.Object, err error) jcs.Object {

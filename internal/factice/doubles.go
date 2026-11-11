@@ -9,6 +9,7 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"errors"
+	"fmt"
 	"sort"
 	"strings"
 	"sync"
@@ -433,6 +434,7 @@ type Gateway struct {
 	mu       sync.Mutex
 	requests []Request
 	Answer   func(Request) (int, []byte, error)
+	Check    *Check // vérification des requêtes de Sésame (passerelle.go), nil : aucune
 }
 
 // MaxRequests borne les requêtes gardées par la passerelle de test.
@@ -447,10 +449,19 @@ func (g *Gateway) Send(_ context.Context, method, pq string, h map[string]string
 	g.requests = append(g.requests, r)
 	answer := g.Answer
 	g.mu.Unlock()
-	if answer != nil {
-		return answer(r)
+	if g.Check != nil {
+		if st := g.Check.verdict(r); st != 0 {
+			return st, []byte("{}"), nil
+		}
 	}
-	return 200, []byte("{}"), nil
+	st, body, err := 200, []byte("{}"), error(nil)
+	if answer != nil {
+		st, body, err = answer(r)
+	}
+	if g.Check != nil && method == "POST" && (err != nil || st != 200) {
+		g.Check.forget(h["X-Sesame-Request-Id"])
+	}
+	return st, body, err
 }
 
 // Requests rend une copie des requêtes reçues.
@@ -509,4 +520,116 @@ func (o *Outbox) Sent() []Message {
 	o.mu.Lock()
 	defer o.mu.Unlock()
 	return append([]Message{}, o.sent...)
+}
+
+// Identity est le double de Stripe Identity : chaque session créée est
+// "processing" jusqu'à ce que le test lui donne un verdict (Verdict) ; il
+// garde les demandes de suppression. Pannes : "Identite", "Redact".
+type Identity struct {
+	Faults
+	mu       sync.Mutex
+	sessions map[string]ports.Verification
+	Redacted []string
+}
+
+func (s *Identity) Create(_ context.Context) (string, string, error) {
+	if s.fail("Identite") {
+		return "", "", errDouble
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.sessions == nil {
+		s.sessions = map[string]ports.Verification{}
+	}
+	if len(s.sessions) >= MaxRequests {
+		return "", "", errDouble
+	}
+	id := fmt.Sprintf("vs_test_%d", len(s.sessions)+1)
+	s.sessions[id] = ports.Verification{Status: "processing"}
+	return id, id + "_secret_test", nil
+}
+
+func (s *Identity) Read(_ context.Context, id string) (ports.Verification, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	v, ok := s.sessions[id]
+	if s.fail("Identite") || !ok {
+		return v, errDouble
+	}
+	return v, nil
+}
+
+func (s *Identity) Redact(_ context.Context, id string) error {
+	if s.fail("Redact") {
+		return errDouble
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.Redacted = append(s.Redacted, id)
+	return nil
+}
+
+// Verdict donne son verdict à la dernière session créée.
+func (s *Identity) Verdict(v ports.Verification) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.sessions[fmt.Sprintf("vs_test_%d", len(s.sessions))] = v
+}
+
+// Letter est une lettre reçue par le double de Pingen.
+type Letter struct {
+	ID, Organisation string
+	PDF              []byte
+}
+
+// Post est le double de Pingen : il garde les lettres reçues et rend l'état
+// que le test leur donne (Statuses, "commandee" par défaut). Panne : "Courrier".
+type Post struct {
+	Faults
+	mu       sync.Mutex
+	Letters  []Letter
+	Statuses map[string]string
+}
+
+func (p *Post) Send(_ context.Context, org string, pdf []byte) (string, error) {
+	if p.fail("Courrier") {
+		return "", errDouble
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if len(p.Letters) >= MaxRequests {
+		return "", errDouble
+	}
+	id := fmt.Sprintf("lettre-test-%d", len(p.Letters)+1)
+	p.Letters = append(p.Letters, Letter{id, org, append([]byte{}, pdf...)})
+	return id, nil
+}
+
+func (p *Post) Status(_ context.Context, _ string, id string) (string, error) {
+	if p.fail("Courrier") {
+		return "", errDouble
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if st := p.Statuses[id]; st != "" {
+		return st, nil
+	}
+	return "commandee", nil
+}
+
+// Sent rend une copie des lettres reçues.
+func (p *Post) Sent() []Letter {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return append([]Letter{}, p.Letters...)
+}
+
+// SetStatus donne un état à la lettre id.
+func (p *Post) SetStatus(id, st string) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.Statuses == nil {
+		p.Statuses = map[string]string{}
+	}
+	p.Statuses[id] = st
 }

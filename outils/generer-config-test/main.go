@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"math/big"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/attestation"
@@ -62,7 +63,7 @@ func main() {
 	for _, n := range append(append([]string{}, routes.Textes...), "alerte_signalement_insee_email", "alerte_signalement_insee_rappel_email", "alerte_signalement_insee_sms",
 		"alerte_signalement_acte_email", "alerte_signalement_acte_rappel_email", "alerte_signalement_acte_sms",
 		"alerte_signalement_inactivite_email", "alerte_signalement_inactivite_rappel_email", "alerte_signalement_inactivite_sms") {
-		textes[n] = "Texte de test " + n + "."
+		textes[n] = "Texte de test " + n + "." + placeholders(n)
 	}
 	doc := must(jcs.Marshal(jcs.Object{"v": 1, "textes": textes}))
 	dsum := sha256.Sum256(doc)
@@ -97,4 +98,19 @@ func main() {
 	}
 	write("configuration.json", cfg)
 	write("emetteurs-prives.json", map[string]any{"attention": "Clés privées de test des émetteurs de jetons, publiques et sans valeur hors des tests.", "emetteurs": privates})
+}
+
+// placeholders rend les {clés} que Sésame remplace dans le texte n (dates et
+// heures de Paris, code, prénom du proche, nom du titulaire, pièce d'un
+// décès) : le texte de test les porte pour que les tests les retrouvent.
+func placeholders(n string) string {
+	switch {
+	case n == "dernier_code_email":
+		return " {code}"
+	case strings.HasPrefix(n, "lettre_"):
+		return " {prenom} {titulaire}"
+	case strings.HasPrefix(n, "alerte_signalement_"):
+		return " {signaleLe} {transmissibleLe} {preuveNom} {empreinte}"
+	}
+	return " {date}"
 }

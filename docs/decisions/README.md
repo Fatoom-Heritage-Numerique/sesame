@@ -77,3 +77,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0067](0067-circl-et-x-crypto-verifiees-puis-epinglees.md) | `circl` v1.6.5 et `golang.org/x/crypto` v0.58.0 vérifiées sur leurs vecteurs, puis épinglées | 2026-11-11 |
 | [0068](0068-normalisation-nfc-par-x-text.md) | Contrôle NFC par `golang.org/x/text/unicode/norm` v0.44.0, épinglée | 2026-11-11 |
 | [0069](0069-budget-compte-sur-sesame-fake.md) | Budget de code compté sur ce que lient `cmd/sesame` et `cmd/sesame-fake`, hors doubles | 2026-11-11 |
+| [0070](0070-sessions-lettres-et-alertes-de-sesame-fake.md) | Sessions du portail, lettres et alertes : choix d'écriture du code des décisions | 2026-11-11 |

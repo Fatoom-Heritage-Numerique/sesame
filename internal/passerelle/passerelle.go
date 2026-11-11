@@ -17,8 +17,8 @@ import (
 	"github.com/Fatoom-Heritage-Numerique/sesame/internal/primitives"
 )
 
-// MaxPending borne les notifications en attente d'un nouvel essai (choix de
-// ce dépôt) ; au-delà, la notification est journalisée comme perdue.
+// MaxPending borne les essais en attente (choix de ce dépôt) ; au-delà,
+// l'envoi est tenu pour perdu.
 const (
 	MaxPending = 10_000
 	retryFor   = 24 * time.Hour
@@ -26,8 +26,77 @@ const (
 	maxDelay   = time.Hour
 )
 
+// Retrier refait, en mémoire de la VM, les envois refusés : délai de 1 min,
+// puis le double du précédent, plafonné à 1 h, jusqu'à 24 h après le premier
+// essai (API.md §5.5) ; puis lost. Il sert aux notifications et aux alertes
+// au titulaire.
+type Retrier struct {
+	Horloge ports.Horloge
+	mu      sync.Mutex
+	jobs    []*job
+}
+
+type job struct {
+	try         func(ctx context.Context) bool
+	lost        func()
+	first, next time.Time
+	delay       time.Duration
+}
+
+// Do essaie try ; un échec le met en attente d'un nouvel essai.
+func (r *Retrier) Do(ctx context.Context, try func(ctx context.Context) bool, lost func()) {
+	now := r.Horloge.Now()
+	if try(ctx) {
+		return
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if len(r.jobs) >= MaxPending {
+		lost()
+		return
+	}
+	r.jobs = append(r.jobs, &job{try, lost, now, now.Add(firstDelay), firstDelay})
+}
+
+// Retry refait les essais dus.
+func (r *Retrier) Retry(ctx context.Context) {
+	now := r.Horloge.Now()
+	r.mu.Lock()
+	var due, keep []*job
+	for _, j := range r.jobs {
+		if now.Before(j.next) {
+			keep = append(keep, j)
+		} else {
+			due = append(due, j)
+		}
+	}
+	r.jobs = keep
+	r.mu.Unlock()
+	for _, j := range due {
+		if j.try(ctx) {
+			continue
+		}
+		j.delay = min(2*j.delay, maxDelay)
+		if j.next = now.Add(j.delay); j.next.Sub(j.first) > retryFor {
+			j.lost()
+			continue
+		}
+		r.mu.Lock()
+		r.jobs = append(r.jobs, j)
+		r.mu.Unlock()
+	}
+}
+
+// Pending rend le nombre d'envois en attente.
+func (r *Retrier) Pending() int {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return len(r.jobs)
+}
+
 // Client envoie à la passerelle au nom d'une instance.
 type Client struct {
+	*Retrier
 	KMS                ports.KMS
 	Alea               ports.Alea
 	Horloge            ports.Horloge
@@ -36,15 +105,6 @@ type Client struct {
 	Kid                string
 	SessionPub, KemPub []byte
 	Token              func() string
-	mu                 sync.Mutex
-	pending            []*pending
-}
-
-type pending struct {
-	name, requestID string
-	body            []byte
-	first, next     time.Time
-	delay           time.Duration
 }
 
 func (c *Client) uuid() (string, error) {
@@ -90,60 +150,14 @@ func accepted(status int, resp []byte, err error) bool {
 }
 
 // Notify envoie la notification name (API.md §5.5) ; une réponse autre que
-// 200 {} la met en attente d'un nouvel essai, même X-Sesame-Request-Id.
+// 200 {} la fait réessayer, même X-Sesame-Request-Id, signée de nouveau.
 func (c *Client) Notify(ctx context.Context, name string, body jcs.Object) {
 	b, err := jcs.Marshal(body)
 	id, err2 := c.uuid()
+	lost := func() { c.Journal.Write(ports.Event{Event: "notification_perdue", Resultat: name}) }
 	if err != nil || err2 != nil {
-		c.Journal.Write(ports.Event{Event: "notification_perdue", Resultat: name})
+		lost()
 		return
 	}
-	now := c.Horloge.Now()
-	if accepted(c.Send(ctx, "POST", "/"+name, id, b)) {
-		return
-	}
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if len(c.pending) >= MaxPending {
-		c.Journal.Write(ports.Event{Event: "notification_perdue", Resultat: name})
-		return
-	}
-	c.pending = append(c.pending, &pending{name, id, b, now, now.Add(firstDelay), firstDelay})
-}
-
-// Retry refait les essais dus ; au-delà de 24 h après le premier, la
-// notification est journalisée comme perdue.
-func (c *Client) Retry(ctx context.Context) {
-	now := c.Horloge.Now()
-	c.mu.Lock()
-	var due, keep []*pending
-	for _, p := range c.pending {
-		if now.Before(p.next) {
-			keep = append(keep, p)
-		} else {
-			due = append(due, p)
-		}
-	}
-	c.pending = keep
-	c.mu.Unlock()
-	for _, p := range due {
-		if accepted(c.Send(ctx, "POST", "/"+p.name, p.requestID, p.body)) {
-			continue
-		}
-		p.delay = min(2*p.delay, maxDelay)
-		if p.next = now.Add(p.delay); p.next.Sub(p.first) > retryFor {
-			c.Journal.Write(ports.Event{Event: "notification_perdue", Resultat: p.name})
-			continue
-		}
-		c.mu.Lock()
-		c.pending = append(c.pending, p)
-		c.mu.Unlock()
-	}
-}
-
-// Pending rend le nombre de notifications en attente.
-func (c *Client) Pending() int {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	return len(c.pending)
+	c.Do(ctx, func(ctx context.Context) bool { return accepted(c.Send(ctx, "POST", "/"+name, id, b)) }, lost)
 }

@@ -1,18 +1,18 @@
 {
   "attention": "Configuration de test du dépôt sesame : clés de test publiques, sans valeur hors des tests.",
   "attestation": {
-    "empreinteRacine": "ea0cc0ff11a8fcf3e27dcd1b56cdf711b096c27f3c3fa8479eff2a199044278b",
-    "intermediaire": "MIIDRDCCAiygAwIBAgIBAjANBgkqhkiG9w0BAQsFADBAMRYwFAYDVQQKEw1TZXNhbWUgKHRlc3QpMSYwJAYDVQQDEx1SYWNpbmUgZGUgdGVzdCBkZSBzZXNhbWUtZmFrZTAeFw0yNjAxMDEwMDAwMDBaFw0zNjAxMDEwMDAwMDBaMEcxFjAUBgNVBAoTDVNlc2FtZSAodGVzdCkxLTArBgNVBAMTJEludGVybWVkaWFpcmUgZGUgdGVzdCBkZSBzZXNhbWUtZmFrZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAOKgBGK7HhZY0tJe89FtykAjf6V1UxVp7NYatLZor4e551JHj2t9O1497Z4+X9GrxhipmLHiwhLi1k+tw9ZVTCz0Yvs7TGnXpTMOWy36LoBeOLmw34M3kZiU7Y/YlSent+ke7O5yBTnn/DdeOtjlMqwU6AF7GE1yXjDpQ2HQYVf5j5BJGLpoUJABzK0GSx5zkFD4A1iky7PMZha0tMqHHYi6KVGR7MMO5+IFlcqjyt573uZm81CfmBKicwn52AGNTNyCFQALZghP9qYhGgsZUqG1GxBoJN6wgHdUMvr4rYP2DY/ygtSeLwNIZjGxGMFUVKaJTxXMVPB8JKAmyYxpV5ECAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFFDru6ebwFcM8Qs0CL43AlKDQhRvMA0GCSqGSIb3DQEBCwUAA4IBAQBDCYiC2/omk+/qbMl42eM6dFviMoFi5EqDqePNmIWTWRoBTdsrIod/J76GPSXnNLoAZ2dKmTT15G9B7uDuIN1TL7rHd6dXZq1gu1wGqHVIFCyTeGnDw7MGFWMWuH9wI63/67c5CjiG88gbSR4+854Nn15M9gHSFCea0wXeeX/2Rx8EJes8YyACVISp+suega8k0cKYwOibcyDDUWtImxAf2Mw/RoK+RMp0MtyriK0WmocgWCPHgYO8hsGM3LmHxcAErIzZJmlAX6jbvyIj6HICvNylP9UoL5klc3QKM2IVNZbJ2TQaGVbPYyKZ5udX+L81FxNvH8KUIl8cfhH2oN1W",
-    "intermediairePrivee": "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDioARiux4WWNLSXvPRbcpAI3+ldVMVaezWGrS2aK+HuedSR49rfTtePe2ePl/Rq8YYqZix4sIS4tZPrcPWVUws9GL7O0xp16UzDlst+i6AXji5sN+DN5GYlO2P2JUnp7fpHuzucgU55/w3XjrY5TKsFOgBexhNcl4w6UNh0GFX+Y+QSRi6aFCQAcytBksec5BQ+ANYpMuzzGYWtLTKhx2IuilRkezDDufiBZXKo8ree97mZvNQn5gSonMJ+dgBjUzcghUAC2YIT/amIRoLGVKhtRsQaCTesIB3VDL6+K2D9g2P8oLUni8DSGYxsRjBVFSmiU8VzFTwfCSgJsmMaVeRAgMBAAECggEAASf3KG3InIKS02yVP9dDNd/jJyaZvZKPGRSFIX0X5XsG+WjQttKqZTOvAk9Se9EC2giwymTcFUPqUKO+oQRJttz++EXNgP4O+LC1Dwn8shOeTyGI3QmBM6Rm2y9Wq3TJP7uJp+RrBGhGOsi/R3CmjobYxtEoRuozcs/DKTzqkjallfVSIeO3mC0qTUUyKg241TkwGuZZyd6kW4zWN5bUX0xX68/5NKgb0u83Rt4csOIEw/ibzR+MlKUif5sK5b8RDvgXVkWLVNzub92hc7GfzPtLFreqjxu2Hj9/tj667PGZbuXyWB+4x9Xsn4L+fvvZXloWpRyNtYXKnk0jOK00BQKBgQD04fee3Ih1QdWSb9WWXCBbFTA73H4+NCO5syneufJt1Pfh1kAwy5GRHz4N8xh6uQsTmtC7m30K68F5UChoHDGu8cLUxXBB7XkRhxCpFVy227q8cguTnPAAi6p6BwEIt6HqzN3C572GZpO/FjbBqlCOVsyLIpzgjQ6oIf4VlVOjzwKBgQDs6dv/tCGXfpiXUj+v+UmYj7yNesfYHRBhM+t+MXhihgjPqFI7GfXzsmnz/1F1KLnOHFZT/RkURwBCaUKhkrCBDFLMEyK4FYiQSJ2ZCdeKNXGCmTB0lom0yP02+saCFKsjJZDc981VfUhWX+sl2LqCAo/YudxiuAmU7Jtp1ZRGnwKBgHw4yKEIpBw/SjTfkEyW7T7nD7G+Fzg8wMap0RqP3x/CAgDI64UVLwGcBKGU6J0Qk0LdrPcOWC8bCukcNXMioj1pnHjMszZuXZT7nAL5uC92ZVLE04SM/t53+wGt3eNrK7LtO61sWyL7lAVCIoK5f+XEuDv4UfZC9+VoYPjX6DbXAoGBANAoEcIzlKg09QFPpOGK2J0Q/YwZaul5b+DX63tvH+UA+1DpBYckIjPCeNGHbRzRcZ+kyjz1TknAsHupXH/2ENrx5vWjgofXc6vCAaZrPVQT7O3ghvCJK+kKB2F9KVk1q8Avy346w9DvSNWLZWJVcFm2woiblQWvycttsIdmvublAoGBAOaakky5rjPgvhQSnUIO3tXK01nRDB1ErSbUTDW0GoVNmzWv60dBmil0UJl/V4HMvqv8Ju/UZWPJ3JUAcr43uuvwMKotQpSdjSp2ImLbCahsUFfapOFMjcspnMAgJCUlGcgBfBDcCcX6U6uoZxIVqOqj1gr5B5aUdMPvRQXSf5wK",
-    "racine": "MIIDPTCCAiWgAwIBAgIBATANBgkqhkiG9w0BAQsFADBAMRYwFAYDVQQKEw1TZXNhbWUgKHRlc3QpMSYwJAYDVQQDEx1SYWNpbmUgZGUgdGVzdCBkZSBzZXNhbWUtZmFrZTAeFw0yNjAxMDEwMDAwMDBaFw0zNjAxMDEwMDAwMDBaMEAxFjAUBgNVBAoTDVNlc2FtZSAodGVzdCkxJjAkBgNVBAMTHVJhY2luZSBkZSB0ZXN0IGRlIHNlc2FtZS1mYWtlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsxcBifNyyoI8gHWN+vXIioEtnlurRJ7lQcDJY3P98jhWLJtwkuyua+3ADGAcW37Q4WQmV25TA2ai/5Y36YChfmdsaTXqKvrYNRXZOYnXH+2e8Q9aJwxjJaKihyjlo6FnyHn7J/OimE476R9ZScVtdcPjzdgYGDHEATQ32QuDXMwNz5moWU7y8cw7wRjKz4xRRqtxw5ZGWuE2YQJIkeBsU5DZ6pafml0L6PtFb3Ot0n9fwLKRtgzui3oxtbgj2R8yj5oMqeRejTkgyBprklISIMf4qlns5HHNjzaLOKBIR8bha+VW2zJdXTK9U46glTqPOssoV33eGZPURPaLJp2WQQIDAQABo0IwQDAOBgNVHQ8BAf8EBAMCAgQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUbHWgAOf9457C5N9/1oprB774EVkwDQYJKoZIhvcNAQELBQADggEBAAy4sbr4qV/Qy3weR6oz+78fjOEla7N9+ogCqfeNl50sSqKrgLS20mmlF1YcK2/Oexn6urMkCvsBPeVXB+eTRvUO1VnWIUxDNrl9VSmBxc8k/5SpWpIOdykc8Ed8azjrWIRdYnJyLvUnyXb8ZFqDOIzkkWVX4phKRe8mkkVtrQv24vOGNm3eJNGwI1xj2xuO2WbLNHRn4M31heOizcciZmcYu0+KN8ozzqqADPiIn2inzSNYrOF0fKp0kDS+6d95fjwdkwXehw27HBjPt/Ua+NgmqxL1BWS9sogXmor0KNM0uG7dQZg0Y14RnoDwhmbkA5vbBm6E7IhAAeJo117zamA="
+    "empreinteRacine": "f699116d6feef4884ca9c23d1675b0026e2385587963971d4082cf173ea5ca6b",
+    "intermediaire": "MIIDRDCCAiygAwIBAgIBAjANBgkqhkiG9w0BAQsFADBAMRYwFAYDVQQKEw1TZXNhbWUgKHRlc3QpMSYwJAYDVQQDEx1SYWNpbmUgZGUgdGVzdCBkZSBzZXNhbWUtZmFrZTAeFw0yNjAxMDEwMDAwMDBaFw0zNjAxMDEwMDAwMDBaMEcxFjAUBgNVBAoTDVNlc2FtZSAodGVzdCkxLTArBgNVBAMTJEludGVybWVkaWFpcmUgZGUgdGVzdCBkZSBzZXNhbWUtZmFrZTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMEiAypNRzJc3PYqTf/UXcGcdbJdrag8fW6Ly9738kE+8+gFVJgP85TB4j9KFHoXGQEm7yPOm1dDufdNIl+74AhpLI5W06mRVHngmIbYlm6U/bAZQsFY78uQyXOi04JnwWJT1AJ1Kw/4Gfh9C6yF/gXmdaYqwRBQ1cdy1o+ZJPQp37NS2ByUMzwlgbxzYP400S5upYymic0PYMeb6A2iAR2mo4xBCtmevlcPAgFtr0suLjXeMJZFFHBoN8x/mcAdQAj+d1jCGGtqC7O8pnd60mZEMLnSKuET1Jx1zwNECgBMhngQmGxDwMOI1DTgigX8Wyl/eocskj+HUED7eJN4EXkCAwEAAaNCMEAwDgYDVR0PAQH/BAQDAgIEMA8GA1UdEwEB/wQFMAMBAf8wHQYDVR0OBBYEFNqtWuavRJMa5XbP5Il3dGazCqkAMA0GCSqGSIb3DQEBCwUAA4IBAQDDRJEoJs5eyEK6DxNPiiJxUfb4cYx+f8bJtm72GGALG87jvHcRQaGhNW6YE7fCfwtZkqSCq3mbKRLaq+Ls9es60/StwVKX7lsX6SNNFqXg9s5fpBUB6t3bmwgReOjDo9MzglBJHmr8N4YH73lZBXaYdFSX/yPgXCBAfSiOa9PlUmsWk5SXzEhvo1W1H3h1dR1pcHpTxnpNhS8quX7mspGqNY0ne48tLipiYEzWX2v7Eoaj13MNfgjgN3Yl4pYc9PhBIjjIedPz8gUQXknpZaW5R+ENNLo4b6/VQaQa47MBusUtTQenHnBrb0cpSlAIl7ITkBx8LjYPQ2ISbGdXLhpq",
+    "intermediairePrivee": "MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDBIgMqTUcyXNz2Kk3/1F3BnHWyXa2oPH1ui8ve9/JBPvPoBVSYD/OUweI/ShR6FxkBJu8jzptXQ7n3TSJfu+AIaSyOVtOpkVR54JiG2JZulP2wGULBWO/LkMlzotOCZ8FiU9QCdSsP+Bn4fQushf4F5nWmKsEQUNXHctaPmST0Kd+zUtgclDM8JYG8c2D+NNEubqWMponND2DHm+gNogEdpqOMQQrZnr5XDwIBba9LLi413jCWRRRwaDfMf5nAHUAI/ndYwhhraguzvKZ3etJmRDC50irhE9Scdc8DRAoATIZ4EJhsQ8DDiNQ04IoF/Fspf3qHLJI/h1BA+3iTeBF5AgMBAAECggEAG5JrqZgzEAgSODHYRSvVdLoNqCNX6DrhMgJ9iP0/KxG93W5sDMdziqsBTfAZVfLCjEJkL+mjjgTqYYQJYmnJH+Tv9PmFVIxzEcaUJTrPgxr8eq2oij9/AGymWJQIJnJXOTPm17D62a1IUTbSOf+TwSuNDpDE/jt5bEoYl+iQ+NWvngKEhM8wT0mduNnCi8w9OU+7Whym3H6FiofaEEmPrSNzRvQKz1CM2JMtSeiTxoogiSwSAKpiiJsBRNHI5lzR0b5aB0SCIwXfbIAGdSJajRj7kBNtrCOkGQq6cIitIJEZiRoB36+TQEhbqTFQYsKIvypK2cIhQMz80CPjYUQFbwKBgQD6Q4eZkyIOQtF7zsFpTcSH80KnrmxzkBSNwnaxYzIceKMZzBXRoYT8haqRVv9Lkzvpj+6CTmR+zWToD7TZ0fwYj3uF2GMdtWbA7a1Hb20R8hNIQ9t6FGV27DdEJslQaeBrB1Rdmre7wfUu8kyiHfcD244E+fMgdkTBWHWuU8Y13wKBgQDFj0GQd4gx1HqLI7d3Kl0F2zYUPrs1B5wMFNOWLnHF4U09LDKQGvkyaYW725S31971OQ1i3HC6sZ0msNHfFiT6129Lehcr3YSrIGetb7kV0tDWQ4JPbBTXrN/c0NtNc8tkKqk0eXd5AnszEJ241UtEn+wRifgJQxcXVsn/WoCzpwKBgBu9IGqFRGEQRufSIt3pIL9w1xJ+4sZsUdrkkwNWW1eMh4d0d3ak0His2BsD6YgW6a0ZpvYKelkTqvuNwh3iiG6weKB9O38vfBQmQ+6HCy/SBREddFYzrIth4z5KjkW7doRma5N0cqj89pAdiyDs8VQcIcGrcqdGdJh5lZGc93tBAoGBAJVwheHn6Uf4ODIj9FXZ37/cUA4EXcwBU5L39g12WG2cvbZ2RlEndjUiCR1PPjHKw0avv2Z25Xbzf7KSsk6UC6kLaY6obfqqd/6SZpqVFmZhr8NEEcBOO33hsPzxp9Hws3uzoYamEy+gJt07xnLYNTVV21ZxDQTEkSUAa5ATP6OlAoGBAK3V4TNaSIaR9+nsxu7XGoHbvzBkkpzIxbq8XHSO7mR2pKOVi0x0eFXM5ELvqSDnxQtWhBfhl4921OiRRw9rJsPYnetcspfpjNeNVn6ferYBBCRRHuy1g0Dobxf1KXzSrz37E2aghBU9dXYDLOcvgLdtceuIz+txhN6KkdB4IbCV",
+    "racine": "MIIDPTCCAiWgAwIBAgIBATANBgkqhkiG9w0BAQsFADBAMRYwFAYDVQQKEw1TZXNhbWUgKHRlc3QpMSYwJAYDVQQDEx1SYWNpbmUgZGUgdGVzdCBkZSBzZXNhbWUtZmFrZTAeFw0yNjAxMDEwMDAwMDBaFw0zNjAxMDEwMDAwMDBaMEAxFjAUBgNVBAoTDVNlc2FtZSAodGVzdCkxJjAkBgNVBAMTHVJhY2luZSBkZSB0ZXN0IGRlIHNlc2FtZS1mYWtlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzqxHg0vXVxshj6R45aLGFvF2deWa7L0a77rrZrJLw//r1ha9W7gaovsOfE6Yrs6U8/hKjUdnWqLg8Hx8gClbf/wwYlJBdjkSRsZVnuaaQJ4K3UFKuSf1jH/MhxNvDsvMmkk4JfXFBars9sKU9myAi/YpG0UDyYjIlcTjGXW4q1hZvJOkKsyq9nnGEmztazTS1wennKdGrvgWkGGNKms5ak+M87FVvdmz2KE1Le0QIlpxa0gg/tXHYRSWli6+ldZHxdDIfqehjb72/B2+Mh6SGpd4rnpIFTUdIAYbZfAfnc/dJj6bFZn3WixEPQWurzpbzKXMZCFi2y5r90Oaw+8FaQIDAQABo0IwQDAOBgNVHQ8BAf8EBAMCAgQwDwYDVR0TAQH/BAUwAwEB/zAdBgNVHQ4EFgQUm4HsAXpQKCcYrcGxbPGocyCU6DswDQYJKoZIhvcNAQELBQADggEBAFePjDgBkcR0/cLKpO192XlmlecTT8v0Umuotiww367uSkmOaZOhGwKW+7rih++7I8yGC9RVrcy13lgLWiCfCOvsMhJS4qeuAw2YSFx62rRDffOeEKYcBfEhsiR040SwOd5wXU6rlzlyECP0jozuvdBpax1CYNejBDGmYEUHNMkAJmVrKhHqTqWTInQAxpGLRfmND9Q9sAVqECcTu1rxuiKI0kZIEihwr8I8fpSrPx5Sa0hmPKlGte+8GC9lF2fgMV9QgbNLAgZ8LqC71b8/a1t16hDym4y2aEXK3TeGm4lK4AKR4k6U0WteD+n8Wmk5Q0xd3AQXBaUUIin1sb9l7OU="
   },
   "ecoute": "127.0.0.1:8090",
   "emetteurs": {
     "google": {
-      "google-test-1": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA3cXEL2U7oEaqGYxVHOUdxjEzE5r0iQtmWkjL3bcdF2Ja8SNmnA18HT0qu1RD1lGECjJwQcQLB7R0Q+2s3NepWS9vMV7Aqu4giMXounDcmmXvYz7R1aGpl7UIX8bN1+bY0+yvfOnneDpw1mouaExyUEfRw5Lkcv7LvUKaapAX8IG17zmep6Y8/QMqymtjlJchbxBrgRuD9+HviGRgfKklWSpZXCxfFeSjZtzS8lhsU5w0mvIUIrvBev6T0xy8vnj8rDckasT51AlH9HhY/L7US/5ONugdEYiJmSOVwSKTnlWLl6AOgRPbSgSrv11LD/ZVqPxerWgMBIxPj4KBzzCuqQIDAQAB"
+      "google-test-1": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw2B+rQvGu1035WxssLNkEN9p9gl2133PjG7ldTVieaivIstrytilyi9UiXGzmt5PZhNznVV6awX4/C4YR4kLvEyNhKFLjvYfnN9RlDQmx9bbtzL6oCJTSvXpsK2HnDl0I6ru+g1c/O5/XK6AFIvicyXIQMziHuEDTbSs+dkit1BbVdabGgBfHHNQImGp6KccUSofxkNwar4ElMtXYhNyyFZYzPgfCOd/dk0+q2Syg/bHegYqebaZOlfLtkrTLZ0I3DtaNptCQinhuuAd2LK+03yIoup41n7q3BK0Vab6th7kGmmUIkrTHtbBKwUdd0iwAQehFGUyh4fd76w8HYKcAQIDAQAB"
     },
     "idToken": {
-      "idToken-test-1": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4jXBi8i7Ilo8I0NJwB31fjcxT014Zunzerqkst9p62AKuMpX9hDntRR8UsXgASZumdsTS0Fx6jqU6VowDoPp4frbqmlnKU5nCH3oGqwSkMHUF9XzKS/J5Cw/IY+Z5BeR2CBglU3BC+5VVINwCnR641hj7tUWFr2Z4gVu3rzUeUY8mQ71Uo/VKWEJUJiNNHUVMe89zKPFavtokv4J6tToLNqrMPdjTUyDcl3PeN8icaf2FD+/6Kxzwtd5AO5dsiljzP/PPRgTkNwlVbZ/5em0Kk4ub0BlYY9wzNMlzMMa6+r6sDtw3Zl3hzrOFsYDhJ+xrWIfe0LtTs9OaPDyEd26gQIDAQAB"
+      "idToken-test-1": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp9oHgdOOsDlnTfWabDc01hCb0PIs7siqxzD3cfdLubMIb1FpUtRFocIsGN2bB2Q16sSxArcbXMERHVxVdN+5oB1+IUpIcbahF3J5ib3JRL/d4y9Qb7HBJBMklgfs/kI9VWM6KnIYfSW2pNiIAzWupZ1hZekDCsnlDKA8gvb7hqSN6Czro0wwcMYIipodioOZxG14Xm4UrLcemRfdZv05OY0R7h5hNH1oLlopNS+WfW892HUhWBHid46yBsBX3iNFGu5T4ybKenI9H4OlLDaMB4M1J29JA/EIsojNpueF6L2tWL5EcLIYpI3s+oaad4jjUas3JxhTYV3gTQYvMMia+QIDAQAB"
     }
   },
   "envOverride": {
@@ -23,7 +23,7 @@
     "IDTOKEN_PROJET": "projet-de-test",
     "PASSERELLE_URL": "https://passerelle.exemple.test",
     "SESAME_AUDIENCE": "https://sesame.exemple.test",
-    "SESAME_TEXTES": "sha256:e4f6a41aed89fc35ef06b2f8627353d1cea6de41b03ba2a5fcb01d24a13bfc8a",
+    "SESAME_TEXTES": "sha256:6ea7e5e72d7e9992af69f6cd393964119fec4e97e37237851abecab520b6ef5a",
     "SMS_EXPEDITEUR": "SesameTest",
     "VERIFICATION_SERVICE": "VA-service-de-test"
   },
@@ -33,36 +33,36 @@
   "registreImages": "registre.exemple.test/projet-de-test/sesame/",
   "sessionSign": {
     "kid": "session-sign/1",
-    "privee": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgYVKmddRp81p1B4n3wNAi0vS1ztwz7H0HpiF9zvLZQyyhRANCAAQQ/XRHANfMnU7ifMDry9Ple7rs7ScsWd3xzl7abSk/48ynh+KegH4DXDAY3AdIOOwRCDII0Sv/aAqZt4RWApnq",
-    "publique": "BBD9dEcA18ydTuJ8wOvL0+V7uuztJyxZ3fHOXtptKT/jzKeH4p6AfgNcMBjcB0g47BEIMgjRK/9oCpm3hFYCmeo="
+    "privee": "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgYHbJlQ8D53xBDyzTspT3g78xW9xcevBkTWpOgYfAi9ehRANCAAQnQ7KYpp88KQHrPBpDhZu+CSv14R9MTxeZT8MvudbNXGjqX4K0nRLjc++YKiqlaPDggBb1eaaf2cJfreyi+3RR",
+    "publique": "BCdDspimnzwpAes8GkOFm74JK/XhH0xPF5lPwy+51s1caOpfgrSdEuNz75gqKqVo8OCAFvV5pp/Zwl+t7KL7dFE="
   },
   "textes": {
     "textes": {
-      "alerte_confiance_email": "Texte de test alerte_confiance_email.",
-      "alerte_confiance_sms": "Texte de test alerte_confiance_sms.",
-      "alerte_ligne_rejetee_email": "Texte de test alerte_ligne_rejetee_email.",
-      "alerte_ligne_rejetee_sms": "Texte de test alerte_ligne_rejetee_sms.",
-      "alerte_pin_email": "Texte de test alerte_pin_email.",
-      "alerte_pin_sms": "Texte de test alerte_pin_sms.",
-      "alerte_signalement_acte_email": "Texte de test alerte_signalement_acte_email.",
-      "alerte_signalement_acte_rappel_email": "Texte de test alerte_signalement_acte_rappel_email.",
-      "alerte_signalement_acte_sms": "Texte de test alerte_signalement_acte_sms.",
-      "alerte_signalement_inactivite_email": "Texte de test alerte_signalement_inactivite_email.",
-      "alerte_signalement_inactivite_rappel_email": "Texte de test alerte_signalement_inactivite_rappel_email.",
-      "alerte_signalement_inactivite_sms": "Texte de test alerte_signalement_inactivite_sms.",
-      "alerte_signalement_insee_email": "Texte de test alerte_signalement_insee_email.",
-      "alerte_signalement_insee_rappel_email": "Texte de test alerte_signalement_insee_rappel_email.",
-      "alerte_signalement_insee_sms": "Texte de test alerte_signalement_insee_sms.",
-      "dernier_code_email": "Texte de test dernier_code_email.",
-      "lettre_deces": "Texte de test lettre_deces.",
-      "lettre_inactivite": "Texte de test lettre_inactivite."
+      "alerte_confiance_email": "Texte de test alerte_confiance_email. {date}",
+      "alerte_confiance_sms": "Texte de test alerte_confiance_sms. {date}",
+      "alerte_ligne_rejetee_email": "Texte de test alerte_ligne_rejetee_email. {date}",
+      "alerte_ligne_rejetee_sms": "Texte de test alerte_ligne_rejetee_sms. {date}",
+      "alerte_pin_email": "Texte de test alerte_pin_email. {date}",
+      "alerte_pin_sms": "Texte de test alerte_pin_sms. {date}",
+      "alerte_signalement_acte_email": "Texte de test alerte_signalement_acte_email. {signaleLe} {transmissibleLe} {preuveNom} {empreinte}",
+      "alerte_signalement_acte_rappel_email": "Texte de test alerte_signalement_acte_rappel_email. {signaleLe} {transmissibleLe} {preuveNom} {empreinte}",
+      "alerte_signalement_acte_sms": "Texte de test alerte_signalement_acte_sms. {signaleLe} {transmissibleLe} {preuveNom} {empreinte}",
+      "alerte_signalement_inactivite_email": "Texte de test alerte_signalement_inactivite_email. {signaleLe} {transmissibleLe} {preuveNom} {empreinte}",
+      "alerte_signalement_inactivite_rappel_email": "Texte de test alerte_signalement_inactivite_rappel_email. {signaleLe} {transmissibleLe} {preuveNom} {empreinte}",
+      "alerte_signalement_inactivite_sms": "Texte de test alerte_signalement_inactivite_sms. {signaleLe} {transmissibleLe} {preuveNom} {empreinte}",
+      "alerte_signalement_insee_email": "Texte de test alerte_signalement_insee_email. {signaleLe} {transmissibleLe} {preuveNom} {empreinte}",
+      "alerte_signalement_insee_rappel_email": "Texte de test alerte_signalement_insee_rappel_email. {signaleLe} {transmissibleLe} {preuveNom} {empreinte}",
+      "alerte_signalement_insee_sms": "Texte de test alerte_signalement_insee_sms. {signaleLe} {transmissibleLe} {preuveNom} {empreinte}",
+      "dernier_code_email": "Texte de test dernier_code_email. {code}",
+      "lettre_deces": "Texte de test lettre_deces. {prenom} {titulaire}",
+      "lettre_inactivite": "Texte de test lettre_inactivite. {prenom} {titulaire}"
     },
     "v": 1
   },
   "versions": {
     "clesSession": {
       "session-sign/1": {
-        "cle": "BBD9dEcA18ydTuJ8wOvL0+V7uuztJyxZ3fHOXtptKT/jzKeH4p6AfgNcMBjcB0g47BEIMgjRK/9oCpm3hFYCmeo=",
+        "cle": "BCdDspimnzwpAes8GkOFm74JK/XhH0xPF5lPwy+51s1caOpfgrSdEuNz75gqKqVo8OCAFvV5pp/Zwl+t7KL7dFE=",
         "depuis": "2026-01-01T00:00:00.000Z"
       }
     },
@@ -70,7 +70,7 @@
     "versions": [
       {
         "commit": "0000000000000000000000000000000000000001",
-        "envDigest": "sha256:003f260c93102cbcff245f703467d736e371ff0aaa6ca038e8fdd9d9f73a71b8",
+        "envDigest": "sha256:2903d2784ff198ca0b6bf51cf58a9bee14d35d744d9dac8b17f7035c6b52bd07",
         "hwmodels": [
           "GCP_AMD_SEV",
           "GCP_INTEL_TDX"

@@ -165,26 +165,25 @@ func (a *call) charteGeneration() (jcs.Object, error) {
 	if _, err := a.signedLine(uid, msg, err, false); err != nil {
 		return nil, err
 	}
-	err = a.in.reg.Write(a.ctx, func(w *registre.Writer) error {
-		cur, err := w.Get(titulaire(uid))
-		if err != nil || cur.State != registre.Valid || cur.Doc["etat"] == "supprime" {
-			return registre.ErrUnavailable
-		}
+	err = a.edit(titulaire(uid), func(cur registre.Line) (jcs.Object, error) {
 		charters := sub(cur.Doc, "chartes")
-		if charters == nil {
+		old, ok := charters[contact].(float64)
+		switch {
+		case cur.State != registre.Valid || cur.Doc["etat"] == "supprime":
+			return nil, registre.ErrUnavailable
+		case ok && (old == vie.GenerationDeleted || gen != vie.GenerationDeleted && float64(gen) <= old):
+			return nil, fail("generation_non_croissante")
+		case charters == nil:
 			charters = jcs.Object{}
 			cur.Doc["chartes"] = charters
 		}
-		if old, ok := charters[contact].(float64); ok && (old == vie.GenerationDeleted || gen != vie.GenerationDeleted && float64(gen) <= old) {
-			return fail("generation_non_croissante")
-		}
 		charters[contact] = gen
-		w.Put(cur.Path, cur.Doc)
-		return nil
+		return cur.Doc, nil
 	})
 	if err != nil {
 		return nil, err
 	}
+	a.in.closeSessions(uid, contact, a.now, nil) // nouvelle génération : sessions de ce proche fermées (§2.6)
 	recu, err := a.receipt("generation", jcs.Object{"uid": uid, "contactId": contact, "generation": gen})
 	return jcs.Object{"contactId": contact, "generation": gen, "recu": recu}, err
 }
@@ -208,17 +207,15 @@ func (a *call) alerteFiche() (jcs.Object, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = a.in.reg.Write(a.ctx, func(w *registre.Writer) error {
-		cur, err := w.Get(titulaire(uid))
-		if err != nil || cur.State != registre.Valid {
-			return registre.ErrUnavailable
-		}
-		if gen <= num(cur.Doc, "ficheGeneration") {
-			return fail("generation_non_croissante")
+	err = a.edit(titulaire(uid), func(cur registre.Line) (jcs.Object, error) {
+		switch {
+		case cur.State != registre.Valid:
+			return nil, registre.ErrUnavailable
+		case gen <= num(cur.Doc, "ficheGeneration"):
+			return nil, fail("generation_non_croissante")
 		}
 		cur.Doc["ficheGeneration"], cur.Doc["ficheScellee"] = gen, b64(sealed)
-		w.Put(cur.Path, cur.Doc)
-		return nil
+		return cur.Doc, nil
 	})
 	return jcs.Object{"ficheGeneration": gen}, err
 }
@@ -240,16 +237,14 @@ func (a *call) supprimer() (jcs.Object, error) {
 	case l.State == registre.Absent:
 		return jcs.Object{"etat": "absent"}, nil
 	}
-	err = a.in.reg.Write(a.ctx, func(w *registre.Writer) error {
-		cur, err := w.Get(titulaire(uid))
-		if err != nil || cur.State != registre.Valid {
-			return registre.ErrUnavailable
+	err = a.edit(titulaire(uid), func(cur registre.Line) (jcs.Object, error) {
+		if cur.State != registre.Valid {
+			return nil, registre.ErrUnavailable
+		} else if cur.Doc["etat"] == "supprime" {
+			return nil, nil
 		}
-		if cur.Doc["etat"] != "supprime" {
-			cur.Doc["etat"] = "supprime"
-			w.Put(cur.Path, cur.Doc)
-		}
-		return nil
+		cur.Doc["etat"] = "supprime"
+		return cur.Doc, nil
 	})
 	return jcs.Object{"etat": "supprime"}, err
 }
@@ -280,7 +275,9 @@ func (a *call) signaler() (jcs.Object, error) {
 		return nil, err
 	}
 	var out jcs.Object
+	var created *registre.Line
 	err = a.in.reg.Write(a.ctx, func(w *registre.Writer) error {
+		created = nil
 		reports, err := w.List(titulaire(uid)+"/signalements", "", "", maxReports)
 		if err != nil {
 			return err
@@ -305,7 +302,7 @@ func (a *call) signaler() (jcs.Object, error) {
 		}
 		id := base64URL(rnd)
 		doc := jcs.Object{"signaleLe": stamp(w.Now), "source": source, "deces": source != "inactivite",
-			"transmissibleLe": stamp(Transmissible(w.Now)), "alertesEnvoyeesLe": jcs.Array{}}
+			"transmissibleLe": stamp(Transmissible(w.Now)), "alertesEnvoyeesLe": jcs.Array{stamp(w.Now)}}
 		if source != "inactivite" {
 			doc["dateDeces"], doc["empreintePreuve"] = b["dateDeces"], b["preuve"]
 		}
@@ -313,11 +310,15 @@ func (a *call) signaler() (jcs.Object, error) {
 			doc["preuveNom"] = b["preuveNom"]
 		}
 		w.Put(titulaire(uid)+"/signalements/"+id, doc)
+		created = &registre.Line{Path: titulaire(uid) + "/signalements/" + id, Doc: doc}
 		out = jcs.Object{"signalementId": id, "signaleLe": doc["signaleLe"], "transmissibleLe": doc["transmissibleLe"]}
 		return nil
 	})
 	if err != nil {
 		return nil, err
+	}
+	if created != nil { // alerte J0 par la VM qui inscrit (versions-et-alertes.md)
+		a.in.alertReport(a.ctx, uid, *created, false)
 	}
 	out["recu"], err = a.receipt("signalement", jcs.Object{"uid": uid, "signalementId": out["signalementId"], "source": source,
 		"signaleLe": out["signaleLe"], "transmissibleLe": out["transmissibleLe"]})
