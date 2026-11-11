@@ -26,8 +26,9 @@ import (
 	"github.com/Fatoom-Heritage-Numerique/sesame/outils/internal/golist"
 )
 
-// Limit est le plafond dur du budget de code (ARCHITECTURE.md §2.2).
-const Limit = 6000
+// Limit est le plafond dur du budget de code (ARCHITECTURE.md §2.2,
+// décision 0074).
+const Limit = 8500
 
 func main() {
 	limit := flag.Int("plafond", Limit, "nombre de lignes au-delà duquel le contrôle échoue")

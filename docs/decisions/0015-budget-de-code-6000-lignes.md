@@ -2,7 +2,7 @@
 
 # 0015 · Budget de code porté à 6 000 lignes de Go
 
-**Date** : 2026-10-26 · **Statut** : actée (décision de l'opérateur) · revoit [0011](0011-go-binaire-statique-distroless.md)
+**Date** : 2026-10-26 · **Statut** : actée (décision de l'opérateur) · revoit [0011](0011-go-binaire-statique-distroless.md) · **revue depuis** ([0074](0074-budget-de-code-8500-lignes.md))
 
 ## Contexte et menace
 

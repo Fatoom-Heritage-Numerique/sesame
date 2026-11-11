@@ -22,7 +22,7 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0012](0012-canaux-d-envoi-non-croises.md) | Canaux d'envoi non croisés : un fournisseur piraté peut ouvrir après un décès vérifié | 2026-10-12 · revue depuis 0013 |
 | [0013](0013-canaux-d-envoi-croises.md) | Canaux d'envoi croisés : code d'accès par email, dernier code par SMS | 2026-10-22 |
 | [0014](0014-liste-des-versions-compilee.md) | Liste des versions compilée dans les clients, mise à jour forcée | 2026-10-25 · revue depuis 0025, 0026, 0032 |
-| [0015](0015-budget-de-code-6000-lignes.md) | Budget de code porté à 6 000 lignes de Go | 2026-10-26 |
+| [0015](0015-budget-de-code-6000-lignes.md) | Budget de code porté à 6 000 lignes de Go | 2026-10-26 · revue depuis 0074 |
 | [0016](0016-bibliotheques-oprf-argon2-raft.md) | Bibliothèques admises : `circl` pour l'OPRF, `x/crypto/argon2`, `go.etcd.io/raft/v3` | 2026-10-24 et 2026-10-27 |
 | [0017](0017-protocole-de-pin-grappe-de-trois-vm.md) | Protocole de PIN en mémoire, sur une grappe de trois VM à majorité, et règle des 30 jours | 2026-10-24 · revue depuis 0018, 0042, 0043, 0050 |
 | [0018](0018-amorcage-commande-d-une-grappe-neuve.md) | Amorçage d'une grappe neuve commandé par l'exploitant | 2026-10-27 · revue depuis 0055 |
@@ -81,3 +81,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0071](0071-raft-v3-7-0-essaye-puis-epingle.md) | `go.etcd.io/raft/v3` v3.7.0 essayée sur les cas de l'essai jetable, puis épinglée ; grappe de `sesame-fake` | 2026-11-11 |
 | [0072](0072-limites-mesurees-au-contrat-executable.md) | Limites de débit et tailles mesurées sur `sesame-fake` : aucune révision technique | 2026-11-11 |
 | [0073](0073-derniere-evaluation-notee-sur-le-canal.md) | Seule la dernière évaluation notée sur le canal vaut pour un dépôt `ouverture` | 2026-11-11 |
+| [0074](0074-budget-de-code-8500-lignes.md) | Budget de code porté à 8 500 lignes de Go | 2026-11-11 |

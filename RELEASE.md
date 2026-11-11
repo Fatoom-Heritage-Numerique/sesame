@@ -136,7 +136,7 @@ Les contrôles de l'étape 2 (contrat exécutable) tournent sur chaque PR et sur
 |---|---|---|
 | Format, analyse, tests | `gofmt -l` liste un fichier ; `go vet ./...`, `go test -race ./...`, `go mod verify` ou `govulncheck ./...` échoue | 2 |
 | Double construction | les deux digests diffèrent | 2 |
-| Budget | plus de 6 000 lignes de Go hors tests et hors bibliothèques épinglées ; décompte sur les paquets que lient `cmd/sesame` et `cmd/sesame-fake`, hors `internal/factice/` et hors `cmd/sesame-fake`, lignes non vides hors commentaires (`outils/decompte-lignes`) | 2 |
+| Budget | plus de 8 500 lignes de Go hors tests et hors bibliothèques épinglées (décision 0074) ; décompte sur les paquets que lient `cmd/sesame` et `cmd/sesame-fake`, hors `internal/factice/` et hors `cmd/sesame-fake`, lignes non vides hors commentaires (`outils/decompte-lignes`) | 2 |
 | Vecteurs | l'empreinte SHA-256 d'un fichier de vecteurs recopié diffère de celle que porte `SHA256SUMS`, recopié avec lui depuis le client de référence (`CONTRIBUTING.md`, « Formats et vecteurs ») ; `compteurPin` régénéré par `outils/generer-compteurpin` diffère du fichier commité | 2 |
 | Lanceur factice | `SESAME_FAKE_LAUNCHER` lu hors de `internal/factice/`, ou un paquet de `internal/factice/` lié par `cmd/sesame` (`go list -deps`) | 2 |
 | Image | un shell ; une étiquette `tee.launch_policy.*` d'`ARCHITECTURE.md` §2.1 absente ou différente ; image de base non épinglée par digest | 2 |

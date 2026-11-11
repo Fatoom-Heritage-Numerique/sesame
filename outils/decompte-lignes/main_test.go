@@ -100,7 +100,7 @@ func TestRunFailsAboveLimit(t *testing.T) {
 }
 
 func TestLimit(t *testing.T) {
-	if Limit != 6000 {
-		t.Fatalf("le plafond d'ARCHITECTURE.md §2.2 est de 6 000 lignes, pas %d", Limit)
+	if Limit != 8500 {
+		t.Fatalf("le plafond d'ARCHITECTURE.md §2.2 (décision 0074) est de 8 500 lignes, pas %d", Limit)
 	}
 }
