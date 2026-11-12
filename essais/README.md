@@ -22,27 +22,28 @@ Les journaux du programme ne portent que des compteurs et des mesures : ni jeton
 
 ## Ce qui est vérifié, et ce qui ne l'est pas
 
-Rien de ce qui suit n'a été exécuté sur Google Cloud avant la séance : le dépôt n'a pas de projet. Le programme est testé sans Google (`go test ./essais/...` : SNTP contre un serveur local, socket du lanceur simulée, Firestore simulé) et son image construite par Docker. Pour chaque commande, la colonne dit d'où vient sa forme ; **« à ajuster »** signale où la séance peut demander une retouche.
+La marche à suivre a été jouée en une séance, depuis Cloud Shell, sur un projet d'essai jetable, trois VM et l'image Confidential Space de production ; les valeurs relevées sont dans la spécification de l'opérateur (essais de Confidential Space), la décision de concurrence du registre dans la décision 0077. Le programme est aussi testé sans Google (`go test ./essais/...` : SNTP contre un serveur local, socket du lanceur simulée, Firestore simulé) et son image construite par Docker. La colonne dit ce que la séance a montré pour chaque étape ; « forme de la séance » signale une commande écrite ici comme la séance l'a jouée après retouche, et non rejouée depuis d'un bout à l'autre.
 
-| Étape | Commande | Source |
+| Étape | Commande | À la séance |
 |---|---|---|
-| 1 à 3 | `gcloud billing accounts list`, `projects create`, `billing projects link`, `config set` | usage courant de `gcloud`, non relu pour cette séance |
-| 4 | `gcloud billing budgets create` | page de référence de `gcloud billing budgets create` (forme de `--budget-amount`, `--filter-projects`, `--threshold-rule`) |
-| 5 | `gcloud services enable` | noms d'API non relus un à un : **à ajuster** si l'un est refusé |
-| 6 | `gcloud artifacts repositories create` | usage courant, non relu |
-| 7 et 8 | `git clone`, droits du compte de Cloud Build | page « Cloud Build service account updates » : un projet neuf construit avec le compte de service Compute Engine par défaut, sans rôle ; le rôle donné ici (`roles/cloudbuild.builds.builder`) n'est pas relu dans la documentation : **à ajuster** si la construction échoue faute de droit (repli : étape 9 bis) |
-| 9 | `gcloud builds submit --config essais/cloudbuild.yaml` | forme du fichier de construction non essayée sur Cloud Build |
-| 10 | empreinte de l'image (`gcloud artifacts docker images describe`) | champ `image_summary.digest` non relu : **à ajuster** |
-| 11 et 12 | compte de service et rôles | rôles de la page « Deploy workloads » de Confidential Space (`confidentialcomputing.workloadUser`, `artifactregistry.reader`, `logging.logWriter`) ; `roles/datastore.user` pour Firestore, non relu |
-| 13 | `gcloud firestore databases create` | page de référence (`--database`, `--location`, type `firestore-native` et édition `standard` par défaut) |
-| 14 à 16 | réseau, sous-réseau avec accès privé à Google, pare-feu IAP | plage `35.235.240.0/20` et `start-iap-tunnel` : page « Using IAP for TCP forwarding » ; le tirage de l'image et les API de Google par l'accès privé, sans adresse IP publique, non essayés : **à ajuster** (repli : retirer `--no-address`) |
-| 17 | `gcloud compute instances create` | options de la page « Deploy workloads » (`--confidential-compute-type`, `--maintenance-policy=MIGRATE` pour N2D sous SEV, `--shielded-secure-boot`, `--image-project=confidential-space-images`, `--image-family`, `tee-image-reference`, `tee-container-log-redirect`) ; politique `log_redirect=always` et ports par `EXPOSE` : page « Create and customize workloads » |
-| 18 | sortie série de la VM | lecture du démarrage du lanceur, forme du journal non relue |
-| 20 et 21 | tunnels IAP et `curl` des routes | tunnel : page IAP ; lecture de la socket par un conteneur sans privilège (utilisateur 65532) non essayée : **à ajuster** si `/attestation` rend `permission denied` (c'est aussi une réponse utile pour l'image de Sésame) |
-| 21 | mode de concurrence de Firestore (`gcloud firestore databases describe`), puis passage en `OPTIMISTIC` | champ `concurrencyMode` de la ressource `projects.databases` de l'API REST (défaut `PESSIMISTIC` en édition `standard`) ; `describe --database` et la modification par `PATCH` ne sont pas relus : **à ajuster** |
-| 22 | `gcloud compute instances simulate-maintenance-event` | page « Simulate a host maintenance event » ; son effet sur une VM SEV n'y est pas décrit (l'essai du lot précédent a vu la migration à chaud) |
-| 24 | `gcloud logging read` des mesures d'horloge | filtre non essayé : **à ajuster** si rien ne sort |
-| 25 à 27 | archive, `cloudshell download`, suppression du projet | usage courant, non relu |
+| 1 à 3 | `gcloud billing accounts list`, `projects create`, `billing projects link`, `config set` | telles qu'écrites |
+| 4 | `gcloud billing budgets create` | telle qu'écrite |
+| 5 | `gcloud services enable` | noms d'API acceptés tels qu'écrits |
+| 6 | `gcloud artifacts repositories create` | telle qu'écrite |
+| 7 et 8 | `git clone`, droits du compte de Cloud Build | le rôle `roles/cloudbuild.builds.builder` donné au compte de service Compute Engine par défaut suffit ; l'étape 9 bis n'a pas servi |
+| 9 | `gcloud builds submit --config essais/cloudbuild.yaml` | telle qu'écrite |
+| 10 | empreinte de l'image (`gcloud artifacts docker images describe`) | `image_summary.digest` rend l'empreinte |
+| 11 et 12 | compte de service et rôles | suffisants pour les trois essais : jeton, tirage de l'image, journaux, Firestore |
+| 13 | `gcloud firestore databases create` | base `standard`, en concurrence `PESSIMISTIC` par défaut |
+| 14 à 16 | réseau, sous-réseau avec accès privé à Google, pare-feu IAP | sans adresse IP publique, l'image se tire et les API de Google répondent par l'accès privé ; le tunnel IAP joint le port 8080 |
+| 17 | `gcloud compute instances create` | image de production telle qu'écrite ; la variable d'essai (`tee-env-ESSAI_VARIABLE`, étiquette `tee.launch_policy.allow_env_override` de l'image) : forme de la séance, sans laquelle le jeton est refusé (étape 17) |
+| 18 | sortie série de la VM | filtre `"essai : \|horloge : "` et nouvel essai après une ou deux minutes : forme de la séance (un filtre sur `rror` attrape la ligne de commande du noyau, `dm_verity.error_behavior`) |
+| 20 et 21 | tunnels IAP et `curl` des routes | telles qu'écrites ; un conteneur sans privilège (utilisateur 65532) lit la socket du lanceur et l'heure SNTP du serveur de métadonnées, par nom comme par adresse |
+| 21 | jeton d'attestation | accepté par `verifierAttestation` du client de référence avec la racine de production, refusé pour chaque contrôle altéré avec le bon motif ; vérifié avec la variable d'essai |
+| 21 | débit de `chaine/tete`, mode de concurrence (`describe`, `PATCH`) | boucles qui n'attendent que leurs propres `curl` : forme de la séance (un `wait` sans argument attend aussi les tunnels IAP et ne rend jamais la main) ; le passage en `OPTIMISTIC` par `PATCH` prend effet en moins d'une minute |
+| 22 | `gcloud compute instances simulate-maintenance-event` | même `lastStartTimestamp` avant et après, même `demarreLe` : migration sans redémarrage du conteneur |
+| 24 | `gcloud logging read` des mesures d'horloge | tel qu'écrit |
+| 25 à 27 | archive, `cloudshell download`, suppression du projet | telles qu'écrites |
 
 ## Marche à suivre
 
@@ -74,7 +75,13 @@ export IMAGE="${REGION}-docker.pkg.dev/${PROJET}/essais/essai:${COMMIT}"
 export COMPTE="essai-vm@${PROJET}.iam.gserviceaccount.com"
 ```
 
-Si Cloud Shell se ferme pendant la séance, recollez ces blocs (et ceux des étapes 10 et 20) avant de reprendre.
+```bash
+export VARIABLE_ESSAI="seance"
+```
+
+`VARIABLE_ESSAI` est la valeur de la seule variable que l'image d'essai admet, `ESSAI_VARIABLE` (étape 17) ; sans effet sur le programme, elle ne contient ni espace ni virgule.
+
+Si Cloud Shell se ferme pendant la séance, recollez ces blocs (et ceux des étapes 10 et 20, puis le `cd` de l'étape 19) avant de reprendre. Un `cd` se colle seul dans son bloc, jamais enchaîné à une commande lancée en arrière-plan (`&`) : la ligne entière tournerait dans un sous-shell, le dossier courant ne changerait pas et les fichiers suivants s'écriraient ailleurs.
 
 ### 1. Compte de facturation
 
@@ -232,17 +239,21 @@ gcloud compute firewall-rules create essais-iap-8080 --network=essais --directio
 
 Image de **production** pour les trois essais : le jeton doit porter `dbgstat` `disabled-since-boot`, que l'image de débogage n'a pas. L'image de débogage (`--image-family=confidential-space-debug`) ne servirait qu'à comprendre un conteneur qui ne démarre pas, jamais pour l'essai du jeton.
 
+Chaque VM reçoit la variable d'essai `ESSAI_VARIABLE` par la métadonnée `tee-env-ESSAI_VARIABLE`, que l'étiquette `tee.launch_policy.allow_env_override` de l'image admet (`essais/Dockerfile`). Sans variable passée, le jeton ne porte pas `submods.container.env_override` (seul `submods.container.env` est présent), et le client de référence, qui compare l'empreinte de ce claim à l'`envDigest` de la liste des versions (`ARCHITECTURE.md` §2.3 et §3), refuse le jeton au dernier contrôle (`env_override`). Avec elle, le claim vaut `{"ESSAI_VARIABLE": "<valeur>"}`, comme le dictionnaire des variables de Sésame.
+
 ```bash
-for Z in a b c; do gcloud compute instances create "essai-${Z}" --zone="${REGION}-${Z}" --machine-type=n2d-highcpu-2 --confidential-compute-type=SEV --maintenance-policy=MIGRATE --shielded-secure-boot --image-project=confidential-space-images --image-family=confidential-space --network=essais --subnet=essais --no-address --service-account="${COMPTE}" --scopes=cloud-platform --metadata="tee-image-reference=${IMAGE_REF},tee-container-log-redirect=true"; done
+for Z in a b c; do gcloud compute instances create "essai-${Z}" --zone="${REGION}-${Z}" --machine-type=n2d-highcpu-2 --confidential-compute-type=SEV --maintenance-policy=MIGRATE --shielded-secure-boot --image-project=confidential-space-images --image-family=confidential-space --network=essais --subnet=essais --no-address --service-account="${COMPTE}" --scopes=cloud-platform --metadata="tee-image-reference=${IMAGE_REF},tee-container-log-redirect=true,tee-env-ESSAI_VARIABLE=${VARIABLE_ESSAI}"; done
 ```
 
 ### 18. Démarrage du conteneur
 
-Attendez 2 à 3 minutes, puis cherchez la ligne `essai : écoute sur :8080` (journal du conteneur recopié sur la sortie série).
+Attendez 2 à 3 minutes, puis cherchez la ligne `essai : écoute sur :8080` (journal du conteneur recopié sur la sortie série) pour chacune des trois VM.
 
 ```bash
-for Z in a b c; do echo "== essai-${Z}"; gcloud compute instances get-serial-port-output "essai-${Z}" --zone="${REGION}-${Z}" 2>/dev/null | grep -E "essai :|horloge :|rror" | tail -5; done
+for Z in a b c; do echo "== essai-${Z}"; gcloud compute instances get-serial-port-output "essai-${Z}" --zone="${REGION}-${Z}" 2>/dev/null | grep -E "essai : |horloge : " | tail -5; done
 ```
+
+Les VM, créées l'une après l'autre par la boucle de l'étape 17, démarrent l'une après l'autre : si une VM n'a pas encore sa ligne, relancez ce bloc après une ou deux minutes. Un conteneur qui ne démarre pas laisse les messages du lanceur sur la sortie série (`gcloud compute instances get-serial-port-output` sans filtre).
 
 ### 19. Dossier des relevés
 
@@ -308,23 +319,29 @@ gcloud projects describe "${PROJET}" --format='value(projectNumber)' > numero-pr
 echo "${IMAGE_REF}" > image.txt
 ```
 
+Dictionnaire `env_override` attendu, en JSON canonique, et son empreinte (`envDigest` de la liste des versions d'essai : `sha256:` suivi de ces 64 caractères hexadécimaux) :
+
+```bash
+printf '{"ESSAI_VARIABLE":"%s"}' "${VARIABLE_ESSAI}" > env-override.json; sha256sum env-override.json | cut -d' ' -f1 > env-digest.txt; cat env-override.json env-digest.txt
+```
+
 Le jeton vaut environ une heure : la vérification par le client se fait dans l'heure, ou à l'heure du relevé (`attestation-a.json` est daté par son fichier).
 
 #### Débit de `chaine/tete`, concurrence par défaut
 
-Trois clients ensemble, à débit croissant (`debit` est par client : 3 × `debit` en tout), une minute par palier, environ 5 minutes.
+Trois clients ensemble, à débit croissant (`debit` est par client : 3 × `debit` en tout), une minute par palier, environ 5 minutes. Chaque palier n'attend que ses trois `curl` (`wait ${PIDS}`), pas les tunnels IAP lancés en arrière-plan à l'étape 20 : un `wait` sans argument ne rendrait jamais la main. Le bloc écrit une ligne à la fin de chaque palier, puis `paliers : fini`.
 
 ```bash
 gcloud firestore databases describe --database=essai --format='value(concurrencyMode)' > firestore-mode-1.txt
 ```
 
 ```bash
-for D in 2 5 10 20 40; do for P in 8081 8082 8083; do curl -sS "http://localhost:${P}/firestore?duree=60&debit=${D}" > "firestore-1-${D}-${P}.json" & done; wait; done
+for D in 2 5 10 20 40; do PIDS=""; for P in 8081 8082 8083; do curl -sS "http://localhost:${P}/firestore?duree=60&debit=${D}" > "firestore-1-${D}-${P}.json" & PIDS="${PIDS} $!"; done; wait ${PIDS}; echo "palier ${D} : fini"; done; echo "paliers : fini"
 ```
 
 #### Débit de `chaine/tete`, concurrence optimiste
 
-La spécification compte sur la concurrence optimiste de Firestore ; une base `standard` est en concurrence pessimiste par défaut. Passage en `OPTIMISTIC`, puis les mêmes paliers.
+Une base `standard` est en concurrence pessimiste par défaut, que garde Sésame (décision 0077) ; le registre tient dans les deux modes, une transaction en conflit étant rejouée en entier (`ARCHITECTURE.md` §6.2). Pour comparer : passage en `OPTIMISTIC`, puis les mêmes paliers.
 
 ```bash
 curl -sS -X PATCH -H "Authorization: Bearer $(gcloud auth print-access-token)" -H "Content-Type: application/json" "https://firestore.googleapis.com/v1/projects/${PROJET}/databases/essai?updateMask=concurrencyMode" -d '{"concurrencyMode":"OPTIMISTIC"}' > firestore-passage-optimiste.json
@@ -337,7 +354,7 @@ gcloud firestore databases describe --database=essai --format='value(concurrency
 ```
 
 ```bash
-for D in 2 5 10 20 40; do for P in 8081 8082 8083; do curl -sS "http://localhost:${P}/firestore?duree=60&debit=${D}" > "firestore-2-${D}-${P}.json" & done; wait; done
+for D in 2 5 10 20 40; do PIDS=""; for P in 8081 8082 8083; do curl -sS "http://localhost:${P}/firestore?duree=60&debit=${D}" > "firestore-2-${D}-${P}.json" & PIDS="${PIDS} $!"; done; wait ${PIDS}; echo "palier ${D} : fini"; done; echo "paliers : fini"
 ```
 
 ### 22. Maintenance simulée sur `essai-a`
@@ -385,14 +402,14 @@ pkill -f start-iap-tunnel
 ### 26. Fichiers à renvoyer
 
 ```bash
-cd ~ && tar czf resultats-essais.tar.gz resultats-essais
+tar czf ~/resultats-essais.tar.gz -C ~ resultats-essais
 ```
 
 ```bash
-cloudshell download resultats-essais.tar.gz
+cloudshell download ~/resultats-essais.tar.gz
 ```
 
-L'archive contient les relevés JSON, le jeton (public par nature : Sésame le sert à chacun), les deux clés d'essai, l'empreinte et le chemin de l'image et le numéro du projet d'essai, qui ne valent que pour ce projet jetable. Elle ne contient aucun secret.
+L'archive contient les relevés JSON, le jeton (public par nature : Sésame le sert à chacun), les deux clés d'essai, l'empreinte et le chemin de l'image, le dictionnaire `env_override` et son empreinte, et le numéro du projet d'essai, qui ne valent que pour ce projet jetable. Elle ne contient aucun secret.
 
 ### 27. Suppression du projet
 
