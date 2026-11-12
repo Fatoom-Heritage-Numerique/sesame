@@ -84,3 +84,4 @@ Chaque fichier suit le même gabarit : date et statut, contexte et menace, déci
 | [0074](0074-budget-de-code-8500-lignes.md) | Budget de code porté à 8 500 lignes de Go | 2026-11-11 |
 | [0075](0075-programmes-d-essai-sur-confidential-space.md) | Programmes d'essai publics et jetables pour une séance sur Confidential Space | 2026-11-11 |
 | [0076](0076-email-en-ascii-imprimable.md) | Email de la charte et de la fiche d'alerte en ASCII imprimable seul | 2026-11-11 |
+| [0077](0077-registre-en-concurrence-pessimiste-par-defaut.md) | Registre sur une base Firestore en concurrence par défaut, pessimiste | 2026-11-12 |

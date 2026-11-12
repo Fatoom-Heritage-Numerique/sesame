@@ -13,10 +13,14 @@ RUN go mod verify \
 FROM gcr.io/distroless/static-debian12:nonroot@sha256:afa5c872c891853ca7fcf1f12c3edb23f7eeef36189728842dd51042ff57f7ab
 # Politique de lancement de l'essai : journaux redirigés vers Cloud Logging
 # même sur l'image Confidential Space de production (l'essai du jeton exige
-# dbgstat disabled-since-boot, donc pas l'image de débogage) ; aucune
-# variable ni commande modifiable par l'opérateur de la VM.
+# dbgstat disabled-since-boot, donc pas l'image de débogage) ; commande non
+# modifiable. Une seule variable admise, ESSAI_VARIABLE, sans effet sur le
+# programme : sans variable passée, le jeton ne porte pas
+# submods.container.env_override et le client de référence le refuse
+# (ARCHITECTURE.md §2.3) ; les VM la reçoivent par tee-env-ESSAI_VARIABLE.
 LABEL "tee.launch_policy.log_redirect"="always" \
-      "tee.launch_policy.allow_cmd_override"="false"
+      "tee.launch_policy.allow_cmd_override"="false" \
+      "tee.launch_policy.allow_env_override"="ESSAI_VARIABLE"
 COPY --from=construction /sortie/essai /essai
 # Port ouvert par le lanceur (EXPOSE) ; le pare-feu du VPC ne l'ouvre qu'au
 # tunnel IAP.
